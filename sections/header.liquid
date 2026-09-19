@@ -235,6 +235,41 @@
         }
       });
 
+      // Smart Sticky Header on scroll up (matching reference site)
+      let lastScrollY = window.scrollY;
+      const headerGroup = document.querySelector('.shopify-section-group-header-group') || document.querySelector('.header-section');
+      const topShell = document.querySelector('.site-top-shell');
+
+      function onHeaderScroll() {
+        const currentY = window.scrollY;
+        const isSearchOpen = searchOverlay && searchOverlay.classList.contains('open');
+        const isNavOpen = nav && nav.classList.contains('open');
+
+        if (isSearchOpen || isNavOpen || currentY <= 20) {
+          if (headerGroup) headerGroup.classList.remove('is-hidden');
+          if (topShell) topShell.classList.remove('is-hidden');
+          lastScrollY = currentY;
+          return;
+        }
+
+        const diff = currentY - lastScrollY;
+        if (Math.abs(diff) < 6) return;
+
+        if (diff > 0) {
+          // Scrolling down -> hide header smoothly
+          if (headerGroup) headerGroup.classList.add('is-hidden');
+          if (topShell) topShell.classList.add('is-hidden');
+        } else {
+          // Scrolling up ("top ma scroll kariye") -> reveal sticky header smoothly
+          if (headerGroup) headerGroup.classList.remove('is-hidden');
+          if (topShell) topShell.classList.remove('is-hidden');
+        }
+
+        lastScrollY = currentY;
+      }
+
+      window.addEventListener('scroll', onHeaderScroll, { passive: true });
+
       // Live update cart count
       function updateCartCount() {
         fetch('/cart.js')

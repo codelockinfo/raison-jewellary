@@ -1,0 +1,205 @@
+{%- comment -%}
+  Riseon Jewels - Luxury Product Card Snippet
+  Matches: https://riseon-jewels.r-katariya56.chatgpt.site/jewellery/rings
+  Parameters:
+    - product: Product object (or card_product)
+    - show_wishlist: Boolean (default: settings.card_show_wishlist)
+    - show_badge: Boolean (default: settings.card_show_badge)
+    - show_subtitle: Boolean (default: settings.card_show_subtitle)
+    - show_tags: Boolean (default: settings.card_show_tags)
+    - show_view_button: Boolean (default: settings.card_show_view_button)
+    - view_button_text: String (default: settings.card_view_button_text)
+    - custom_badge: String
+    - custom_subtitle: String
+    - custom_tags: String
+    - custom_image: Image object or URL
+    - custom_title: String
+    - custom_price: String
+    - custom_compare_price: String
+    - custom_url: String
+{%- endcomment -%}
+
+{%- liquid
+  assign prod = product | default: card_product
+
+  if show_wishlist == nil
+    assign show_wishlist = settings.card_show_wishlist
+    if show_wishlist == nil
+      assign show_wishlist = true
+    endif
+  endif
+
+  if show_badge == nil
+    assign show_badge = settings.card_show_badge
+    if show_badge == nil
+      assign show_badge = true
+    endif
+  endif
+
+  if show_subtitle == nil
+    assign show_subtitle = settings.card_show_subtitle
+    if show_subtitle == nil
+      assign show_subtitle = true
+    endif
+  endif
+
+  if show_tags == nil
+    assign show_tags = settings.card_show_tags
+    if show_tags == nil
+      assign show_tags = true
+    endif
+  endif
+
+  if show_view_button == nil
+    assign show_view_button = settings.card_show_view_button
+    if show_view_button == nil
+      assign show_view_button = true
+    endif
+  endif
+
+  assign btn_text = view_button_text | default: settings.card_view_button_text | default: 'VIEW DESIGN →'
+  assign default_sub = settings.card_default_subtitle | default: '14K Rose Gold · Laboratory-Grown Diamond'
+  assign default_badge_txt = settings.card_default_badge | default: 'NEW'
+  assign default_tags_txt = settings.card_default_tags | default: 'Ready-stock preview · Marquise · Floral'
+
+  if prod != blank
+    assign card_url = prod.url
+    assign card_title = prod.title
+    assign card_price = prod.price | money
+    if prod.compare_at_price > prod.price
+      assign card_compare_price = prod.compare_at_price | money
+    else
+      assign card_compare_price = ''
+    endif
+    
+    # Subtitle determination
+    if custom_subtitle != blank
+      assign card_subtitle = custom_subtitle
+    elsif prod.metafields.custom.subtitle != blank
+      assign card_subtitle = prod.metafields.custom.subtitle
+    elsif prod.metafields.descriptors.subtitle != blank
+      assign card_subtitle = prod.metafields.descriptors.subtitle
+    elsif prod.type != blank
+      assign card_subtitle = 'Gold · ' | append: prod.type
+    else
+      assign card_subtitle = default_sub
+    endif
+
+    # Badge determination
+    if custom_badge != blank
+      assign card_badge = custom_badge
+    elsif prod.compare_at_price > prod.price
+      assign card_badge = 'SALE'
+    elsif prod.tags contains 'new' or prod.tags contains 'New' or prod.tags contains 'NEW'
+      assign card_badge = 'NEW'
+    elsif prod.tags contains 'bestseller' or prod.tags contains 'Bestseller' or prod.tags contains 'BESTSELLER'
+      assign card_badge = 'BESTSELLER'
+    elsif prod.tags.size > 0
+      assign card_badge = prod.tags.first
+    else
+      assign card_badge = default_badge_txt
+    endif
+
+    # Tags line determination
+    if custom_tags != blank
+      assign card_tags = custom_tags
+    elsif prod.metafields.custom.preview_text != blank
+      assign card_tags = prod.metafields.custom.preview_text
+    elsif prod.tags.size > 1
+      assign tag_list = ''
+      for t in prod.tags limit: 3
+        if forloop.first
+          assign tag_list = t
+        else
+          assign tag_list = tag_list | append: ' · ' | append: t
+        endif
+      endfor
+      assign card_tags = tag_list
+    else
+      assign card_tags = default_tags_txt
+    endif
+
+    # Image
+    if custom_image != blank
+      if custom_image contains 'http' or custom_image contains '//'
+        assign card_image_src = custom_image
+      else
+        assign card_image_src = custom_image | image_url: width: 800
+      endif
+      assign card_image_alt = card_title
+    elsif prod.featured_image != blank
+      assign card_image_src = prod.featured_image | image_url: width: 800
+      assign card_image_alt = prod.featured_image.alt | default: card_title
+    else
+      assign card_image_src = 'https://riseon-jewels.r-katariya56.chatgpt.site/products/nova-petal-ring.jpg'
+      assign card_image_alt = card_title
+    endif
+
+  else
+    # Fallback mock product
+    assign card_url = custom_url | default: '/collections/ring'
+    assign card_title = custom_title | default: 'Nova Petal Ring'
+    assign card_price = custom_price | default: '₹34,990'
+    assign card_compare_price = custom_compare_price | default: '₹40,990'
+    assign card_subtitle = custom_subtitle | default: default_sub
+    assign card_badge = custom_badge | default: default_badge_txt
+    assign card_tags = custom_tags | default: default_tags_txt
+    assign card_image_src = custom_image | default: 'https://riseon-jewels.r-katariya56.chatgpt.site/products/nova-petal-ring.jpg'
+    assign card_image_alt = card_title
+  endif
+-%}
+
+<article class="collection-card product-card" data-product-id="{{ prod.id }}">
+  <a href="{{ card_url }}" class="collection-card-image product-image" aria-label="{{ card_title | escape }}">
+    <img 
+      src="{{ card_image_src }}" 
+      alt="{{ card_image_alt | escape }}" 
+      loading="lazy"
+      width="600"
+      height="600"
+      style="object-position: center;"
+    >
+    {%- if show_badge and card_badge != blank -%}
+      <span class="badge">{{ card_badge }}</span>
+    {%- endif -%}
+  </a>
+
+  {%- if show_wishlist -%}
+    <button 
+      type="button" 
+      class="collection-wish wishlist-btn js-wishlist-toggle" 
+      aria-label="Save {{ card_title | escape }}"
+      data-product-handle="{{ prod.handle | default: card_title | handleize }}"
+      data-product-id="{{ prod.id }}"
+    >
+      <span class="wishlist-icon">♥</span>
+    </button>
+  {%- endif -%}
+
+  <div class="collection-card-copy product-info">
+    {%- if show_subtitle and card_subtitle != blank -%}
+      <p class="card-subtitle">{{ card_subtitle }}</p>
+    {%- endif -%}
+
+    <h3 class="card-title">
+      <a href="{{ card_url }}">{{ card_title }}</a>
+    </h3>
+
+    <div class="card-price-row">
+      <strong>{{ card_price }}</strong>
+      {%- if card_compare_price != blank and card_compare_price != card_price -%}
+        <del>{{ card_compare_price }}</del>
+      {%- endif -%}
+    </div>
+
+    {%- if show_tags and card_tags != blank -%}
+      <small class="card-tags">{{ card_tags }}</small>
+    {%- endif -%}
+
+    {%- if show_view_button -%}
+      <a href="{{ card_url }}" class="collection-view">
+        {{ btn_text }}
+      </a>
+    {%- endif -%}
+  </div>
+</article>

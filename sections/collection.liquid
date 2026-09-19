@@ -1,1045 +1,586 @@
 {% comment %}
-  Collection Page Template
-  - Sidebar with filters (Color, Price, Size, etc.)
-  - specific 3 column grid (adjustable)
-  - Toolbar with Sort and Limit
-  - Adjustable Product Card Style (Horizontal, Vertical, Static)
+  Riseon Jewels - Luxury Collection Page Section
+  Matches: https://riseon-jewels.r-katariya56.chatgpt.site/jewellery/rings
 {% endcomment %}
+
+{%- paginate collection.products by section.settings.products_per_page -%}
+<div class="collection-page-wrap" id="CollectionSection-{{ section.id }}" data-section-id="{{ section.id }}">
+  
+  {%- if section.settings.show_breadcrumbs -%}
+    <div class="collection-crumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>›</span>
+      <a href="{{ routes.all_products_collection_url }}">Jewellery</a>
+      <span>›</span>
+      <strong>{{ section.settings.custom_collection_title | default: collection.title }}</strong>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_collection_title -%}
+    {%- liquid
+      assign meta_title = collection.metafields.custom.display_title
+      if meta_title != blank
+        assign resolved_title = meta_title
+      elsif section.settings.custom_collection_title != blank
+        assign resolved_title = section.settings.custom_collection_title
+      else
+        assign resolved_title = collection.title
+      endif
+    -%}
+    <div class="collection-header-banner">
+      <h1 class="collection-main-title">
+        {{ resolved_title }}
+      </h1>
+      {%- if section.settings.show_collection_description and collection.description != blank -%}
+        <div class="collection-main-description">
+          {{ collection.description }}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Tag Pill Filter Blocks — below collection title {%- endcomment -%}
+  {%- assign has_pill_blocks = false -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'tag_pill_filter' -%}{%- assign has_pill_blocks = true -%}{%- endif -%}
+  {%- endfor -%}
+  {%- if has_pill_blocks -%}
+    <div class="grid-pill-filters">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'tag_pill_filter' -%}
+          {%- assign pill_tag = block.settings.tag | strip -%}
+          {%- assign pill_tag_handle = pill_tag | handle -%}
+          {%- assign pill_label = block.settings.title | default: pill_tag -%}
+          {%- assign pill_active = false -%}
+          {%- if current_tags contains pill_tag -%}
+            {%- assign pill_active = true -%}
+          {%- endif -%}
+          {%- if pill_tag != blank -%}
+            <a
+              href="{% if pill_active %}{{ collection.url }}{% else %}{{ collection.url }}/{{ pill_tag_handle }}{% endif %}"
+              class="grid-pill {% if pill_active %}active{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {{ pill_label }}
+              {%- assign pill_count = 0 -%}
+              {%- for p in collection.products -%}
+                {%- if p.tags contains pill_tag -%}{%- assign pill_count = pill_count | plus: 1 -%}{%- endif -%}
+              {%- endfor -%}
+              <span class="grid-pill-count">{{ pill_count }}</span>
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_style_rail -%}
+    <section class="catalogue-style-rail" aria-label="Shop by style">
+      <div class="catalogue-style-heading">
+        {%- if section.settings.show_style_rail_eyebrow and section.settings.style_rail_eyebrow != blank -%}
+          <span>{{ section.settings.style_rail_eyebrow }}</span>
+        {%- endif -%}
+        {%- if section.settings.show_style_rail_title and section.settings.style_rail_title != blank -%}
+          <h1>{{ section.settings.style_rail_title }}</h1>
+        {%- endif -%}
+      </div>
+
+      <div class="catalogue-style-options">
+        <a href="{{ collection.url }}" class="style-pill {% unless current_tags %}active{% endunless %}">
+          All {{ collection.title }}
+        </a>
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'style_item' -%}
+            {%- assign filter_handle = block.settings.tag | handle -%}
+            {%- assign is_active = false -%}
+            {%- if current_tags contains block.settings.tag -%}
+              {%- assign is_active = true -%}
+            {%- endif -%}
+            <a 
+              href="{% if block.settings.link != blank %}{{ block.settings.link }}{% elsif block.settings.tag != blank %}{{ collection.url }}/{{ filter_handle }}{% else %}#{% endif %}" 
+              class="style-pill {% if is_active %}active{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.title | default: block.settings.tag }}
+              {%- if block.settings.count != blank -%}
+                <small>{{ block.settings.count }}</small>
+              {%- endif -%}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  <div class="collection-toolbar">
+    {%- if section.settings.show_filters and collection.all_products_count > 0 -%}
+      {%- liquid
+        assign active_count = current_tags.size
+        for f in collection.filters
+          assign active_count = active_count | plus: f.active_values.size
+          if f.type == 'price_range' and f.min_value.value != nil or f.max_value.value != nil
+            assign active_count = active_count | plus: 1
+          endif
+        endfor
+      -%}
+      <button type="button" class="mobile-filter-trigger js-filter-drawer-open" aria-label="Open filters">
+        FILTERS{% if active_count > 0 %} ({{ active_count }}){% endif %}
+      </button>
+    {%- endif -%}
+
+    <span class="collection-counter">
+      <strong>{{ paginate.items }}</strong> of {{ collection.all_products_count | default: paginate.items }} designs
+    </span>
+
+    {%- if section.settings.show_sort_by -%}
+      <label class="collection-sort-label">
+        Sort by
+        <select id="SortBy" name="sort_by" class="collection-sort-select" onchange="location.href = this.value">
+          {%- for option in collection.sort_options -%}
+            <option 
+              value="{{ collection.url }}?sort_by={{ option.value }}" 
+              {% if option.value == collection.sort_by %}selected{% endif %}
+            >
+              {{ option.name }}
+            </option>
+          {%- endfor -%}
+        </select>
+      </label>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Active filter tags row {%- endcomment -%}
+  {%- liquid
+    assign has_active_filters = false
+    if current_tags.size > 0
+      assign has_active_filters = true
+    endif
+    for filter in collection.filters
+      if filter.active_values.size > 0 or filter.min_value.value != nil or filter.max_value.value != nil
+        assign has_active_filters = true
+        break
+      endif
+    endfor
+  -%}
+
+  {%- if has_active_filters -%}
+    <div class="active-filter-row">
+      {%- for tag in current_tags -%}
+        <a href="{{ collection.url }}" class="active-filter-pill">
+          {{ tag }} ✕
+        </a>
+      {%- endfor -%}
+      {%- for filter in collection.filters -%}
+        {%- for value in filter.active_values -%}
+          <a href="{{ value.url_to_remove }}" class="active-filter-pill">
+            {{ value.label | escape }} ✕
+          </a>
+        {%- endfor -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+            <a href="{{ filter.url_to_remove }}" class="active-filter-pill">
+              {{ filter.min_value.value | default: 0 | money }} - {{ filter.max_value.value | default: filter.range_max | money }} ✕
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <a href="{{ collection.url }}" class="clear-all-filters clear">Clear all</a>
+    </div>
+  {%- endif -%}
+
+  <div class="collection-shell">
+    
+    {%- if section.settings.show_filters and collection.all_products_count > 0 -%}
+      <aside class="collection-filters" id="CollectionSidebar">
+        <div class="filter-title">
+          <strong>{{ section.settings.filters_title | default: 'FILTERS' }}</strong>
+          <button type="button" class="js-filter-drawer-close" aria-label="Close filters">✕</button>
+        </div>
+
+        <form class="filter-form" id="CollectionFilterForm">
+          {%- if section.settings.filter_type == 'storefront' and collection.filters.size > 0 -%}
+            {%- for filter in collection.filters -%}
+              <details class="filter-group">
+                <summary>{{ filter.label }}</summary>
+                <div>
+                  {%- case filter.type -%}
+                    {%- when 'boolean' or 'list' -%}
+                      {%- for value in filter.values -%}
+                        <label class="{% if value.count == 0 and value.active == false %}unavailable{% endif %}">
+                          <input 
+                            type="checkbox" 
+                            name="{{ value.param_name }}" 
+                            value="{{ value.value }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                            onchange="this.form.submit()"
+                          >
+                          <span>{{ value.label }}</span>
+                          <small>{{ value.count }}</small>
+                        </label>
+                      {%- endfor -%}
+
+                    {%- when 'price_range' -%}
+                      <div class="filter-price-inputs">
+                        <input 
+                          type="number" 
+                          name="{{ filter.min_value.param_name }}" 
+                          placeholder="Min" 
+                          value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                        >
+                        <span>-</span>
+                        <input 
+                          type="number" 
+                          name="{{ filter.max_value.param_name }}" 
+                          placeholder="Max" 
+                          value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                        >
+                      </div>
+                      <button type="submit" class="filter-apply-btn">Apply</button>
+                  {%- endcase -%}
+                </div>
+              </details>
+            {%- endfor -%}
+
+          {%- else -%}
+            {%- comment -%} Custom blocks mode {%- endcomment -%}
+            {%- for block in section.blocks -%}
+              {%- case block.type -%}
+                {%- when 'tag_filter' -%}
+                  {%- assign tags_arr = block.settings.tags_list | split: ',' -%}
+                  {%- if tags_arr.size > 0 -%}
+                    <details class="filter-group" {{ block.shopify_attributes }}>
+                      <summary>{{ block.settings.title | default: 'Filter' }}</summary>
+                      <div>
+                        {%- for raw_tag in tags_arr -%}
+                          {%- assign t = raw_tag | strip -%}
+                          {%- assign t_handle = t | handle -%}
+                          {%- assign is_active = false -%}
+                          {%- if current_tags contains t -%}
+                            {%- assign is_active = true -%}
+                          {%- endif -%}
+                          <label class="{% if is_active %}active{% endif %}">
+                            <input 
+                              type="checkbox" 
+                              {% if is_active %}checked{% endif %}
+                              onchange="location.href='{% if is_active %}{{ collection.url }}{% else %}{{ collection.url }}/{{ t_handle }}{% endif %}'"
+                            >
+                            <span>{{ t }}</span>
+                          </label>
+                        {%- endfor -%}
+                {%- when 'variant_filter' -%}
+                  <details class="filter-group" {{ block.shopify_attributes }}>
+                    <summary>{{ block.settings.title | default: 'Color' }}</summary>
+                    <div>
+                      {%- for filter in collection.filters -%}
+                        {%- if filter.label contains block.settings.variant_label or filter.label contains 'Color' -%}
+                          {%- for value in filter.values -%}
+                            <label class="{% if value.count == 0 and value.active == false %}unavailable{% endif %}">
+                              <input 
+                                type="checkbox" 
+                                name="{{ value.param_name }}" 
+                                value="{{ value.value }}"
+                                {% if value.active %}checked{% endif %}
+                                onchange="this.form.submit()"
+                              >
+                              <span>{{ value.label }}</span>
+                              <small>{{ value.count }}</small>
+                            </label>
+                          {%- endfor -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  </details>
+              {%- endcase -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </form>
+
+        <button type="button" class="filter-apply js-filter-drawer-close">
+          Show {{ paginate.items }} designs
+        </button>
+      </aside>
+    {%- endif -%}
+
+    <section class="collection-results" aria-live="polite">
+
+      {%- if collection.products.size > 0 -%}
+        <div class="collection-grid cols-desktop-{{ section.settings.columns_desktop }} cols-mobile-{{ section.settings.columns_mobile }}">
+          {%- for product in collection.products -%}
+            {%- render 'product-card', product: product -%}
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <div class="collection-pagination" style="text-align: center; margin: 45px 0 20px;">
+            {{ paginate | default_pagination }}
+          </div>
+        {%- endif -%}
+
+      {%- else -%}
+        <div class="collection-empty">
+          <span>◇</span>
+          <h2>No products found</h2>
+          <p>Try clearing active filters or browse all categories.</p>
+          <a href="{{ collection.url }}" class="btn primary" style="margin-top: 15px; display: inline-block;">Clear Filters</a>
+        </div>
+      {%- endif -%}
+    </section>
+
+  </div>
+  
+  <div class="filter-scrim js-filter-drawer-close" aria-hidden="true"></div>
+</div>
+{%- endpaginate -%}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const openBtns = document.querySelectorAll('.js-filter-drawer-open');
+    const closeBtns = document.querySelectorAll('.js-filter-drawer-close');
+    const sidebar = document.getElementById('CollectionSidebar');
+    const scrim = document.querySelector('.filter-scrim');
+
+    openBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (sidebar) sidebar.classList.add('open');
+        if (scrim) scrim.style.display = 'block';
+      });
+    });
+
+    closeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (sidebar) sidebar.classList.remove('open');
+        if (scrim) scrim.style.display = 'none';
+      });
+    });
+  });
+</script>
 
 {% schema %}
 {
-  "name": "Collection Page",
+  "name": "Collection Grid",
+  "class": "collection-page-section",
   "settings": [
     {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "scheme-1"
+      "type": "header",
+      "content": "Breadcrumbs & Heading"
     },
     {
       "type": "checkbox",
       "id": "show_breadcrumbs",
-      "default": true,
-      "label": "Show Breadcrumbs"
+      "label": "Show Breadcrumbs",
+      "default": true
     },
     {
       "type": "checkbox",
       "id": "show_collection_title",
-      "default": true,
-      "label": "Show collection title"
+      "label": "Show Collection Title",
+      "default": true
     },
     {
-      "type": "select",
-      "id": "lazy_load",
-
-      "label": "Image Loading",
-      "options": [
-        { "value": "lazy", "label": "Lazy" },
-        { "value": "eager", "label": "Eager" }
-      ],
-      "default": "lazy"
+      "type": "text",
+      "id": "custom_collection_title",
+      "label": "Custom Collection Title (Override)",
+      "info": "Priority: Metafield (custom.display_title) → This field → Default collection title. To use metafield: Shopify Admin → Content → Metafields → Collections → add key 'display_title' in namespace 'custom'."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Show Collection Description",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Style Filter Rail (Top)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_style_rail",
+      "label": "Show Style Filter Rail",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_style_rail_eyebrow",
+      "label": "Show Eyebrow Text",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "style_rail_eyebrow",
+      "label": "Eyebrow Text (e.g. FIND YOUR FIT)",
+      "default": "FIND YOUR FIT"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_style_rail_title",
+      "label": "Show Heading Text",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "style_rail_title",
+      "label": "Heading Text (e.g. Shop by Style)",
+      "default": "Shop by Style"
+    },
+    {
+      "type": "header",
+      "content": "Product Grid Columns"
     },
     {
       "type": "range",
       "id": "products_per_page",
-      "min": 8,
+      "label": "Products per page",
+      "min": 6,
       "max": 48,
-      "step": 4,
-      "default": 24,
-      "label": "Products per page"
+      "step": 2,
+      "default": 24
     },
     {
-      "type": "range",
+      "type": "select",
       "id": "columns_desktop",
-      "min": 2,
-      "max": 5,
-      "step": 1,
-      "default": 3,
-      "label": "Products per row (Desktop)"
+      "label": "Products per row (Desktop)",
+      "options": [
+        { "value": "2", "label": "2 Cards" },
+        { "value": "3", "label": "3 Cards" },
+        { "value": "4", "label": "4 Cards" }
+      ],
+      "default": "3"
     },
     {
       "type": "select",
       "id": "columns_mobile",
+      "label": "Products per row (Mobile)",
       "options": [
-        { "value": "1", "label": "1 Column" },
-        { "value": "2", "label": "2 Columns" }
+        { "value": "1", "label": "1 Card" },
+        { "value": "2", "label": "2 Cards" },
+        { "value": "3", "label": "3 Cards" },
+        { "value": "4", "label": "4 Cards" }
       ],
-      "default": "2",
-      "label": "Products per row (Mobile)"
+      "default": "2"
     },
     {
       "type": "header",
-      "content": "Sorting and Filtering"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_sort_by",
-      "default": true,
-      "label": "Enable sorting"
+      "content": "Filters & Sorting"
     },
     {
       "type": "checkbox",
       "id": "show_filters",
-      "default": true,
-      "label": "Enable filtering"
+      "label": "Show Filters Sidebar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "filters_title",
+      "label": "Filters Title",
+      "default": "FILTERS"
     },
     {
       "type": "select",
       "id": "filter_type",
-      "label": "Filters type",
-      "default": "storefront",
+      "label": "Filters Type",
       "options": [
-        { "value": "storefront", "label": "Storefront filters" },
-        { "value": "custom", "label": "Filter by custom tags" }
+        { "value": "storefront", "label": "Storefront Filters (Shopify Native)" },
+        { "value": "custom", "label": "Custom Tag Blocks" }
       ],
-      "info": "Choose 'Filter by custom tags' to use the blocks added below."
-    },
-   {
-  "type": "select",
-  "id": "filters_position",
-  "label": "Filters position",
-  "default": "sidebar",
-  "options": [
-    { "value": "sidebar", "label": "Sidebar" },
-    { "value": "drawer", "label": "Drawer" }
-  ]
-},
-    {
-      "type": "text",
-      "id": "filters_title",
-      "label": "Filters title",
-      "default": "Filters"
-    },
-    {
-  "type": "header",
-  "content": "Collection Banners"
-},
-{
-  "type": "image_picker",
-  "id": "banner_1",
-  "label": "Banner after 4th product"
-},
-{
-  "type": "url",
-  "id": "banner_1_link",
-  "label": "Banner 1 Link"
-},
-{
-  "type": "image_picker",
-  "id": "banner_2",
-  "label": "Banner after 10th product"
-},
-{
-  "type": "url",
-  "id": "banner_2_link",
-  "label": "Banner 2 Link"
-},
-    {
-      "type": "header",
-      "content": "Product Card Settings"
-    },
-    {
-      "type": "select",
-      "id": "product_card_style",
-      "label": "Product Card Style",
-      "options": [
-        { "value": "vertical", "label": "Vertical Hover" },
-        { "value": "horizontal", "label": "Horizontal Hover" },
-        { "value": "static", "label": "Static (Always Visible)" }
-      ],
-      "default": "vertical"
+      "default": "storefront"
     },
     {
       "type": "checkbox",
-      "id": "show_wishlist",
-      "default": true,
-      "label": "Show Wishlist Button"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_quick_view",
-      "default": true,
-      "label": "Show Quick View Button"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_compare",
-      "default": true,
-      "label": "Show Compare Button"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_add_to_cart",
-      "default": true,
-      "label": "Show Add to Cart Button"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_colors",
-      "default": true,
-      "label": "Show Color Swatches"
-    },
-
-    {
-      "type": "select",
-      "id": "default_media_type",
-      "label": "Default Media Type",
-      "options": [
-        { "value": "image", "label": "Image" },
-        { "value": "video", "label": "Video" }
-      ],
-      "default": "image"
+      "id": "show_sort_by",
+      "label": "Show Sort By Dropdown",
+      "default": true
     }
   ],
   "blocks": [
     {
-      "type": "@app"
-    },
-    {
-      "type": "tag_filter",
-      "name": "Filter by tags",
+      "type": "style_item",
+      "name": "Style Filter Pill",
       "settings": [
-        {
-          "type": "select",
-          "id": "design",
-          "label": "Design",
-          "options": [
-            { "value": "list", "label": "List" },
-            { "value": "button", "label": "Button" }
-          ],
-          "default": "button"
-        },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
-          "default": "Size"
+          "label": "Pill Title",
+          "default": "Everyday Rings"
         },
         {
-          "type": "textarea",
-          "id": "tags_list",
-          "label": "Tags List",
-          "info": "Comma separated list of tags. Example: XS, S, M, L, XL"
+          "type": "text",
+          "id": "tag",
+          "label": "Tag Filter (optional)",
+          "default": "Everyday"
         },
         {
-          "type": "checkbox",
-          "id": "show_color_with_label",
-          "label": "Show color with label",
-          "default": false
+          "type": "text",
+          "id": "count",
+          "label": "Count Badge (optional)",
+          "default": "1"
         },
         {
-          "type": "checkbox",
-          "id": "work_with_filter_colors",
-          "label": "Work with filter colors",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "enable_collapsible",
-          "label": "Enable collapsible",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "expand_by_default",
-          "label": "Expand by default",
-          "default": true
+          "type": "url",
+          "id": "link",
+          "label": "Custom Link (optional)"
         }
       ]
     },
     {
-      "type": "metafield_filter",
-      "name": "Filter by metafield",
+      "type": "tag_filter",
+      "name": "Custom Tag Filter",
       "settings": [
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
-          "default": "Color"
-        },
-        {
-          "type": "text",
-          "id": "namespace",
-          "label": "Metafield Namespace",
-          "default": "custom"
-        },
-        {
-          "type": "text",
-          "id": "key",
-          "label": "Metafield Key",
-          "default": "color"
+          "label": "Filter Group Title",
+          "default": "Ring Type"
         },
         {
           "type": "textarea",
-          "id": "values",
-          "label": "Metafield Values",
-          "info": "Comma separated list of values. Example: Red, Blue, Green"
-        },
-        {
-          "type": "select",
-          "id": "design",
-          "label": "Design",
-          "options": [
-            { "value": "list", "label": "List" },
-            { "value": "button", "label": "Button" }
-          ],
-          "default": "list"
-        },
-        {
-           "type": "checkbox",
-           "id": "work_with_filter_colors",
-           "label": "Work with filter colors",
-           "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "enable_collapsible",
-          "label": "Enable collapsible",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "expand_by_default",
-          "label": "Expand by default",
-          "default": true
+          "id": "tags_list",
+          "label": "Tags (comma separated)",
+          "default": "Solitaire, Everyday, Engagement, Cocktail, Band, Eternity"
         }
       ]
     },
     {
       "type": "variant_filter",
-      "name": "Filter by variant",
+      "name": "Variant Filter",
       "settings": [
         {
           "type": "text",
           "id": "title",
           "label": "Title",
-          "default": "Size"
+          "default": "Gold Purity"
         },
         {
           "type": "text",
           "id": "variant_label",
-          "label": "Variant Label",
-          "info": "Enter the variant name exactly as it appears in Shopify Admin (e.g. Size, Color, Material)",
-          "default": "Size"
-        },
-        {
-          "type": "select",
-          "id": "design",
-          "label": "Design",
-          "options": [
-            { "value": "list", "label": "List" },
-            { "value": "button", "label": "Button" }
-          ],
-          "default": "button"
-        },
-        {
-           "type": "checkbox",
-           "id": "show_variant_color_swatch",
-           "label": "Show color swatch",
-           "default": true
-        },
-        {
-           "type": "checkbox",
-           "id": "show_variant_color_name",
-           "label": "Show color name",
-           "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "enable_collapsible",
-          "label": "Enable collapsible",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "expand_by_default",
-          "label": "Expand by default",
-          "default": true
+          "label": "Option Name",
+          "default": "Purity"
         }
       ]
+    },
+    {
+      "type": "tag_pill_filter",
+      "name": "Tag Pill Filter (Grid)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Pill Label",
+          "info": "Displayed text on the pill button",
+          "default": "Solitaire"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Product Tag",
+          "info": "Exact tag name on products to filter (e.g. Solitaire)",
+          "default": "Solitaire"
+        }
+      ]
+    },
+    {
+      "type": "@app"
     }
   ]
 }
 {% endschema %}
-
-{{ 'collection.css' | asset_url | stylesheet_tag: preload: true }}
-<script src="{{ 'collection-grid-selector.js' | asset_url }}" defer></script>
-
- <style>
-   .collection-page-wrapper {
-     min-height: 80vh;
-     display: block !important;
-   }
-   .collection-no-products {
-     min-height: 500px;
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
-   }
-   .filter-drawer-overlay {
-     display: none;
-   }
-   .filter-drawer-overlay.active {
-     display: block;
-   }
- </style>
-
-<div class="collection-page-wrapper container_width color-{{ section.settings.color_scheme }} skeleton-container">
-  <!-- Filter Drawer Overlay -->
-  <div class="filter-drawer-overlay" onclick="closeFilterDrawer()"></div>
-
-  {%- comment -%} SKELETON VISIBLE START {%- endcomment -%}
-  <div class="skeleton-visible">
-    <div class="{% if section.settings.container_type == 'container' %}container-box{% else %}full-width{% endif %}">
-      {% if section.settings.show_collection_title %}
-        <div class="collection-title-container" style="text-align: center; margin-bottom: 40px;">
-          <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 48px; width: 300px; margin: 0 auto 10px;"></div>
-          <div class="skeleton-box skeleton-shimmer skeleton-text" style="height: 20px; width: 100px; margin: 0 auto;"></div>
-        </div>
-      {% endif %}
-
-      <div class="layout-collection-container" style="display: flex; gap: 0;">
-        {% if section.settings.show_filters and section.settings.filters_position == 'sidebar' %}
-          <aside class="layout-collection-sidebar" style="width: 280px; flex: 0 0 280px; padding-right: 30px;">
-            <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 30px; width: 150px; margin-bottom: 25px;"></div>
-            {% for i in (1..5) %}
-              <div style="margin-bottom: 30px;">
-                <div class="skeleton-box skeleton-shimmer skeleton-text medium" style="margin-bottom: 12px; height: 24px;"></div>
-                <div class="skeleton-box skeleton-shimmer skeleton-text short" style="margin-bottom: 8px;"></div>
-                <div class="skeleton-box skeleton-shimmer skeleton-text short"></div>
-              </div>
-            {% endfor %}
-          </aside>
-        {% endif %}
-
-        <main class="layout-collection-main" style="flex: 1; min-width: 0;">
-          <div class="layout-collection-toolbar" style="margin-bottom: 30px; height: 60px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee;">
-            <div class="skeleton-box skeleton-shimmer" style="height: 24px; width: 150px; border-radius: 4px;"></div>
-            <div style="display: flex; gap: 15px;">
-              <div class="skeleton-box skeleton-shimmer" style="height: 36px; width: 120px; border-radius: 4px;"></div>
-              <div class="skeleton-box skeleton-shimmer" style="height: 36px; width: 150px; border-radius: 4px;"></div>
-            </div>
-          </div>
-
-          <div class="layout-product-grid" style="display: grid; grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr); gap: 30px;">
-            {% for i in (1..12) %}
-              <div class="skeleton-item" style="margin-bottom: 30px;">
-                <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: 0.8; border-radius: 4px; margin-bottom: 15px;"></div>
-                <div class="skeleton-box skeleton-shimmer skeleton-text medium" style="margin-bottom: 10px; height: 20px; width: 80%; margin-left: auto; margin-right: auto;"></div>
-                <div class="skeleton-box skeleton-shimmer skeleton-text short" style="height: 16px; width: 40%; margin-left: auto; margin-right: auto;"></div>
-              </div>
-            {% endfor %}
-          </div>
-        </main>
-      </div>
-    </div>
-  </div>
-{%- comment -%} SKELETON VISIBLE END {%- endcomment -%}
-
-  {%- comment -%} ACTUAL CONTENT WRAPPER {%- endcomment -%}
-  <div class="content-visible">
-     <!-- Filter Drawer -->
-     {% if collection.all_products_count > 0 %}
-     <div class="filter-drawer">
-      <div class="filter-drawer-header">
-        <h3 class="filter-drawer-title">{{ section.settings.filters_title | default: 'Filters' }}</h3>
-        <button class="filter-drawer-close" onclick="closeFilterDrawer()" aria-label="Close filters">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="filter-drawer-content">
-        {% if section.settings.filter_type == 'storefront' %}
-          {% render 'collection-sidebar', results: collection %}
-        {% else %}
-          {%- comment -%} Automatically show Price and Availability for custom mode {%- endcomment -%}
-          {%- for filter in collection.filters -%}
-            {%- if filter.type == 'price_range' or filter.param_name contains 'availability' -%}
-              {%- render 'standard-filter-item', filter: filter -%}
-            {%- endif -%}
-          {%- endfor -%}
-  
-          {% for block in section.blocks %}
-              {% case block.type %}
-                {% when '@app' %}
-                  {% render block %}
-                {% when 'tag_filter' %}
-                  {% render 'tag-filter', block: block %}
-                {% when 'metafield_filter' %}
-                  {% render 'metafield-filter', block: block %}
-                {% when 'variant_filter' %}
-                  {% render 'variant-filter', block: block %}
-              {% endcase %}
-          {% endfor %}
-          
-        {% endif %}
-      </div>
-     </div>
-     {% endif %}
-   
-     <!-- Mobile Sort Dropdown -->
-     {% if collection.all_products_count > 0 %}
-     <div class="mobile-sort-dropdown">
-      <ul class="mobile-sort-options">
-        {% for option in collection.sort_options %}
-          <li class="mobile-sort-option {% if option.value == collection.sort_by %}active{% endif %}" 
-              onclick="updateSortBy('{{ option.value }}'); closeSortDropdown();">
-            {{ option.name }}
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-     {% endif %}
-    <div class="{% if section.settings.container_type == 'container' %}container-box{% else %}full-width{% endif %}">
-      {% if section.settings.show_breadcrumbs %}
-        <div class="collection-breadcrumbs-wrapper">
-          {% render 'breadcrumbs' %}
-        </div>
-      {% endif %}
-      {% if section.settings.show_collection_title %}
-        <div class="collection-title-container">
-            <h1 class="collection-title">{{ collection.title }}</h1>
-             {% if collection.products_count > 0 %}
-              <div class="product-count">
-                {{ collection.products_count }}
-                {% if collection.products_count == 1 %}product{% else %}products{% endif %}
-              </div>
-            {% endif %}
-          </div>
-      {% endif %}
-    
-      <div class="collection-container">
-
-
-     {% if section.settings.show_filters and collection.all_products_count > 0 %}
-     <aside class="collection-sidebar {% if section.settings.filters_position == 'drawer' %}is-drawer-mode{% endif %}" id="desktop-sidebar">
-      
-      {% if section.settings.filters_position == 'drawer' %}
-       <div class="sidebar-header-btn-wrapper">
-         <button class="desktop-filter-btn sidebar-btn" aria-label="Open filters" onclick="openFilterDrawer()">
-           <svg xmlns="https://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-3-3a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
-            </svg>
-            {{ section.settings.filters_title }} 
-         </button>
-       </div>
-      {% endif %}
-
-      {% if section.settings.filters_title != blank %}
-        <h3 class="sidebar-title">{{ section.settings.filters_title }}</h3>
-      {% endif %}
-
-      {% if section.settings.filter_type == 'storefront' %}
-        {% render 'collection-sidebar', results: collection %}
-      {% else %}
-        {%- comment -%} Automatically show Price and Availability for custom mode {%- endcomment -%}
-        {%- for filter in collection.filters -%}
-          {%- if filter.type == 'price_range' or filter.param_name contains 'availability' -%}
-            {%- render 'standard-filter-item', filter: filter -%}
-          {%- endif -%}
-        {%- endfor -%}
-        
-        {% comment %} Render blocks or app blocks here {% endcomment %}
-        {% for block in section.blocks %}
-            {% case block.type %}
-              {% when '@app' %}
-                {% render block %}
-              {% when 'tag_filter' %}
-                {% render 'tag-filter', block: block %}
-              {% when 'metafield_filter' %}
-                {% render 'metafield-filter', block: block %}
-              {% when 'variant_filter' %}
-                {% render 'variant-filter', block: block %}
-            {% endcase %}
-        {% endfor %}
-      {% endif %}
-    </aside>
-    {% endif %}
-
-     <main class="collection-main">
-       
-       {% if collection.all_products_count > 0 %}
-       <div class="collection-toolbar">
-        <div class="collection-page-header {% if section.settings.filters_position == 'drawer' %}is-drawer{% else %}is-sidebar{% endif %}">
-              {% if section.settings.show_filters and section.settings.filters_position == 'drawer' %}
-                 <button class="desktop-filter-btn" onclick="openFilterDrawer()" aria-label="Open filters">
-                   <svg xmlns="https://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-3-3a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
-                    </svg>
-                   {{ section.settings.filters_title }} 
-                  </button>
-              {% endif %}
-        </div>
-
-
-        <!-- Mobile Filter and Sort Buttons -->
-        <div class="mobile-toolbar-buttons">
-            {% if section.settings.show_filters %}
-            <button class="mobile-filter-btn" aria-label="Open filters" onclick="openFilterDrawer()">
-              {{ section.settings.filters_title }}
-              <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1">
-                <polyline points="3 4.5 6 7.5 9 4.5"></polyline>
-              </svg>
-            </button>
-            {% endif %}
-          
-          {% if section.settings.show_sort_by %}
-          {% assign mobile_sort_name = 'Featured' %}
-            {% for option in collection.sort_options %}
-              {% if option.value == collection.sort_by %}
-                {% assign mobile_sort_name = option.name %}
-              {% endif %}
-            {% endfor %}
-          <button class="mobile-sort-btn" aria-label="Open sort options" onclick="toggleSortDropdown()">
-              <span class="mobile-sort-text">
-                {{ mobile_sort_name }}
-              </span>
-
-                <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1">
-                <polyline points="3 4.5 6 7.5 9 4.5"></polyline>
-              </svg>
-          </button>
-          {% endif %}
-
-          <div class="toolbar-select-wrapper">
-             <div class="media-toggle">
-               <button type="button" class="media-toggle-btn {% if section.settings.default_media_type == 'image' %}active{% endif %}" aria-label="Show images" data-type="image" onclick="setMediaType('image')">
-                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-               </button>
-               <button type="button" class="media-toggle-btn {% if section.settings.default_media_type == 'video' %}active{% endif %}" aria-label="Show videos" data-type="video" onclick="setMediaType('video')">
-                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-               </button>
-             </div>
-          </div>
-
-        </div>
-          {%- liquid
-         assign has_active_filters = false
-         if current_tags.size > 0
-           assign has_active_filters = true
-         endif
-         
-         if has_active_filters == false
-           for filter in collection.filters
-             if filter.active_values.size > 0
-               assign has_active_filters = true
-               break
-             endif
-             if filter.min_value.value != nil or filter.max_value.value != nil
-               assign has_active_filters = true
-               break
-             endif
-           endfor
-         endif
-       -%}
-        {%- if has_active_filters -%}
-          <div class="active-filters">
-            <span class="active-filters-label">Active Filters:</span>
-            {%- if current_tags.size > 0 -%}
-              {%- for tag in current_tags -%}
-                {%- assign tag_handle = tag | handle -%}
-                <a href="javascript:void(0)" onclick="toggleTagFilter('{{ tag_handle }}')" class="active-filter-tag">
-                  {{ tag }}
-                  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
-                </a>
-              {%- endfor -%}
-            {%- endif -%}
-
-            {%- for filter in collection.filters -%}
-              {%- for value in filter.active_values -%}
-                <a href="{{ value.url_to_remove }}" class="active-filter-tag">
-                  {{ value.label | escape }}
-                  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
-                </a>
-              {%- endfor -%}
-              {% if filter.type == "price_range" %}
-                {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
-                  <a href="{{ filter.url_to_remove }}" class="active-filter-tag">
-                    {%- assign min_value = filter.min_value.value | default: 0 -%}
-                    {%- assign max_value = filter.max_value.value | default: filter.range_max -%}
-                    {{ min_value | money }} - {{ max_value | money }}
-                    <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
-                  </a>
-                {%- endif -%}
-              {% endif %}
-            {%- endfor -%}
-            <a href="{{ collection.url }}" class="clear-all-filters">Clear All</a>
-          </div>
-        {%- endif -%} 
-          <div class="toolbar-options">
-            <!-- Media Toggle (Image/Video) -->
-            <div class="toolbar-select-wrapper">
-              <div class="media-toggle">
-                <button type="button" class="media-toggle-btn {% if section.settings.default_media_type == 'image' %}active{% endif %}" aria-label="Show images" data-type="image" onclick="setMediaType('image')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                </button>
-                <button type="button" class="media-toggle-btn {% if section.settings.default_media_type == 'video' %}active{% endif %}" aria-label="Show videos" data-type="video" onclick="setMediaType('video')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Grid Selector -->
-            <div class="toolbar-select-wrapper">
-              <div class="grid-selector">
-                <button type="button" class="grid-selector-btn {% if section.settings.columns_desktop == 1 %}active{% endif %}" aria-label="Show 1 column" data-grid="1" onclick="setGridColumns(1)">
-                    <svg class="m-svg-icon--small" fill="currentColor" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 2.5 12.5">
-                        <path d="M.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75A.76.76 0 010 11.75v-11A.76.76 0 01.75 0z"/>
-                    </svg>
-                </button>
-                <button type="button" class="grid-selector-btn {% if section.settings.columns_desktop == 2 %}active{% endif %}" aria-label="Show 2 columns" data-grid="2" onclick="setGridColumns(2)">
-                  <svg class="m-svg-icon--small" fill="currentColor" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 6.5 12.5">
-                    <path d="M.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 01.75 0z"/><path d="M4.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 014.75 0z"/>
-                  </svg>
-                </button>
-                <button type="button" class="grid-selector-btn {% if section.settings.columns_desktop == 3 %}active{% endif %}" aria-label="Show 3 columns" data-grid="3" onclick="setGridColumns(3)">
-                <svg class="m-svg-icon--small" fill="currentColor" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 9.5 12.5">
-                  <path id="Rectangle" d="M.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 01.75 0z" class="cls-1"></path><path id="Rectangle-2" d="M4.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 014.75 0z" class="cls-1" data-name="Rectangle"></path><path id="Rectangle-3" d="M8.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 018.75 0z" class="cls-1" data-name="Rectangle"></path>
-                </svg>
-                </button>
-                <button type="button" class="grid-selector-btn {% if section.settings.columns_desktop == 4 %}active{% endif %}" aria-label="Show 4 columns" data-grid="4" onclick="setGridColumns(4)">
-                <svg class="m-svg-icon--small" fill="currentColor" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 13.5 12.5">
-                  <path id="Rectangle" d="M.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 01.75 0z" class="cls-1"></path><path id="Rectangle-2" d="M4.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 014.75 0z" class="cls-1" data-name="Rectangle"></path><path id="Rectangle-3" d="M8.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 018.75 0z" class="cls-1" data-name="Rectangle"></path><path id="Rectangle-4" d="M12.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11a.76.76 0 01.75-.75z" class="cls-1" data-name="Rectangle"></path>
-                </svg>
-                </button>
-                <button type="button" class="grid-selector-btn {% if section.settings.columns_desktop == 5 %}active{% endif %}" aria-label="Show 5 columns" data-grid="5" onclick="setGridColumns(5)">
-                <svg class="m-svg-icon--small" fill="currentColor" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 17.5 12.5">
-                  <path id="Rectangle" d="M.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 01.75 0z" class="cls-1"></path><path id="Rectangle-2" d="M4.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 014.75 0z" class="cls-1" data-name="Rectangle"></path><path id="Rectangle-3" d="M8.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11A.76.76 0 018.75 0z" class="cls-1" data-name="Rectangle"></path><path id="Rectangle-4" d="M12.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11a.76.76 0 01.75-.75z" class="cls-1" data-name="Rectangle"></path><path id="Rectangle-5" d="M16.75 0a.76.76 0 01.75.75v11a.76.76 0 01-.75.75.76.76 0 01-.75-.75v-11a.76.76 0 01.75-.75z" class="cls-1" data-name="Rectangle"></path>
-                </svg>
-                </button>
-              </div>
-            </div>
-
-            {% if section.settings.show_sort_by %}
-
-              <div class="toolbar-select-wrapper">
-                <select class="toolbar-select" onchange="updateSortBy(this.value)">
-                  {% for option in collection.sort_options %}
-                    <option
-                      value="{{ option.value }}"
-                      {% if option.value == collection.sort_by %}selected{% endif %}
-                    >
-                      {{ option.name }}
-                    </option>
-                  {% endfor %}
-                </select>
-              </div>
-            {% endif %}
-          </div>
-       </div>
-       {% endif %}
-
-     
-
-      {% paginate collection.products by section.settings.products_per_page %}
-        <div class="product-grid button-shape-{{ settings.product_card_button_shape }} {% if section.settings.default_media_type == 'video' %}show-video{% endif %}" style="--grid-columns: {{ section.settings.columns_desktop }}; --grid-columns-mobile: {{ section.settings.columns_mobile }};">
-          {% for product in collection.products %}
-             {% assign loading_attr = 'lazy' %}
-             {% assign fetch_priority_attr = 'low' %}
-             {% if forloop.index <= 10 %}
-               {% assign loading_attr = 'eager' %}
-               {% assign fetch_priority_attr = 'high' %}
-             {% endif %}
-             
-             {% case section.settings.product_card_style %}
-               {% when 'vertical' %}
-                 {% render 'product-card-vertical', product: product, collection: collection, settings: section.settings, show_video: true, loading: loading_attr, fetchpriority: fetch_priority_attr %}
-               {% when 'horizontal' %}
-                 {% render 'product-card-horizontal', product: product, collection: collection, settings: section.settings, show_video: true, loading: loading_attr, fetchpriority: fetch_priority_attr %}
-               {% when 'static' %}
-                 {% render 'product-card-static', product: product, collection: collection, settings: section.settings, show_video: true, loading: loading_attr, fetchpriority: fetch_priority_attr %}
-               {% else %}
-                 {% render 'product-card-vertical', product: product, collection: collection, settings: section.settings, show_video: true, loading: loading_attr, fetchpriority: fetch_priority_attr %}
-             {% endcase %}
-
-              {% if forloop.index == 4 and section.settings.banner_1 != blank %}
-                <div class="collection-banner-card">
-                  {% if section.settings.banner_1_link != blank %}
-                    <a href="{{ section.settings.banner_1_link }}">
-                  {% endif %}
-
-                  {{
-                    section.settings.banner_1
-                    | image_url: width: 1200
-                    | image_tag: loading: 'lazy'
-                  }}
-
-                  {% if section.settings.banner_1_link != blank %}
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
-
-              {% if forloop.index == 10 and section.settings.banner_2 != blank %}
-                <div class="collection-banner-card">
-                  {% if section.settings.banner_2_link != blank %}
-                    <a href="{{ section.settings.banner_2_link }}">
-                  {% endif %}
-
-                  {{
-                    section.settings.banner_2
-                    | image_url: width: 1200
-                    | image_tag: loading: 'lazy'
-                  }}
-
-                  {% if section.settings.banner_2_link != blank %}
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
-          {% endfor %}
-          
-        </div>
-        {% if collection.products.size == 0 %}
-            <div class="collection-no-products">
-              <div class="no-products-icon">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-              </div>
-              <p>Sorry, there are no products in this collection</p>
-              <a href="../collections/all" class="clear-filters-btn">Continue shopping</a>
-            </div>
-          {% endif %}
-
-        {% if paginate.pages > 1 %}
-          <div class="pagination">
-            {% if paginate.previous %}
-              <a href="{{ paginate.previous.url }}" class="prev">‹</a>
-            {% else %}
-              <span class="prev deco">‹</span>
-            {% endif %}
-
-            {% for part in paginate.parts %}
-              {% if part.is_link %}
-                <a href="{{ part.url }}">{{ part.title }}</a>
-              {% elsif part.title == paginate.current_page %}
-                <span class="current">{{ part.title }}</span>
-              {% else %}
-                <span class="deco">{{ part.title }}</span>
-              {% endif %}
-            {% endfor %}
-
-            {% if paginate.next %}
-              <a href="{{ paginate.next.url }}" class="next">›</a>
-            {% else %}
-              <span class="next deco">›</span>
-            {% endif %}
-          </div>
-        {% endif %}
-      {% endpaginate %}
-    </main>
-  </div>
-  {% if collection.metafields.custom.faqs.value %}
-<section class="collection-faq-section">
-  <div class="faq-container">
-
-    <div class="faq-header">
-      <h2>Frequently Asked Questions</h2>
-    </div>
-
-    <div class="faq-list">
-      {% for faq in collection.metafields.custom.faqs.value %}
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>{{ faq.question }}</span>
-            <span class="faq-arrow"></span>
-          </button>
-
-          <div class="faq-answer">
-            <div class="faq-answer-inner">
-              {{ faq.answer }}
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-
-  </div>
-</section>
-{% endif %}
-
-    </div>
-  </div>
-</div>
-
-<script>
-  function setMediaType(type) {
-    const grid = document.querySelector('.product-grid');
-    const buttons = document.querySelectorAll('.media-toggle-btn');
-    
-    if (!grid) return;
-    
-    buttons.forEach(btn => {
-      if (btn.getAttribute('data-type') === type) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-
-    if (type === 'video') {
-      grid.classList.add('show-video');
-      // For each video in the grid, try to play it
-      setTimeout(() => {
-        grid.querySelectorAll('video').forEach(v => {
-          v.play()
-        });
-      }, 100);
-    } else {
-      grid.classList.remove('show-video');
-      // Pause all videos when switching to image mode
-      grid.querySelectorAll('video').forEach(v => {
-        v.pause();
-      });
-    }
-  }
-
-  // Initialize on page load - always use admin's default setting
-  document.addEventListener('DOMContentLoaded', function() {
-    const grid = document.querySelector('.product-grid');
-    if (!grid) return;
-    
-    const defaultType = '{{ section.settings.default_media_type }}' || 'image';
-    
-    // Always use the admin's default setting
-    setMediaType(defaultType);
-  });
-  
-  // Listen for theme editor changes
-  if (window.Shopify && window.Shopify.designMode) {
-    document.addEventListener('shopify:section:load', function() {
-      const defaultType = '{{ section.settings.default_media_type }}' || 'image';
-      setMediaType(defaultType);
-    });
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-
-  const items = document.querySelectorAll('.faq-item');
-
-  items.forEach(item => {
-
-    const btn = item.querySelector('.faq-question');
-    const answer = item.querySelector('.faq-answer');
-
-    btn.addEventListener('click', () => {
-
-      const isActive = item.classList.contains('active');
-
-      items.forEach(i => {
-        i.classList.remove('active');
-        i.querySelector('.faq-answer').style.maxHeight = null;
-      });
-
-      if(!isActive){
-        item.classList.add('active');
-        answer.style.maxHeight = answer.scrollHeight + 'px';
-      }
-    });
-
-  });
-
-});
-</script>
-
-<style>
- .collection-faq-section{
-  padding:40px 0;
-}
-
-.faq-container{
-  max-width:var(--container-width);
-  margin: 0 auto;
-}
-
-.faq-header{
-  text-align:center;
-  margin-bottom:50px;
-}
-
-.faq-header h2{
-  font-size:42px;
-  margin:0 0 12px;
-  line-height:1.2;
-}
-
-
-.faq-item{
-  background:#FEFEFE;
-  border:1px solid #ececec;
-  border-radius:18px;
-  margin-bottom:16px;
-  overflow:hidden;
-  transition:.3s;
-}
-
-.faq-item.active{
-  box-shadow:0 10px 40px rgba(0,0,0,.08);
-}
-
-.faq-question{
-  width:100%;
-  border:none !important;
-  background:none;
-  padding:24px 28px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-  font-size:18px;
-  font-weight:600;
-  text-align:left;
-}
-
-.faq-arrow{
-  width:10px;
-  height:10px;
-  border-right:2px solid #000;
-  border-bottom:2px solid #000;
-  transform:rotate(45deg);
-  transition:.3s ease;
-}
-
-.faq-item.active .faq-arrow{
-  transform:rotate(-135deg);
-}
-
-.faq-item.active .faq-icon{
-  transform:rotate(45deg);
-}
-
-.faq-answer{
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .4s ease;
-}
-
-.faq-answer-inner{
-  padding:0 28px 24px;
-  color:#666;
-  line-height:1.8;
-}
-
-@media(max-width:768px){
-
-  .collection-faq-section{
-    padding:30px 15px;
-  }
-
-  .faq-header h2{
-    font-size:30px;
-  }
-
-  .faq-question{
-    font-size:16px;
-    padding:20px;
-  }
-
-  .faq-answer-inner{
-    padding:0 20px 20px;
-  }
-}
-</style>

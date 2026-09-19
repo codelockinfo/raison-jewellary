@@ -1,7 +1,7 @@
 {% style -%}
   {%- # Load custom Body font if enabled -%} 
   {%- if settings.use_custom_font_body and settings.custom_body_font != blank -%}
-    {%- assign body_font_lines = settings.custom_body_font | newline_to_br | split: '<br />' -%}
+    {%- assign body_font_lines = settings.custom_body_font | newline_to_br | replace: '<br>', '<br />' | replace: '<br/>', '<br />' | split: '<br />' -%}
     {%- for line in body_font_lines -%}
       {%- assign trimmed_line = line | strip -%}
       {%- if trimmed_line != blank -%}
@@ -21,7 +21,7 @@
 
   {%- # Load custom Heading font if enabled -%}
   {%- if settings.use_custom_font_heading and settings.custom_heading_font != blank -%}
-    {%- assign heading_font_lines = settings.custom_heading_font | newline_to_br | split: '<br />' -%}
+    {%- assign heading_font_lines = settings.custom_heading_font | newline_to_br | replace: '<br>', '<br />' | replace: '<br/>', '<br />' | split: '<br />' -%}
     {%- for line in heading_font_lines -%}
       {%- assign trimmed_line = line | strip -%}
       {%- if trimmed_line != blank -%}
@@ -154,15 +154,19 @@
   }
 
   :root {
-    {%- # Typography - Heading - Riseon Jewels uses Cormorant Garamond -%}
-    {%- if settings.use_custom_font_heading -%}
+    {%- # Typography - Heading - Pulled directly from Theme Settings > Typography -%}
+    {%- if settings.use_custom_font_heading and settings.custom_heading_font != blank -%}
       {%- assign heading_first_line = settings.custom_heading_font | newline_to_br | split: '<br />' | first | strip -%}
       {%- assign heading_font_parts = heading_first_line | split: '@' -%}
       {%- assign heading_font_name = heading_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
       {%- if heading_font_parts[2] != blank %}{% assign heading_font_name = heading_font_parts[2] | strip %}{% endif -%}
-      --font-heading--family: '{{ heading_font_name }}', 'Cormorant Garamond', Georgia, serif;
+      --font-heading--family: '{{ heading_font_name }}', {{ settings.type_header_font.fallback_families | default: 'serif' }};
       --font-heading--style: normal;
       --font-heading--weight: {{ settings.custom_heading_weight | default: 500 }};
+    {%- elsif settings.type_header_font != blank -%}
+      --font-heading--family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+      --font-heading--style: {{ settings.type_header_font.style }};
+      --font-heading--weight: {{ settings.type_header_font.weight }};
     {%- else -%}
       --font-heading--family: 'Cormorant Garamond', Georgia, serif;
       --font-heading--style: normal;
@@ -179,15 +183,19 @@
     --h6-size: {{ settings.h6_font_size }}px;
     --heading-letter-spacing: {{ settings.type_header_spacing }}px;
 
-    {%- # Typography - Body - Riseon Jewels uses Mulish -%}
-    {%- if settings.use_custom_font_body -%}
+    {%- # Typography - Body - Pulled directly from Theme Settings > Typography -%}
+    {%- if settings.use_custom_font_body and settings.custom_body_font != blank -%}
       {%- assign body_first_line = settings.custom_body_font | newline_to_br | split: '<br />' | first | strip -%}
       {%- assign body_font_parts = body_first_line | split: '@' -%}
       {%- assign body_font_name = body_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
       {%- if body_font_parts[2] != blank %}{% assign body_font_name = body_font_parts[2] | strip %}{% endif -%}
-      --font-body--family: '{{ body_font_name }}', 'Mulish', Arial, sans-serif;
+      --font-body--family: '{{ body_font_name }}', {{ settings.type_base_font.fallback_families | default: 'sans-serif' }};
       --font-body--style: normal;
       --font-body--weight: {{ settings.custom_body_weight | default: 400 }};
+    {%- elsif settings.type_base_font != blank -%}
+      --font-body--family: {{ settings.type_base_font.family }}, {{ settings.type_base_font.fallback_families }};
+      --font-body--style: {{ settings.type_base_font.style }};
+      --font-body--weight: {{ settings.type_base_font.weight }};
     {%- else -%}
       --font-body--family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-body--style: normal;
@@ -196,6 +204,10 @@
     --font-body--scale: {{ settings.type_body_scale | divided_by: 100.0 }};
     --font-body--size: {{ settings.type_base_size }}px;
     --font-body--line-height: {{ settings.type_base_line_height }}px;
+
+    {%- # Alias helper variables so any theme CSS referencing cormorant / mulish dynamically updates -%}
+    --font-cormorant: var(--font-heading--family);
+    --font-mulish: var(--font-body--family);
 
     {%- # Typography - Subheading -%}
     {%- if settings.use_custom_font_subheading -%}

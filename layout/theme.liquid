@@ -20,12 +20,14 @@
 
     <!-- ================= SHOPIFY FONT PRELOADS (SAFE) ================= -->
 
-    {%- if settings.type_heading_font and settings.type_heading_font.system? == false -%}
-      {{ settings.type_heading_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {%- assign current_header_font = settings.type_header_font | default: settings.type_heading_font -%}
+    {%- if current_header_font and current_header_font.system? == false -%}
+      {{ current_header_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {%- endif -%}
 
-    {%- if settings.type_body_font and settings.type_body_font.system? == false -%}
-      {{ settings.type_body_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {%- assign current_base_font = settings.type_base_font | default: settings.type_body_font -%}
+    {%- if current_base_font and current_base_font.system? == false -%}
+      {{ current_base_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {%- endif -%}
 
     {%- if settings.type_button_font and settings.type_button_font.system? == false -%}

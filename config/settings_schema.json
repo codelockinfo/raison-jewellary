@@ -1611,5 +1611,68 @@
         "info": "Format: Color Name: Hex Code (e.g. Floral: #EBA20F). Each entry on a new line."
       }
     ]
+  },
+  {
+    "name": "Product Card",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Product Card (Riseon Jewels)"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_wishlist",
+        "label": "Show Wishlist Button",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_badge",
+        "label": "Show Badge / Tag",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "card_default_badge",
+        "label": "Default Badge Text",
+        "default": "NEW"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_subtitle",
+        "label": "Show Material / Subtitle",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "card_default_subtitle",
+        "label": "Default Subtitle Text",
+        "default": "14K Rose Gold · Laboratory-Grown Diamond"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_tags",
+        "label": "Show Preview Tags / Features",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "card_default_tags",
+        "label": "Default Preview Tags Text",
+        "default": "Ready-stock preview · Marquise · Floral"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_view_button",
+        "label": "Show View Link / Button",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "card_view_button_text",
+        "label": "View Link Text",
+        "default": "VIEW DESIGN →"
+      }
+    ]
   }
 ]

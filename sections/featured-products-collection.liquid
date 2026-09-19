@@ -15,95 +15,50 @@
     {%- assign featured_collection = section.settings.collection -%}
     {%- if featured_collection != blank and featured_collection.products_count > 0 -%}
       {%- for product in featured_collection.products limit: section.settings.products_to_show -%}
-        <article class="product-card">
-          <div class="product-image">
-            {%- if product.featured_image != blank -%}
-              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | default: product.title }}" loading="lazy">
-            {%- else -%}
-              <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png" alt="{{ product.title }}" loading="lazy">
-            {%- endif -%}
-            {%- if product.tags.size > 0 -%}
-              <span class="badge">{{ product.tags.first }}</span>
-            {%- else -%}
-              <span class="badge">{{ featured_collection.title }}</span>
-            {%- endif -%}
-            <button type="button" aria-label="Save {{ product.title }}">♡</button>
-            <a class="quick" href="{{ product.url }}">View product</a>
-          </div>
-          <div class="product-info">
-            <p>{{ product.metafields.custom.subtitle | default: 'Gold · Laboratory-Grown Diamond' }}</p>
-            <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
-            <div>
-              <strong>{{ product.price | money }}</strong>
-              {%- if product.compare_at_price > product.price -%}
-                <del>{{ product.compare_at_price | money }}</del>
-              {%- endif -%}
-            </div>
-            <button type="button" onclick="window.location.href='{{ product.url }}'">Select options</button>
-          </div>
-        </article>
+        {% render 'product-card', product: product %}
       {%- endfor -%}
     {%- else -%}
-      <!-- Default reference products -->
-      <article class="product-card">
-        <div class="product-image">
-          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png" alt="Aurelia Arc Ring from the Everyday Edit" loading="lazy">
-          <span class="badge">Everyday Edit</span>
-          <button type="button" aria-label="Save Aurelia Arc Ring">♡</button>
-          <a class="quick" href="/collections/ring">View product</a>
-        </div>
-        <div class="product-info">
-          <p>Gold · Laboratory-Grown Diamond</p>
-          <h3><a href="/collections/ring">Aurelia Arc Ring</a></h3>
-          <div><strong>₹18,999</strong><del></del></div>
-          <button type="button" onclick="window.location.href='/collections/ring'">Select options</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <div class="product-image">
-          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png" alt="Mira Dewdrop Studs from the Bestseller Edit" loading="lazy">
-          <span class="badge">Bestseller Edit</span>
-          <button type="button" aria-label="Save Mira Dewdrop Studs">♡</button>
-          <a class="quick" href="/collections/earring">View product</a>
-        </div>
-        <div class="product-info">
-          <p>Gold · Laboratory-Grown Diamonds</p>
-          <h3><a href="/collections/earring">Mira Dewdrop Studs</a></h3>
-          <div><strong>₹24,999</strong><del></del></div>
-          <button type="button" onclick="window.location.href='/collections/earring'">Select options</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <div class="product-image">
-          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-bracelet-bangles-v2.png" alt="Elara Line Bracelet from the Office Edit" loading="lazy">
-          <span class="badge">Office Edit</span>
-          <button type="button" aria-label="Save Elara Line Bracelet">♡</button>
-          <a class="quick" href="/collections/bracelate-for-her">View product</a>
-        </div>
-        <div class="product-info">
-          <p>Gold · Laboratory-Grown Diamonds</p>
-          <h3><a href="/collections/bracelate-for-her">Elara Line Bracelet</a></h3>
-          <div><strong>₹48,999</strong><del></del></div>
-          <button type="button" onclick="window.location.href='/collections/bracelate-for-her'">Select options</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <div class="product-image">
-          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-pendant-v2.png" alt="Luna Light Pendant from the Minimal Edit" loading="lazy">
-          <span class="badge">Minimal Edit</span>
-          <button type="button" aria-label="Save Luna Light Pendant">♡</button>
-          <a class="quick" href="/collections/pendant-for-her">View product</a>
-        </div>
-        <div class="product-info">
-          <p>Gold · Laboratory-Grown Diamond</p>
-          <h3><a href="/collections/pendant-for-her">Luna Light Pendant</a></h3>
-          <div><strong>₹15,999</strong><del></del></div>
-          <button type="button" onclick="window.location.href='/collections/pendant-for-her'">Select options</button>
-        </div>
-      </article>
+      <!-- Default reference products matching https://riseon-jewels.r-katariya56.chatgpt.site/jewellery/rings -->
+      {% render 'product-card', 
+        custom_title: 'Aurelia Arc Ring',
+        custom_price: '₹18,999',
+        custom_compare_price: '',
+        custom_subtitle: 'Gold · Laboratory-Grown Diamond',
+        custom_badge: 'NEW',
+        custom_tags: 'Everyday Edit · Marquise · Solitaire',
+        custom_image: 'https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png',
+        custom_url: '/collections/ring'
+      %}
+      {% render 'product-card', 
+        custom_title: 'Mira Dewdrop Studs',
+        custom_price: '₹24,999',
+        custom_compare_price: '',
+        custom_subtitle: 'Gold · Laboratory-Grown Diamonds',
+        custom_badge: 'BESTSELLER',
+        custom_tags: 'Bestseller Edit · Certified · Modern',
+        custom_image: 'https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png',
+        custom_url: '/collections/earring'
+      %}
+      {% render 'product-card', 
+        custom_title: 'Elara Line Bracelet',
+        custom_price: '₹48,999',
+        custom_compare_price: '',
+        custom_subtitle: 'Gold · Laboratory-Grown Diamonds',
+        custom_badge: 'OFFICE EDIT',
+        custom_tags: 'Office Edit · Refined · Everyday',
+        custom_image: 'https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-bracelet-bangles-v2.png',
+        custom_url: '/collections/bracelate-for-her'
+      %}
+      {% render 'product-card', 
+        custom_title: 'Luna Light Pendant',
+        custom_price: '₹15,999',
+        custom_compare_price: '',
+        custom_subtitle: 'Gold · Laboratory-Grown Diamond',
+        custom_badge: 'MINIMAL EDIT',
+        custom_tags: 'Minimal Edit · Lightweight · Solitaire',
+        custom_image: 'https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-pendant-v2.png',
+        custom_url: '/collections/pendant-for-her'
+      %}
     {%- endif -%}
   </div>
 </section>
