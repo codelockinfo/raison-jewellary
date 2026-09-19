@@ -114,8 +114,8 @@
         "show_breadcrumbs": true,
         "show_sticky_cart": true,
         "show_arrows": true,
-        "arrow_bg_color": "#4E032A",
-        "arrow_color": "#FEFEFE",
+        "arrow_bg_color": "#4e032a",
+        "arrow_color": "#fefefe",
         "arrow_border_radius": 50,
         "enable_zoom": true,
         "enable_cursor_zoom": false,
@@ -140,29 +140,10 @@
         "section_padding_desktop": "30px 0",
         "section_padding_mobile": "20px 15px"
       }
-    },
-    "recently_viewed_wgMchN": {
-      "type": "recently-viewed",
-      "name": "Recently Viewed Slider",
-      "settings": {
-        "color_scheme": "scheme-e6380cb9-d101-44f7-aead-258d53328ff4",
-        "heading": "Recently Viewed Products",
-        "product_card_style": "horizontal",
-        "show_wishlist": true,
-        "show_quick_view": true,
-        "show_compare": false,
-        "show_add_to_cart": true,
-        "show_rating": true,
-        "show_colors": true,
-        "arrow_shape": "round",
-        "section_padding_desktop": "30px 0 60px 0",
-        "section_padding_mobile": "20px 15px 40px 15px"
-      }
     }
   },
   "order": [
     "main",
-    "product_recomand_PQTk8c",
-    "recently_viewed_wgMchN"
+    "product_recomand_PQTk8c"
   ]
 }
