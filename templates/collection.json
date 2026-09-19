@@ -1,1 +1,86 @@
-{"sections":{"collection_metafield_banner_yciF6r":{"type":"collection-metafield-banner","name":"Collection banner","settings":{"color_scheme":"scheme-6bb6ef94-62e4-4071-b173-23ae42dbf66c","show_title":true,"show_description":false,"desktop_height":450,"mobile_height":260,"overlay_opacity":25}},"main":{"type":"collection","blocks":{"tag_filter_mCh7WY":{"type":"tag_filter","settings":{"design":"list","title":"Tags","tags_list":"Saree, Women, Cloth Accessories","show_color_with_label":false,"work_with_filter_colors":false,"enable_collapsible":true,"expand_by_default":true}},"variant_filter_biirw6":{"type":"variant_filter","settings":{"title":"Color","variant_label":"Color","design":"button","show_variant_color_swatch":true,"show_variant_color_name":false,"enable_collapsible":true,"expand_by_default":true}}},"block_order":["tag_filter_mCh7WY","variant_filter_biirw6"],"settings":{"color_scheme":"scheme-1","show_breadcrumbs":false,"show_collection_title":false,"lazy_load":"lazy","products_per_page":16,"columns_desktop":4,"columns_mobile":"2","show_sort_by":true,"show_filters":true,"filter_type":"storefront","filters_position":"drawer","filters_title":"Filters","banner_1_link":"","banner_2_link":"","product_card_style":"horizontal","show_wishlist":true,"show_quick_view":true,"show_compare":false,"show_add_to_cart":true,"show_colors":true,"default_media_type":"video"}}},"order":["collection_metafield_banner_yciF6r","main"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "collection_metafield_banner_yciF6r": {
+      "type": "collection-metafield-banner",
+      "disabled": true,
+      "name": "Collection banner",
+      "settings": {
+        "color_scheme": "scheme-6bb6ef94-62e4-4071-b173-23ae42dbf66c",
+        "show_title": true,
+        "show_description": false,
+        "desktop_height": 450,
+        "mobile_height": 260,
+        "overlay_opacity": 25
+      }
+    },
+    "main": {
+      "type": "collection",
+      "blocks": {
+        "tag_filter_mCh7WY": {
+          "type": "tag_filter",
+          "settings": {
+            "design": "list",
+            "title": "Tags",
+            "tags_list": "Saree, Women, Cloth Accessories",
+            "show_color_with_label": false,
+            "work_with_filter_colors": false,
+            "enable_collapsible": true,
+            "expand_by_default": true
+          }
+        },
+        "variant_filter_biirw6": {
+          "type": "variant_filter",
+          "settings": {
+            "title": "Color",
+            "variant_label": "Color",
+            "design": "button",
+            "show_variant_color_swatch": true,
+            "show_variant_color_name": false,
+            "enable_collapsible": true,
+            "expand_by_default": true
+          }
+        }
+      },
+      "block_order": [
+        "tag_filter_mCh7WY",
+        "variant_filter_biirw6"
+      ],
+      "settings": {
+        "color_scheme": "scheme-55547420-26f2-4a3d-a26d-c2e13ac2c2b3",
+        "show_breadcrumbs": true,
+        "show_collection_title": true,
+        "lazy_load": "lazy",
+        "products_per_page": 16,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "show_sort_by": true,
+        "show_filters": true,
+        "filter_type": "storefront",
+        "filters_position": "sidebar",
+        "filters_title": "Filters",
+        "banner_1_link": "",
+        "banner_2_link": "",
+        "product_card_style": "horizontal",
+        "show_wishlist": true,
+        "show_quick_view": true,
+        "show_compare": false,
+        "show_add_to_cart": true,
+        "show_colors": true,
+        "default_media_type": "video"
+      }
+    }
+  },
+  "order": [
+    "collection_metafield_banner_yciF6r",
+    "main"
+  ]
+}
