@@ -1,0 +1,204 @@
+<section class="section journal" id="{{ section.settings.section_id | default: 'journal' }}">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">{{ section.settings.eyebrow | default: 'BUY WITH CLARITY' }}</span>
+      <h2>{{ section.settings.heading | default: 'The Riseon Journal' }}</h2>
+    </div>
+    {%- if section.settings.view_all_text != blank -%}
+      <a href="{{ section.settings.blog.url | default: section.settings.view_all_link | default: '/blogs/news' }}">
+        {{ section.settings.view_all_text | default: 'Explore all guides →' }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="journal-grid">
+    {%- assign blog = section.settings.blog -%}
+    {%- if blog != blank and blog.articles_count > 0 -%}
+      {%- for article in blog.articles limit: 3 -%}
+        <a href="{{ article.url }}" class="journal-card">
+          {%- if article.image != blank -%}
+            <img src="{{ article.image | image_url: width: 800 }}" alt="{{ article.image.alt | default: article.title }}" loading="lazy">
+          {%- else -%}
+            <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/lgd-card-resized-aug2026.webp" alt="{{ article.title }}" loading="lazy">
+          {%- endif -%}
+          <div>
+            <span>{{ article.tags.first | default: 'JEWELLERY EDUCATION' }}</span>
+            <h3>{{ article.title }}</h3>
+            <p>{{ article.excerpt_or_content | strip_html | truncatewords: 18 }}</p>
+            <strong>Read guide →</strong>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- elsif section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.link | default: '#' }}" class="journal-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title }}" loading="lazy">
+          {%- else -%}
+            {%- case forloop.index -%}
+              {%- when 1 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/lgd-card-resized-aug2026.webp" alt="{{ block.settings.title }}" loading="lazy">
+              {%- when 2 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/gold-card-resized-aug2026.webp" alt="{{ block.settings.title }}" loading="lazy">
+              {%- else -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/care-card-resized-aug2026.webp" alt="{{ block.settings.title }}" loading="lazy">
+            {%- endcase -%}
+          {%- endif -%}
+          <div>
+            <span>{{ block.settings.tag }}</span>
+            <h3>{{ block.settings.title }}</h3>
+            <p>{{ block.settings.summary }}</p>
+            <strong>{{ block.settings.link_text | default: 'Read guide →' }}</strong>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      <!-- Default reference articles -->
+      <a href="/blogs/news" class="journal-card">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/lgd-card-resized-aug2026.webp" alt="Are Laboratory-Grown Diamonds Real?" loading="lazy">
+        <div>
+          <span>DIAMOND EDUCATION · 3 MIN READ</span>
+          <h3>Are Laboratory-Grown Diamonds Real?</h3>
+          <p>A clear answer to what they are, how they are made and what to check before buying.</p>
+          <strong>Read guide →</strong>
+        </div>
+      </a>
+
+      <a href="/blogs/news" class="journal-card">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/gold-card-resized-aug2026.webp" alt="How Gold Purity Affects Jewellery Price" loading="lazy">
+        <div>
+          <span>GOLD EDUCATION · 4 MIN READ</span>
+          <h3>How Gold Purity Affects Jewellery Price</h3>
+          <p>Understand karat, gold weight and every component that shapes the final jewellery price.</p>
+          <strong>Read guide →</strong>
+        </div>
+      </a>
+
+      <a href="/blogs/news" class="journal-card">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/journal/care-card-resized-aug2026.webp" alt="Daily-Wear Jewellery Care" loading="lazy">
+        <div>
+          <span>JEWELLERY CARE · 4 MIN READ</span>
+          <h3>Daily-Wear Jewellery Care</h3>
+          <p>Simple, safe habits that help protect your fine jewellery, its setting and its finish.</p>
+          <strong>Read guide →</strong>
+        </div>
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "The Riseon Journal",
+  "class": "home-journal-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section Anchor ID",
+      "default": "journal"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "BUY WITH CLARITY"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Riseon Journal"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog (Optional)"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Link Text",
+      "default": "Explore all guides →"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View All Link URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "article_card",
+      "name": "Custom Guide Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag",
+          "default": "DIAMOND EDUCATION · 3 MIN READ"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Are Laboratory-Grown Diamonds Real?"
+        },
+        {
+          "type": "textarea",
+          "id": "summary",
+          "label": "Summary",
+          "default": "A clear answer to what they are, how they are made and what to check before buying."
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text",
+          "default": "Read guide →"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "The Riseon Journal",
+      "blocks": [
+        {
+          "type": "article_card",
+          "settings": {
+            "tag": "DIAMOND EDUCATION · 3 MIN READ",
+            "title": "Are Laboratory-Grown Diamonds Real?",
+            "summary": "A clear answer to what they are, how they are made and what to check before buying."
+          }
+        },
+        {
+          "type": "article_card",
+          "settings": {
+            "tag": "GOLD EDUCATION · 4 MIN READ",
+            "title": "How Gold Purity Affects Jewellery Price",
+            "summary": "Understand karat, gold weight and every component that shapes the final jewellery price."
+          }
+        },
+        {
+          "type": "article_card",
+          "settings": {
+            "tag": "JEWELLERY CARE · 4 MIN READ",
+            "title": "Daily-Wear Jewellery Care",
+            "summary": "Simple, safe habits that help protect your fine jewellery, its setting and its finish."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

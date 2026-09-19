@@ -1,0 +1,140 @@
+<section class="partner" id="{{ section.settings.section_id | default: 'partner' }}">
+  <div class="partner-title">
+    <span class="eyebrow">{{ section.settings.eyebrow | default: 'RISEON BRAND PARTNER' }}</span>
+    <h2>{{ section.settings.heading | default: 'Share the style.<br/>Grow with Riseon.' }}</h2>
+    <p>{{ section.settings.description | default: 'Recommend jewellery you genuinely love and earn on eligible delivered orders.' }}</p>
+  </div>
+
+  <div class="steps">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <article {{ block.shopify_attributes }}>
+          <b>0{{ forloop.index }}</b>
+          <h3>{{ block.settings.title }}</h3>
+          <p>{{ block.settings.description }}</p>
+        </article>
+      {%- endfor -%}
+    {%- else -%}
+      <article>
+        <b>01</b>
+        <h3>Join</h3>
+        <p>Create your Brand Partner account.</p>
+      </article>
+
+      <article>
+        <b>02</b>
+        <h3>Share</h3>
+        <p>Use your unique link or code.</p>
+      </article>
+
+      <article>
+        <b>03</b>
+        <h3>Grow</h3>
+        <p>Earn on eligible delivered orders.</p>
+      </article>
+    {%- endif -%}
+
+    <a class="btn light" href="{{ section.settings.button_link | default: '/pages/brand-partner-programme' }}">
+      {{ section.settings.button_label | default: 'Explore the programme' }}
+    </a>
+    <small>{{ section.settings.footnote | default: 'Eligibility, commission and payouts are governed by current programme terms.' }}</small>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Brand Partner",
+  "class": "brand-partner-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section Anchor ID",
+      "default": "partner"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "RISEON BRAND PARTNER"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Share the style.<br/>Grow with Riseon."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Recommend jewellery you genuinely love and earn on eligible delivered orders."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Explore the programme"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "text",
+      "id": "footnote",
+      "label": "Footnote Text",
+      "default": "Eligibility, commission and payouts are governed by current programme terms."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Partner Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Step Title",
+          "default": "Join"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Step Description",
+          "default": "Create your Brand Partner account."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Partner",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Join",
+            "description": "Create your Brand Partner account."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Share",
+            "description": "Use your unique link or code."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Grow",
+            "description": "Earn on eligible delivered orders."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

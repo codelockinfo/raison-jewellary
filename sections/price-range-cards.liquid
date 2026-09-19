@@ -1,0 +1,158 @@
+<section class="section price-section" id="PriceSection-{{ section.id }}">
+  <div class="center-head">
+    <span class="eyebrow">{{ section.settings.eyebrow | default: 'CHOOSE YOUR RANGE' }}</span>
+    <h2>{{ section.settings.heading | default: 'Our Best Sellers' }}</h2>
+    <p>{{ section.settings.subheading | default: 'Explore lightweight gold and laboratory-grown diamond designs across three considered price ranges.' }}</p>
+  </div>
+
+  <div class="mood-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.link | default: '#' }}" class="mood m{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.heading }}" loading="lazy">
+          {%- else -%}
+            {%- case forloop.index -%}
+              {%- when 1 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-nose-pin-v2.png" alt="Bestselling jewellery Up to ₹9,999" loading="lazy">
+              {%- when 2 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png" alt="Bestselling jewellery Up to ₹24,999" loading="lazy">
+              {%- else -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-mangalsutra-v2.png" alt="Bestselling jewellery Up to ₹99,999" loading="lazy">
+            {%- endcase -%}
+          {%- endif -%}
+          <span>0{{ forloop.index }}</span>
+          <div>
+            <h3>{{ block.settings.heading }}</h3>
+            <p>{{ block.settings.description }}</p>
+            <small>{{ block.settings.link_text | default: 'Explore the collection →' }}</small>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      <a href="/collections/nose-pin" class="mood m0">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-nose-pin-v2.png" alt="Bestselling jewellery Up to ₹9,999" loading="lazy">
+        <span>01</span>
+        <div>
+          <h3>Up to ₹9,999</h3>
+          <p>Selected entry-price pieces for your first fine-jewellery buy.</p>
+          <small>Explore the collection →</small>
+        </div>
+      </a>
+
+      <a href="/collections/earring" class="mood m1">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png" alt="Bestselling jewellery Up to ₹24,999" loading="lazy">
+        <span>02</span>
+        <div>
+          <h3>Up to ₹24,999</h3>
+          <p>Lightweight gold and laboratory-grown diamond styles for everyday wear.</p>
+          <small>Explore the collection →</small>
+        </div>
+      </a>
+
+      <a href="/collections/mangalsutra-pendant" class="mood m2">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-mangalsutra-v2.png" alt="Bestselling jewellery Up to ₹99,999" loading="lazy">
+        <span>03</span>
+        <div>
+          <h3>Up to ₹99,999</h3>
+          <p>Elevated designs for celebrations, milestones and meaningful gifting.</p>
+          <small>Explore the collection →</small>
+        </div>
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Price Range Cards",
+  "class": "price-range-cards-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "CHOOSE YOUR RANGE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Best Sellers"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Explore lightweight gold and laboratory-grown diamond designs across three considered price ranges."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "range_card",
+      "name": "Price Range Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Card Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Price Heading",
+          "default": "Up to ₹9,999"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Selected entry-price pieces for your first fine-jewellery buy."
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text",
+          "default": "Explore the collection →"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Price Range Cards",
+      "blocks": [
+        {
+          "type": "range_card",
+          "settings": {
+            "heading": "Up to ₹9,999",
+            "description": "Selected entry-price pieces for your first fine-jewellery buy.",
+            "link": "/collections/nose-pin"
+          }
+        },
+        {
+          "type": "range_card",
+          "settings": {
+            "heading": "Up to ₹24,999",
+            "description": "Lightweight gold and laboratory-grown diamond styles for everyday wear.",
+            "link": "/collections/earring"
+          }
+        },
+        {
+          "type": "range_card",
+          "settings": {
+            "heading": "Up to ₹99,999",
+            "description": "Elevated designs for celebrations, milestones and meaningful gifting.",
+            "link": "/collections/mangalsutra-pendant"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

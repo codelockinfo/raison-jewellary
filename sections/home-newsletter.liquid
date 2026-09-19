@@ -1,0 +1,76 @@
+<section class="newsletter" id="Newsletter-{{ section.id }}">
+  <span>✦</span>
+  <div>
+    <p class="eyebrow">{{ section.settings.eyebrow | default: 'FROM RISEON, THOUGHTFULLY' }}</p>
+    <h2>{{ section.settings.heading | default: 'New designs and useful jewellery guides.' }}</h2>
+  </div>
+
+  {%- form 'customer', class: 'riseon-newsletter-form' -%}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+    <input 
+      type="email" 
+      name="contact[email]" 
+      value="{{ form.email }}"
+      aria-label="Email address" 
+      placeholder="{{ section.settings.placeholder | default: 'Your email address' }}" 
+      required
+      autocomplete="email"
+    >
+    <button type="submit">{{ section.settings.button_text | default: 'Join the list →' }}</button>
+    <small>{{ section.settings.disclaimer | default: 'By subscribing, you agree to our <a href="/policies/privacy-policy">Privacy Policy</a>.' }}</small>
+
+    {%- if form.posted_successfully? -%}
+      <p class="newsletter-success" style="color: #2d6448; font-size: 11px; margin-top: 8px; grid-column: 1 / -1;">
+        Thank you for subscribing!
+      </p>
+    {%- elsif form.errors -%}
+      <p class="newsletter-error" style="color: #a20d51; font-size: 11px; margin-top: 8px; grid-column: 1 / -1;">
+        {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+      </p>
+    {%- endif -%}
+  {%- endform -%}
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter (Riseon)",
+  "class": "home-newsletter-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "FROM RISEON, THOUGHTFULLY"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "New designs and useful jewellery guides."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Input Placeholder",
+      "default": "Your email address"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Join the list →"
+    },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "label": "Disclaimer HTML",
+      "default": "By subscribing, you agree to our <a href=\"/policies/privacy-policy\">Privacy Policy</a>."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter (Riseon)"
+    }
+  ]
+}
+{% endschema %}

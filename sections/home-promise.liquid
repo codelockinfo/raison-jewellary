@@ -1,0 +1,161 @@
+<section class="home-promise" id="HomePromise-{{ section.id }}" aria-labelledby="home-promise-title-{{ section.id }}">
+  <div class="home-promise-heading">
+    <span class="eyebrow">{{ section.settings.eyebrow | default: 'THE RISEON ASSURANCE' }}</span>
+    <h2 id="home-promise-title-{{ section.id }}">{{ section.settings.heading | default: 'Our Promise' }}</h2>
+    <p>{{ section.settings.subheading | default: 'Clear standards and dependable support, before and after your purchase.' }}</p>
+  </div>
+
+  <div class="home-promise-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <article {{ block.shopify_attributes }}>
+          <span class="home-promise-icon">
+            {%- case forloop.index -%}
+              {%- when 1 -%}
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 29 8l6-.2 2.8 5.3 5 3.2-1 5.9 2.1 5.5-4.2 4.2-.8 6-5.9 1-4.1 4.3-5.5-2.2-5.5 2.2-4.1-4.3-5.9-1-.8-6-4.2-4.2 2.1-5.5-1-5.9 5-3.2L13 7.8l6 .2 5-3Z"></path><path d="m16.5 24 5 5 10.5-11"></path></svg>
+              {%- when 2 -%}
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 12h24v22H5zM29 20h7l7 8v6H29z"></path><circle cx="14" cy="36" r="4"></circle><circle cx="36" cy="36" r="4"></circle><path d="M33 24h5"></path></svg>
+              {%- when 3 -%}
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 17a17 17 0 1 1-1 12M8 7v10h10"></path><rect x="17" y="20" width="14" height="14" rx="2"></rect><path d="M24 20v5"></path></svg>
+              {%- else -%}
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 17h27M29 10l7 7-7 7M40 31H13M19 24l-7 7 7 7"></path><circle cx="8" cy="17" r="3"></circle><circle cx="40" cy="31" r="3"></circle></svg>
+            {%- endcase -%}
+          </span>
+          <h3>{{ block.settings.title }}</h3>
+          <p>{{ block.settings.description }}</p>
+        </article>
+      {%- endfor -%}
+    {%- else -%}
+      <article>
+        <span class="home-promise-icon">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 29 8l6-.2 2.8 5.3 5 3.2-1 5.9 2.1 5.5-4.2 4.2-.8 6-5.9 1-4.1 4.3-5.5-2.2-5.5 2.2-4.1-4.3-5.9-1-.8-6-4.2-4.2 2.1-5.5-1-5.9 5-3.2L13 7.8l6 .2 5-3Z"></path><path d="m16.5 24 5 5 10.5-11"></path></svg>
+        </span>
+        <h3>Certified &amp; Hallmarked Jewellery</h3>
+        <p>Product-linked diamond report, BIS hallmark and HUID where applicable.</p>
+      </article>
+
+      <article>
+        <span class="home-promise-icon">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 12h24v22H5zM29 20h7l7 8v6H29z"></path><circle cx="14" cy="36" r="4"></circle><circle cx="36" cy="36" r="4"></circle><path d="M33 24h5"></path></svg>
+        </span>
+        <h3>Free Shipping &amp; Insurance</h3>
+        <p>Secure, insured and trackable delivery across serviceable locations.</p>
+      </article>
+
+      <article>
+        <span class="home-promise-icon">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 17a17 17 0 1 1-1 12M8 7v10h10"></path><rect x="17" y="20" width="14" height="14" rx="2"></rect><path d="M24 20v5"></path></svg>
+        </span>
+        <h3>Hassle-Free 15-Day Returns</h3>
+        <p>Eligible purchases may be returned within 15 days of delivery.</p>
+      </article>
+
+      <article>
+        <span class="home-promise-icon">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 17h27M29 10l7 7-7 7M40 31H13M19 24l-7 7 7 7"></path><circle cx="8" cy="17" r="3"></circle><circle cx="40" cy="31" r="3"></circle></svg>
+        </span>
+        <h3>80% Buyback &amp; 100% Exchange*</h3>
+        <p>Based on prevailing assessed value; policy terms and deductions apply.</p>
+      </article>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.link_text != blank -%}
+    <a class="home-promise-link" href="{{ section.settings.link_url | default: '/policies/refund-policy' }}">
+      {{ section.settings.link_text | default: 'View complete policy terms →' }}
+    </a>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Our Promise",
+  "class": "home-promise-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "THE RISEON ASSURANCE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Promise"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Clear standards and dependable support, before and after your purchase."
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link Text",
+      "default": "View complete policy terms →"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promise_block",
+      "name": "Promise Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Certified & Hallmarked Jewellery"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Product-linked diamond report, BIS hallmark and HUID where applicable."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Our Promise",
+      "blocks": [
+        {
+          "type": "promise_block",
+          "settings": {
+            "title": "Certified & Hallmarked Jewellery",
+            "description": "Product-linked diamond report, BIS hallmark and HUID where applicable."
+          }
+        },
+        {
+          "type": "promise_block",
+          "settings": {
+            "title": "Free Shipping & Insurance",
+            "description": "Secure, insured and trackable delivery across serviceable locations."
+          }
+        },
+        {
+          "type": "promise_block",
+          "settings": {
+            "title": "Hassle-Free 15-Day Returns",
+            "description": "Eligible purchases may be returned within 15 days of delivery."
+          }
+        },
+        {
+          "type": "promise_block",
+          "settings": {
+            "title": "80% Buyback & 100% Exchange*",
+            "description": "Based on prevailing assessed value; policy terms and deductions apply."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

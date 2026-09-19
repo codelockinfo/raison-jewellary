@@ -1,0 +1,76 @@
+<section class="home-press" id="HomePress-{{ section.id }}" aria-labelledby="home-press-title-{{ section.id }}">
+  <div>
+    <p class="eyebrow">{{ section.settings.eyebrow | default: 'PR & MEDIA' }}</p>
+    <h2 id="home-press-title-{{ section.id }}">{{ section.settings.heading | default: 'The story behind Riseon.' }}</h2>
+    <p>{{ section.settings.description | default: 'For founder interviews, brand stories and editorial enquiries, connect with the Riseon Jewels team.' }}</p>
+  </div>
+  <div class="home-press-actions">
+    <a class="btn primary" href="mailto:{{ section.settings.email | default: 'riseonjewels@gmail.com' }}?subject={{ section.settings.email_subject | default: 'Riseon Jewels Press Enquiry' | escape }}">
+      {{ section.settings.button_label | default: 'Press enquiries' }}
+    </a>
+    <a href="{{ section.settings.brand_link | default: '/pages/about-us' }}">
+      {{ section.settings.brand_text | default: 'Explore the brand →' }}
+    </a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PR & Media",
+  "class": "home-press-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "PR & MEDIA"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The story behind Riseon."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "For founder interviews, brand stories and editorial enquiries, connect with the Riseon Jewels team."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Press enquiries"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Press Contact Email",
+      "default": "riseonjewels@gmail.com"
+    },
+    {
+      "type": "text",
+      "id": "email_subject",
+      "label": "Email Subject",
+      "default": "Riseon Jewels Press Enquiry"
+    },
+    {
+      "type": "text",
+      "id": "brand_text",
+      "label": "Brand Link Text",
+      "default": "Explore the brand →"
+    },
+    {
+      "type": "url",
+      "id": "brand_link",
+      "label": "Brand Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PR & Media"
+    }
+  ]
+}
+{% endschema %}

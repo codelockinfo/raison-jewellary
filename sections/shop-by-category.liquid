@@ -1,0 +1,186 @@
+<section class="section" id="{{ section.settings.section_id | default: 'shop' }}">
+  <div class="section-head section-head-centered">
+    <div>
+      <span class="eyebrow">{{ section.settings.eyebrow | default: 'DESIGNED AROUND YOUR DAY' }}</span>
+      <h2>{{ section.settings.heading | default: 'Shop by Category' }}</h2>
+    </div>
+    {%- if section.settings.view_all_link != blank or section.settings.view_all_text != blank -%}
+      <a href="{{ section.settings.view_all_link | default: '/collections/all' }}">
+        {{ section.settings.view_all_text | default: 'View all categories →' }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="category-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <a href="{{ block.settings.link | default: '#' }}" class="category" aria-label="Explore {{ block.settings.title }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img 
+              src="{{ block.settings.image | image_url: width: 800 }}" 
+              alt="{{ block.settings.alt_text | default: block.settings.title }}"
+              loading="lazy"
+            >
+          {%- else -%}
+            {%- case forloop.index -%}
+              {%- when 1 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-ring-aug2026.webp" alt="Explore Ring" loading="lazy">
+              {%- when 2 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-earring-aug2026.webp" alt="Explore Earring" loading="lazy">
+              {%- when 3 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-pendant-aug2026.webp" alt="Explore Pendant" loading="lazy">
+              {%- when 4 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-bracelet-aug2026.webp" alt="Explore Bracelet & Bangles" loading="lazy">
+              {%- when 5 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-nose-pin-aug2026.webp" alt="Explore Nose Pin" loading="lazy">
+              {%- else -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-mangalsutra-aug2026.webp" alt="Explore Mangalsutra" loading="lazy">
+            {%- endcase -%}
+          {%- endif -%}
+          <span class="category-label">{{ block.settings.title }}</span>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      <a href="/collections/ring" class="category" aria-label="Explore Ring">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-ring-aug2026.webp" alt="Woman wearing a lightweight gold and laboratory-grown diamond solitaire ring" loading="lazy">
+        <span class="category-label">Ring</span>
+      </a>
+      <a href="/collections/earring" class="category" aria-label="Explore Earring">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-earring-aug2026.webp" alt="Woman wearing gold and laboratory-grown diamond drop earrings" loading="lazy">
+        <span class="category-label">Earring</span>
+      </a>
+      <a href="/collections/pendant-for-her" class="category" aria-label="Explore Pendant">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-pendant-aug2026.webp" alt="Woman wearing a lightweight gold and laboratory-grown diamond pendant" loading="lazy">
+        <span class="category-label">Pendant</span>
+      </a>
+      <a href="/collections/bracelate-for-her" class="category" aria-label="Explore Bracelet & Bangles">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-bracelet-aug2026.webp" alt="Woman wearing a delicate gold and laboratory-grown diamond bracelet" loading="lazy">
+        <span class="category-label">Bracelet &amp; Bangles</span>
+      </a>
+      <a href="/collections/nose-pin" class="category" aria-label="Explore Nose Pin">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-nose-pin-aug2026.webp" alt="Woman wearing a minimal laboratory-grown diamond nose pin" loading="lazy">
+        <span class="category-label">Nose Pin</span>
+      </a>
+      <a href="/collections/mangalsutra-pendant" class="category" aria-label="Explore Mangalsutra">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/category-mangalsutra-aug2026.webp" alt="Woman wearing a modern gold and laboratory-grown diamond mangalsutra" loading="lazy">
+        <span class="category-label">Mangalsutra</span>
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shop by Category",
+  "class": "shop-by-category-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section Anchor ID",
+      "default": "shop"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "DESIGNED AROUND YOUR DAY"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Text",
+      "default": "View all categories →"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View All Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_card",
+      "name": "Category Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Name",
+          "default": "Ring"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt Text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Category",
+      "blocks": [
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Ring",
+            "link": "/collections/ring"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Earring",
+            "link": "/collections/earring"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Pendant",
+            "link": "/collections/pendant-for-her"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Bracelet & Bangles",
+            "link": "/collections/bracelate-for-her"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Nose Pin",
+            "link": "/collections/nose-pin"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "title": "Mangalsutra",
+            "link": "/collections/mangalsutra-pendant"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

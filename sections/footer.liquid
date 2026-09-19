@@ -1,421 +1,224 @@
-<footer class="footer color-{{ section.settings.color_scheme }}">
-  <div class="footer-top container_width">
-    {% for block in section.blocks %}
-      {% case block.type %}
-        {% when 'about' %}
-          <div class="footer-col footer-about" {{ block.shopify_attributes }}>
-            {% if block.settings.logo != blank %}
-              <a href="{{ shop.url }}">
-                <img src="{{ block.settings.logo | image_url: width: 200 }}" alt="{{ block.settings.logo.alt | default: shop.name }}" class="footer-logo" width="{{ block.settings.logo.width }}" height="{{ block.settings.logo.height }}">
-              </a>
-            {% endif %}
+<footer class="riseon-footer" id="Footer-{{ section.id }}">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <a href="{{ routes.root_url }}" class="brand" aria-label="{{ shop.name }} home">
+        {%- if section.settings.logo != blank -%}
+          <img src="{{ section.settings.logo | image_url: width: 220 }}" alt="{{ section.settings.logo.alt | default: shop.name }}" loading="lazy">
+        {%- else -%}
+          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/riseon-logo-trimmed.png" alt="Riseon Jewels" loading="lazy">
+        {%- endif -%}
+        <span class="brand-tm" aria-label="Trademark">TM</span>
+      </a>
+      <p>{{ section.settings.brand_tagline | default: 'Modern fine jewellery for women rising in their own way.' }}</p>
+      
+      <div class="socials">
+        {%- if section.settings.show_instagram != false -%}
+          <a class="social-instagram" href="{{ section.settings.instagram_link | default: '#' }}" aria-label="Riseon Jewels on Instagram" title="Instagram" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle class="social-fill" cx="17.4" cy="6.7" r="1.15"></circle></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.show_youtube != false -%}
+          <a class="social-youtube" href="{{ section.settings.youtube_link | default: '#' }}" aria-label="Riseon Jewels on YouTube" title="YouTube" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8.2c-.2-1.5-1-2.6-2.5-2.8C16.6 5.1 14.3 5 12 5s-4.6.1-6.5.4C4 5.6 3.2 6.7 3 8.2 2.8 9.4 2.7 10.7 2.7 12s.1 2.6.3 3.8c.2 1.5 1 2.6 2.5 2.8 1.9.3 4.2.4 6.5.4s4.6-.1 6.5-.4c1.5-.2 2.3-1.3 2.5-2.8.2-1.2.3-2.5.3-3.8s-.1-2.6-.3-3.8Z"></path><path class="social-fill" d="m10 9 5 3-5 3V9Z"></path></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.show_facebook != false -%}
+          <a class="social-facebook" href="{{ section.settings.facebook_link | default: '#' }}" aria-label="Riseon Jewels on Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.5 1.6-1.5h1.7V3.9c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.4V10H8v3h2.8v8h3.4Z"></path></svg>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
 
-            <p class="footer-desc">{{ block.settings.about_text }}</p>
+    <!-- 1. SHOP -->
+    <div class="footer-col">
+      <h3>SHOP</h3>
+      {%- if section.settings.menu_shop.links.size > 0 -%}
+        {%- for link in section.settings.menu_shop.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/collections/all">All Jewellery</a>
+        <a href="/collections/ring">Rings</a>
+        <a href="/collections/earring">Earrings</a>
+        <a href="/collections/pendant-for-her">Pendants</a>
+        <a href="/collections/bracelate-for-her">Bracelets &amp; Bangles</a>
+        <a href="/collections/nose-pin">Nose Pin</a>
+        <a href="/collections/mangalsutra-pendant">Mangalsutra</a>
+        <a href="#shop">Gifts</a>
+      {%- endif -%}
+    </div>
 
-            <div class="footer-contact">
-              {% if block.settings.address != blank %}
-                <a class="footer_contact_link" href="https://www.google.com/maps/search/?api=1&query={{ block.settings.address | url_encode }}" target="_blank">
-                  <div class="footer-contact-item">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                      <path fill="currentcolor" d="M 12 12 C 14.210938 12 16 10.210938 16 8 C 16 5.789062 14.210938 4 12 4 C 9.789062 4 8 5.789062 8 8 C 8 10.210938 9.789062 12 12 12 Z M 12 6 C 13.105469 6 14 6.894531 14 8 C 14 9.105469 13.105469 10 12 10 C 10.894531 10 10 9.105469 10 8 C 10 6.894531 10.894531 6 12 6 Z M 16 22.03125 L 24 23.976562 L 24 13.484375 C 24 12.160156 23.132812 10.996094 21.867188 10.613281 L 19.765625 9.910156 C 19.921875 9.289062 20 8.648438 20 8.007812 C 20 3.585938 16.417969 0.0078125 12 0.0078125 C 7.582031 0.0078125 4 3.585938 4 8.007812 C 4.003906 8.410156 4.035156 8.816406 4.101562 9.21875 C 3.179688 8.851562 2.132812 8.964844 1.3125 9.519531 C 0.492188 10.078125 0 11.007812 0 12 L 0 21.753906 L 7.984375 24.03125 Z M 7.757812 3.765625 C 10.101562 1.449219 13.875 1.460938 16.207031 3.789062 C 18.539062 6.117188 18.558594 9.890625 16.25 12.242188 L 12 16.398438 L 7.757812 12.25 C 5.414062 9.90625 5.414062 6.105469 7.757812 3.765625 Z M 2 12 C 1.996094 11.664062 2.164062 11.351562 2.445312 11.167969 C 2.738281 10.976562 3.113281 10.949219 3.429688 11.101562 L 4.863281 11.617188 C 5.246094 12.378906 5.75 13.070312 6.351562 13.675781 L 12 19.199219 L 17.65625 13.667969 C 18.214844 13.113281 18.683594 12.476562 19.058594 11.785156 L 21.273438 12.527344 C 21.703125 12.648438 22 13.039062 22 13.488281 L 22 21.4375 L 16 19.96875 L 8.019531 21.96875 L 2 20.246094 Z M 2 12 "></path>
-                    </svg>
-                    <div>{{ block.settings.address }}</div>
-                  </div>
-                </a>
-              {% endif %}
-              {% if block.settings.phone != blank %}
-                <a class="footer_contact_link" href="tel:{{ block.settings.phone | replace: ' ', '' | replace: '(', '' | replace: ')', '' | replace: '-', '' }}">
-                  <div class="footer-contact-item">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                      <path fill="currentcolor" d="M 13 1 C 13 0.449219 13.449219 0 14 0 C 19.519531 0.0078125 23.992188 4.480469 24 10 C 24 10.550781 23.550781 11 23 11 C 22.449219 11 22 10.550781 22 10 C 21.996094 5.582031 18.417969 2.003906 14 2 C 13.449219 2 13 1.550781 13 1 Z M 14 6 C 16.210938 6 18 7.789062 18 10 C 18 10.550781 18.449219 11 19 11 C 19.550781 11 20 10.550781 20 10 C 19.996094 6.6875 17.3125 4.003906 14 4 C 13.449219 4 13 4.449219 13 5 C 13 5.550781 13.449219 6 14 6 Z M 23.09375 16.738281 C 24.300781 17.949219 24.300781 19.90625 23.09375 21.117188 L 22.183594 22.164062 C 13.992188 30.007812 -5.9375 10.082031 1.78125 1.867188 L 2.933594 0.867188 C 4.144531 -0.304688 6.070312 -0.289062 7.261719 0.90625 C 7.289062 0.9375 9.144531 3.34375 9.144531 3.34375 C 10.285156 4.542969 10.28125 6.429688 9.136719 7.625 L 7.980469 9.082031 C 9.273438 12.226562 11.769531 14.726562 14.910156 16.027344 L 16.375 14.863281 C 17.570312 13.71875 19.457031 13.714844 20.65625 14.855469 C 20.65625 14.855469 23.0625 16.707031 23.09375 16.738281 Z M 21.71875 18.191406 C 21.71875 18.191406 19.324219 16.351562 19.292969 16.320312 C 18.863281 15.894531 18.171875 15.894531 17.742188 16.320312 C 17.71875 16.347656 15.699219 17.957031 15.699219 17.957031 C 15.421875 18.175781 15.050781 18.234375 14.722656 18.109375 C 10.644531 16.589844 7.425781 13.375 5.898438 9.300781 C 5.765625 8.964844 5.820312 8.582031 6.046875 8.300781 C 6.046875 8.300781 7.652344 6.28125 7.679688 6.257812 C 8.105469 5.828125 8.105469 5.136719 7.679688 4.707031 C 7.648438 4.675781 5.808594 2.28125 5.808594 2.28125 C 5.371094 1.894531 4.710938 1.910156 4.296875 2.320312 L 3.148438 3.320312 C -2.496094 10.105469 14.777344 26.417969 20.722656 20.800781 L 21.632812 19.75 C 22.074219 19.339844 22.113281 18.648438 21.71875 18.191406 Z M 21.71875 18.191406 "></path>
-                    </svg>
-                    <div>{{ block.settings.phone }}</div>
-                  </div>
-                </a>
-              {% endif %}
-              {% if block.settings.email != blank %}
-                <a class="footer_contact_link" href="mailto:{{ block.settings.email }}">
-                  <div class="footer-contact-item">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                      <path fill="currentcolor" d="M 19 1 L 5 1 C 2.238281 1.003906 0.00390625 3.238281 0 6 L 0 18 C 0.00390625 20.761719 2.238281 22.996094 5 23 L 19 23 C 21.761719 22.996094 23.996094 20.761719 24 18 L 24 6 C 23.996094 3.238281 21.761719 1.003906 19 1 Z M 5 3 L 19 3 C 20.226562 3.003906 21.324219 3.75 21.78125 4.886719 L 14.121094 12.546875 C 12.949219 13.714844 11.050781 13.714844 9.878906 12.546875 L 2.21875 4.886719 C 2.675781 3.75 3.773438 3.003906 5 3 Z M 19 21 L 5 21 C 3.34375 21 2 19.65625 2 18 L 2 7.5 L 8.464844 13.960938 C 10.417969 15.910156 13.582031 15.910156 15.535156 13.960938 L 22 7.5 L 22 18 C 22 19.65625 20.65625 21 19 21 Z M 19 21 "></path>
-                    </svg>
-                    <div>{{ block.settings.email }}</div>
-                  </div>
-                </a>
-              {% endif %}
-            </div>
-          </div>
+    <!-- 2. CUSTOMER CARE -->
+    <div class="footer-col">
+      <h3>CUSTOMER CARE</h3>
+      {%- if section.settings.menu_care.links.size > 0 -%}
+        {%- for link in section.settings.menu_care.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/pages/product-care">Product Care</a>
+        <a href="/pages/track-order">Track Order</a>
+        <a href="/pages/shipping-information">Shipping Information</a>
+        <a href="/pages/faq">FAQs</a>
+        <a href="{{ routes.account_login_url }}">Customer Login</a>
+      {%- endif -%}
+    </div>
 
-        {% when 'menu' %}
-          {% assign footer_menu = linklists[block.settings.menu] %}
-          <div class="footer-col" {{ block.shopify_attributes }}>
-            <div class="footer-menu-title">{{ block.settings.heading | default: footer_menu.title }}</div>
-            {% if footer_menu.links.size > 0 %}
-              <div class="footer-col-content">
-                <div class="footer-col-content-inner">
-                  <ul class="footer-menu-list">
-                    {% for link in footer_menu.links %}
-                      <li>
-                        <a href="{{ link.url }}">{{ link.title }}</a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              </div>
-            {% endif %}
-          </div>
+    <!-- 3. ABOUT RISEON -->
+    <div class="footer-col">
+      <h3>ABOUT RISEON</h3>
+      {%- if section.settings.menu_about.links.size > 0 -%}
+        {%- for link in section.settings.menu_about.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/pages/about-us">The Brand</a>
+        <a href="/pages/brand-partner-programme">Brand Partner Programme</a>
+        <a href="/pages/brand-partner-programme">Partner Login</a>
+        <a href="/pages/contact-us">Careers</a>
+        <a href="/pages/contact-us">Contact Us</a>
+      {%- endif -%}
+    </div>
 
-        {% when 'newsletter' %}
-          <div class="footer-col footer-newsletter" {{ block.shopify_attributes }}>
-            <div class="newsletter_heading">{{ block.settings.heading }}</div>
-            <p>{{ block.settings.text }}</p>
+    <!-- 4. RISEON JOURNAL -->
+    <div class="footer-col">
+      <h3>RISEON JOURNAL</h3>
+      {%- if section.settings.menu_journal.links.size > 0 -%}
+        {%- for link in section.settings.menu_journal.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/pages/size-guide">Find Your Ring Size</a>
+        <a href="/blogs/news">Diamond Shape vs Cut</a>
+        <a href="/blogs/news">Prong, Bezel or Halo?</a>
+        <a href="/blogs/news">Desk-to-Dinner Jewellery</a>
+        <a href="/blogs/news">Read a Diamond Report</a>
+      {%- endif -%}
+    </div>
 
-            {% form 'customer' %}
-              <input type="hidden" name="contact[tags]" value="newsletter">
-              <div class="newsletter-box">
-                <input type="email" name="contact[email]" placeholder="Enter your email..." required>
-                <button type="submit">➤</button>
-              </div>
-            {% endform %}
+    <!-- 5. POLICIES -->
+    <div class="footer-col">
+      <h3>POLICIES</h3>
+      {%- if section.settings.menu_policies.links.size > 0 -%}
+        {%- for link in section.settings.menu_policies.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/policies/privacy-policy">Privacy Policy</a>
+        <a href="/policies/terms-of-service">Terms of Service</a>
+        <a href="/policies/shipping-policy">Shipping Policy</a>
+        <a href="/policies/refund-policy">Return &amp; Refund Policy</a>
+        <a href="/policies/warranty-policy">Warranty Policy</a>
+        <a href="/pages/brand-partner-programme">Partner Terms</a>
+      {%- endif -%}
+    </div>
+  </div>
 
-            <div class="small_text">{{ block.settings.note }}</div>
+  <!-- Popular searches bar -->
+  <div class="popular">
+    <strong>Popular searches</strong>
+    <span>{{ section.settings.popular_searches | default: 'Lightweight Gold Jewellery · Laboratory-Grown Diamond Rings · Office-Wear Jewellery for Women · Daily-Wear Diamond Earrings · Gold Pendants for Women · Jewellery Up to ₹24,999' }}</span>
+  </div>
 
-            <div class="footer-social">
-              {% render 'social-sharing',
-                show_facebook: section.settings.show_facebook,
-                show_twitter: section.settings.show_twitter,
-                show_instagram: section.settings.show_instagram,
-                show_pinterest: section.settings.show_pinterest,
-                show_youtube: section.settings.show_youtube,
-                show_tiktok: section.settings.show_tiktok
-              %}
-            </div>
-          </div>
-      {% endcase %}
-    {% endfor %}
+  <!-- Legal & Copyright bar -->
+  <div class="legal">
+    <span>© {{ 'now' | date: '%Y' }} Riseon Jewels. All rights reserved.</span>
+    <span>Secure payments · Made with care in India</span>
   </div>
 </footer>
 
-<div class="footer-bottom">
-  <p>
-    © {{ 'now' | date: '%Y' }}
-    <a href="{{ routes.root_url }}">
-      {{ section.settings.store_name }}
-    </a>.
-    All rights reserved.
-  </p>
-</div>
-
-<style>
-  .footer {
-    padding:40px 0;
-    background: var(--color-background);
-    color: var(--color-text);
-  }
-
-  .footer-bottom a {
-    text-decoration: none;
-    color:white;
-  }
-
-  {% liquid
-    assign footer_grid_columns = ''
-    for block in section.blocks
-      if block.type == 'about' or block.type == 'newsletter'
-        assign footer_grid_columns = footer_grid_columns | append: '1.5fr '
-      else
-        assign footer_grid_columns = footer_grid_columns | append: '1fr '
-      endif
-    endfor
-  %}
-
-  @media (min-width: 1440px) {
-    .footer-top {
-      grid-template-columns: {{ footer_grid_columns | default: 'repeat(4, 1fr)' }};
-    }
-  }
-
-  .newsletter_heading {
-    font-size: 20px;
-    margin-bottom: 5px;
-    color: var(--color-heading);
-  }
-  .footer_contact_link {
-    align-items: center;
-    gap: 10px;
-  }
-  .footer-contact-item {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .footer-contact-item > div {
-    margin: 0;
-    font-size: 16px;
-  }
-  .footer_contact_link {
-    text-decoration: none;
-    color: inherit;
-  }
-  .footer-top {
-    display: grid;
-    gap: 40px;
-  }
-
-  .footer-logo {
-    max-width: 140px;
-    margin-bottom: 15px;
-  }
-  .footer-menu-title {
-    font-size: 20px !important;
-    margin-bottom: 19px;
-    color: var(--color-heading);
-  }
-  .footer-col h3,
-  .footer-col h4 {
-    color: var(--color-heading);
-    margin-bottom: 15px;
-  }
-
-  .footer-desc {
-    line-height: 28px;
-    margin-bottom: 15px;
-  }
-  .small_text {
-    line-height: 24px;
-    font-size: 14px;
-    opacity: 0.7;
-  }
-  .footer-contact li {
-    list-style: none;
-    margin-bottom: 8px;
-  }
-
-  .footer-col ul {
-    padding: 0;
-  }
-
-  .footer-col ul li {
-    list-style: none;
-    margin-bottom: 10px;
-  }
-
-  .footer-col ul li a {
-    color: #FEFEFE;
-    opacity: 0.8;
-    text-decoration: none;
-  }
-
-  .footer-col ul li a:hover {
-    opacity: 1;
-    color: var(--color-text);
-  }
-
-  .newsletter-box {
-    display: flex;
-    background: var(--color-background-secondary);
-    border-radius: 30px;
-    overflow: hidden;
-    margin: 15px 0;
-    border: 1px solid var(--color-border);
-  }
-
-  .newsletter-box input {
-    flex: 1;
-    padding: 12px 15px;
-    background: transparent;
-    border: none;
-    color: black;
-    font-size: var(--font-body--size);
-  }
-
-  .newsletter-box input:focus-visible {
-    outline: none;
-  }
-
-  .newsletter-box button {
-    background: none;
-    border: none !important;
-    color: black;
-    padding: 0 18px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .footer-social {
-    margin-top: 10px;
-  }
-  .footer-social a {
-    display: inline-flex;
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--color-border);
-    border-radius: 50%;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
-    color: inherit;
-    text-decoration: none;
-  }
-  .footer-bottom {
-  border-top: 1px solid rgba(var(--color-foreground), 0.1);
-  border-top: 1px solid #4E032A;
-  background-color: #4E032A;
-  color:#FEFEFE;
-    padding: 20px 0;
-    text-align: center;
-  }
-
-  footer .share-button:hover {
-    background: var(--color-text);
-    color: var(--color-background);
-    border-color: var(--color-background);
-  }
-  @media (max-width: 1439px) and (min-width: 1200px) {
-    .footer-top {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-  @media (max-width: 1199px) and (min-width: 900px) {
-    .footer-top {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-  @media screen and (max-width: 989px) {
-    .footer-bottom {
-      padding-bottom: 20px;
-    }
-  }
-  @media (max-width: 900px) {
-    .footer-top {
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-    .milano-footer {
-      padding-top: 35px;
-    }
-    .newsletter_heading {
-      font-size: 18px !important;
-      color: inherit;
-    }
-    .footer-menu-list {
-      margin-top: 10px;
-    }
-
-    .footer-col {
-      border-bottom: 1px solid rgba(var(--color-foreground), 0.1);
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .footer-col:last-child{
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .footer-col.active {
-      border-bottom: 1px solid rgba(var(--color-foreground), 1);
-    }
-
-    .footer-menu-title {
-      cursor: pointer;
-      position: relative;
-      padding-right: 25px;
-      font-size: 16px !important;
-      margin-bottom: 10px !important;
-    }
-
-    .footer-menu-title::after {
-      content: "+";
-      font-size: 24px;
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      transition: transform 0.3s ease;
-      line-height: 1;
-    }
-
-    .footer-col-content {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.3s ease-out;
-      overflow: hidden;
-    }
-
-    .footer-col.active .footer-col-content {
-      grid-template-rows: 1fr;
-    }
-
-    .footer-col-content-inner {
-      min-height: 0;
-      padding-left: 10px;
-    }
-
-    .footer-col.active .footer-menu-title::after {
-      transform: translateY(-50%) rotate(45deg);
-    }
-  }
-</style>
-
 {% schema %}
 {
-  "name": " Footer",
+  "name": "Footer (Riseon)",
+  "class": "footer-section",
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "Color Scheme", "default": "scheme-1" },
-    { "type": "text", "id": "store_name", "label": "Store Name" },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer Logo"
+    },
+    {
+      "type": "text",
+      "id": "brand_tagline",
+      "label": "Brand Tagline",
+      "default": "Modern fine jewellery for women rising in their own way."
+    },
     {
       "type": "header",
-      "content": "Social Media"
-    },
-    { "type": "checkbox", "id": "show_facebook", "label": "Show Facebook", "default": true },
-    { "type": "checkbox", "id": "show_twitter", "label": "Show Twitter (X)", "default": true },
-    { "type": "checkbox", "id": "show_instagram", "label": "Show Instagram", "default": true },
-    { "type": "checkbox", "id": "show_pinterest", "label": "Show Pinterest", "default": false },
-    { "type": "checkbox", "id": "show_youtube", "label": "Show YouTube", "default": false },
-    { "type": "checkbox", "id": "show_tiktok", "label": "Show TikTok", "default": false }
-  ],
-  "blocks": [
-    {
-      "type": "about",
-      "name": "About Store",
-      "settings": [
-        { "type": "image_picker", "id": "logo", "label": "Footer Logo" },
-        { "type": "textarea", "id": "about_text", "label": "About Text", "default": "We only carry designs we believe in ethically and aesthetically – original, authentic pieces that are made to last." },
-        { "type": "header", "content": "Contact Info" },
-        { "type": "text", "id": "address", "label": "Address", "default": "Street Address 2571 Oakridge" },
-        { "type": "text", "id": "phone", "label": "Phone", "default": "+1 (555) 123-4567" },
-        { "type": "text", "id": "email", "label": "Email", "default": "[EMAIL_ADDRESS]" }
-      ]
+      "content": "Social Links"
     },
     {
-      "type": "menu",
-      "name": "Footer Menu",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading" },
-        { "type": "link_list", "id": "menu", "label": "Menu" }
-      ]
+      "type": "checkbox",
+      "id": "show_instagram",
+      "label": "Show Instagram",
+      "default": true
     },
     {
-      "type": "newsletter",
-      "name": "Newsletter",
-      "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Sign Up to Newsletter" },
-        { "type": "textarea", "id": "text", "label": "Newsletter Text", "default": "Subscribe for store updates and discounts." },
-        { "type": "textarea", "id": "note", "label": "Newsletter Note", "default": "***By entering the e-mail you accept the terms and conditions and the privacy policy." }
-      ]
-    }
-  ],
-  "max_blocks": 5,
-  "presets": [
+      "type": "url",
+      "id": "instagram_link",
+      "label": "Instagram Link"
+    },
     {
-      "name": "Footer",
-      "blocks": [
-        { "type": "about" },
-        { "type": "menu" },
-        { "type": "menu" },
-        { "type": "newsletter" }
-      ]
+      "type": "checkbox",
+      "id": "show_youtube",
+      "label": "Show YouTube",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "youtube_link",
+      "label": "YouTube Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_facebook",
+      "label": "Show Facebook",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "facebook_link",
+      "label": "Facebook Link"
+    },
+    {
+      "type": "header",
+      "content": "Navigation Menus (Optional overrides)"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_shop",
+      "label": "Shop Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_care",
+      "label": "Customer Care Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_about",
+      "label": "About Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_journal",
+      "label": "Journal Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_policies",
+      "label": "Policies Menu"
+    },
+    {
+      "type": "header",
+      "content": "Footer Badges & Searches"
+    },
+    {
+      "type": "textarea",
+      "id": "popular_searches",
+      "label": "Popular Searches Text",
+      "default": "Lightweight Gold Jewellery · Laboratory-Grown Diamond Rings · Office-Wear Jewellery for Women · Daily-Wear Diamond Earrings · Gold Pendants for Women · Jewellery Up to ₹24,999"
     }
   ]
 }

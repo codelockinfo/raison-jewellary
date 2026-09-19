@@ -16,10 +16,10 @@
 }
 
 .header {
-  top: 10px;
+  top: 0 !important;
+  margin: 0 !important;
   transition: top 0.3s ease;
   background: var(--gradient-background) !important;
-
 }
 
 .header_sticky {
@@ -417,7 +417,6 @@ header a sup {
 }
 
 header svg {
-  width: 2rem;
   color: var(--icon-color, var(--color-text, #000));
 }
 

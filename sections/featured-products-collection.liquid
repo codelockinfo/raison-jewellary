@@ -1,0 +1,160 @@
+<section class="section products-section" id="ProductsSection-{{ section.id }}">
+  <div class="section-head section-head-centered">
+    <div>
+      <span class="eyebrow">{{ section.settings.eyebrow | default: 'THE RISEON EVERYDAY EDIT' }}</span>
+      <h2>{{ section.settings.heading | default: 'Shop by Collection' }}</h2>
+    </div>
+    {%- if section.settings.view_all_text != blank -%}
+      <a href="{{ section.settings.collection.url | default: section.settings.view_all_link | default: '/collections/all' }}">
+        {{ section.settings.view_all_text | default: 'View all designs →' }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="product-grid">
+    {%- assign featured_collection = section.settings.collection -%}
+    {%- if featured_collection != blank and featured_collection.products_count > 0 -%}
+      {%- for product in featured_collection.products limit: section.settings.products_to_show -%}
+        <article class="product-card">
+          <div class="product-image">
+            {%- if product.featured_image != blank -%}
+              <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | default: product.title }}" loading="lazy">
+            {%- else -%}
+              <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png" alt="{{ product.title }}" loading="lazy">
+            {%- endif -%}
+            {%- if product.tags.size > 0 -%}
+              <span class="badge">{{ product.tags.first }}</span>
+            {%- else -%}
+              <span class="badge">{{ featured_collection.title }}</span>
+            {%- endif -%}
+            <button type="button" aria-label="Save {{ product.title }}">♡</button>
+            <a class="quick" href="{{ product.url }}">View product</a>
+          </div>
+          <div class="product-info">
+            <p>{{ product.metafields.custom.subtitle | default: 'Gold · Laboratory-Grown Diamond' }}</p>
+            <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+            <div>
+              <strong>{{ product.price | money }}</strong>
+              {%- if product.compare_at_price > product.price -%}
+                <del>{{ product.compare_at_price | money }}</del>
+              {%- endif -%}
+            </div>
+            <button type="button" onclick="window.location.href='{{ product.url }}'">Select options</button>
+          </div>
+        </article>
+      {%- endfor -%}
+    {%- else -%}
+      <!-- Default reference products -->
+      <article class="product-card">
+        <div class="product-image">
+          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png" alt="Aurelia Arc Ring from the Everyday Edit" loading="lazy">
+          <span class="badge">Everyday Edit</span>
+          <button type="button" aria-label="Save Aurelia Arc Ring">♡</button>
+          <a class="quick" href="/collections/ring">View product</a>
+        </div>
+        <div class="product-info">
+          <p>Gold · Laboratory-Grown Diamond</p>
+          <h3><a href="/collections/ring">Aurelia Arc Ring</a></h3>
+          <div><strong>₹18,999</strong><del></del></div>
+          <button type="button" onclick="window.location.href='/collections/ring'">Select options</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="product-image">
+          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png" alt="Mira Dewdrop Studs from the Bestseller Edit" loading="lazy">
+          <span class="badge">Bestseller Edit</span>
+          <button type="button" aria-label="Save Mira Dewdrop Studs">♡</button>
+          <a class="quick" href="/collections/earring">View product</a>
+        </div>
+        <div class="product-info">
+          <p>Gold · Laboratory-Grown Diamonds</p>
+          <h3><a href="/collections/earring">Mira Dewdrop Studs</a></h3>
+          <div><strong>₹24,999</strong><del></del></div>
+          <button type="button" onclick="window.location.href='/collections/earring'">Select options</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="product-image">
+          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-bracelet-bangles-v2.png" alt="Elara Line Bracelet from the Office Edit" loading="lazy">
+          <span class="badge">Office Edit</span>
+          <button type="button" aria-label="Save Elara Line Bracelet">♡</button>
+          <a class="quick" href="/collections/bracelate-for-her">View product</a>
+        </div>
+        <div class="product-info">
+          <p>Gold · Laboratory-Grown Diamonds</p>
+          <h3><a href="/collections/bracelate-for-her">Elara Line Bracelet</a></h3>
+          <div><strong>₹48,999</strong><del></del></div>
+          <button type="button" onclick="window.location.href='/collections/bracelate-for-her'">Select options</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="product-image">
+          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-pendant-v2.png" alt="Luna Light Pendant from the Minimal Edit" loading="lazy">
+          <span class="badge">Minimal Edit</span>
+          <button type="button" aria-label="Save Luna Light Pendant">♡</button>
+          <a class="quick" href="/collections/pendant-for-her">View product</a>
+        </div>
+        <div class="product-info">
+          <p>Gold · Laboratory-Grown Diamond</p>
+          <h3><a href="/collections/pendant-for-her">Luna Light Pendant</a></h3>
+          <div><strong>₹15,999</strong><del></del></div>
+          <button type="button" onclick="window.location.href='/collections/pendant-for-her'">Select options</button>
+        </div>
+      </article>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shop by Collection",
+  "class": "featured-products-collection-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "THE RISEON EVERYDAY EDIT"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Products to Show",
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Text",
+      "default": "View all designs →"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View All Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Collection"
+    }
+  ]
+}
+{% endschema %}

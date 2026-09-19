@@ -1,0 +1,217 @@
+<section class="section occasion-section" id="{{ section.settings.section_id | default: 'occasions' }}">
+  <div class="center-head">
+    <span class="eyebrow">{{ section.settings.eyebrow | default: 'DESIGNED FOR YOUR MOMENTS' }}</span>
+    <h2>{{ section.settings.heading | default: 'Shop by Occasion' }}</h2>
+  </div>
+
+  <div class="occasion-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <a class="occasion-card" href="{{ block.settings.link | default: '#' }}" aria-label="Shop {{ block.settings.title }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title }}" loading="lazy">
+          {%- else -%}
+            {%- case forloop.index -%}
+              {%- when 1 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png" alt="Everyday Wear" loading="lazy">
+              {%- when 2 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-bracelet-bangles-v2.png" alt="Office Wear" loading="lazy">
+              {%- when 3 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-pendant-v2.png" alt="Date Night" loading="lazy">
+              {%- when 4 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png" alt="Festive Celebrations" loading="lazy">
+              {%- when 5 -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-mangalsutra-v2.png" alt="Wedding Guest" loading="lazy">
+              {%- else -%}
+                <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-nose-pin-v2.png" alt="Meaningful Gifts" loading="lazy">
+            {%- endcase -%}
+          {%- endif -%}
+          <span>0{{ forloop.index }}</span>
+          <div>
+            <h3>{{ block.settings.title }}</h3>
+            <p>{{ block.settings.subtitle }}</p>
+            <small>{{ block.settings.link_text | default: 'Explore designs →' }}</small>
+          </div>
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      <a class="occasion-card" href="/collections/ring" aria-label="Shop Everyday Wear">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-ring-v2.png" alt="Rendered jewellery for Everyday Wear" loading="lazy">
+        <span>01</span>
+        <div>
+          <h3>Everyday Wear</h3>
+          <p>Easy brilliance for every day</p>
+          <small>Explore designs →</small>
+        </div>
+      </a>
+
+      <a class="occasion-card" href="/collections/bracelate-for-her" aria-label="Shop Office Wear">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-bracelet-bangles-v2.png" alt="Rendered jewellery for Office Wear" loading="lazy">
+        <span>02</span>
+        <div>
+          <h3>Office Wear</h3>
+          <p>Refined pieces for workdays</p>
+          <small>Explore designs →</small>
+        </div>
+      </a>
+
+      <a class="occasion-card" href="/collections/pendant-for-her" aria-label="Shop Date Night">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-pendant-v2.png" alt="Rendered jewellery for Date Night" loading="lazy">
+        <span>03</span>
+        <div>
+          <h3>Date Night</h3>
+          <p>A little extra evening shine</p>
+          <small>Explore designs →</small>
+        </div>
+      </a>
+
+      <a class="occasion-card" href="/collections/earring" aria-label="Shop Festive Celebrations">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-earring-v2.png" alt="Rendered jewellery for Festive Celebrations" loading="lazy">
+        <span>04</span>
+        <div>
+          <h3>Festive Celebrations</h3>
+          <p>Modern sparkle for festivities</p>
+          <small>Explore designs →</small>
+        </div>
+      </a>
+
+      <a class="occasion-card" href="/collections/mangalsutra-pendant" aria-label="Shop Wedding Guest">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-mangalsutra-v2.png" alt="Rendered jewellery for Wedding Guest" loading="lazy">
+        <span>05</span>
+        <div>
+          <h3>Wedding Guest</h3>
+          <p>Elevated, occasion-ready designs</p>
+          <small>Explore designs →</small>
+        </div>
+      </a>
+
+      <a class="occasion-card" href="/collections/nose-pin" aria-label="Shop Meaningful Gifts">
+        <img src="https://riseon-jewels.r-katariya56.chatgpt.site/categories/shop-nose-pin-v2.png" alt="Rendered jewellery for Meaningful Gifts" loading="lazy">
+        <span>06</span>
+        <div>
+          <h3>Meaningful Gifts</h3>
+          <p>Fine jewellery for every milestone</p>
+          <small>Explore designs →</small>
+        </div>
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shop by Occasion",
+  "class": "shop-by-occasion-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section Anchor ID",
+      "default": "occasions"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "DESIGNED FOR YOUR MOMENTS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Occasion"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "occasion_item",
+      "name": "Occasion Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Card Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Occasion Title",
+          "default": "Everyday Wear"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Easy brilliance for every day"
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text",
+          "default": "Explore designs →"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Occasion",
+      "blocks": [
+        {
+          "type": "occasion_item",
+          "settings": {
+            "title": "Everyday Wear",
+            "subtitle": "Easy brilliance for every day",
+            "link": "/collections/ring"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "title": "Office Wear",
+            "subtitle": "Refined pieces for workdays",
+            "link": "/collections/bracelate-for-her"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "title": "Date Night",
+            "subtitle": "A little extra evening shine",
+            "link": "/collections/pendant-for-her"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "title": "Festive Celebrations",
+            "subtitle": "Modern sparkle for festivities",
+            "link": "/collections/earring"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "title": "Wedding Guest",
+            "subtitle": "Elevated, occasion-ready designs",
+            "link": "/collections/mangalsutra-pendant"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "title": "Meaningful Gifts",
+            "subtitle": "Fine jewellery for every milestone",
+            "link": "/collections/nose-pin"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

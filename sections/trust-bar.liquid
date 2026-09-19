@@ -1,0 +1,115 @@
+<section class="trust" id="TrustBar-{{ section.id }}">
+  {%- if section.blocks.size > 0 -%}
+    {%- for block in section.blocks -%}
+      <article {{ block.shopify_attributes }}>
+        <i>{{ block.settings.icon | default: '◈' }}</i>
+        <div>
+          <strong>{{ block.settings.title }}</strong>
+          <span>{{ block.settings.subtitle }}</span>
+        </div>
+      </article>
+    {%- endfor -%}
+  {%- else -%}
+    <article>
+      <i>◈</i>
+      <div>
+        <strong>Gold Purity Disclosed</strong>
+        <span>Karat and fineness shown product-wise</span>
+      </div>
+    </article>
+    <article>
+      <i>◇</i>
+      <div>
+        <strong>Laboratory-Grown Diamonds</strong>
+        <span>Origin and reports stated where supplied</span>
+      </div>
+    </article>
+    <article>
+      <i>⌾</i>
+      <div>
+        <strong>Secure, Trackable Delivery</strong>
+        <span>Carefully packed and tracked to you</span>
+      </div>
+    </article>
+    <article>
+      <i>◉</i>
+      <div>
+        <strong>Human Support</strong>
+        <span>Real help before and after purchase</span>
+      </div>
+    </article>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Trust Bar",
+  "class": "trust-bar-section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "trust_item",
+      "name": "Trust Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon / Symbol",
+          "default": "◈"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Gold Purity Disclosed"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Karat and fineness shown product-wise"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust Bar",
+      "blocks": [
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon": "◈",
+            "title": "Gold Purity Disclosed",
+            "subtitle": "Karat and fineness shown product-wise"
+          }
+        },
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon": "◇",
+            "title": "Laboratory-Grown Diamonds",
+            "subtitle": "Origin and reports stated where supplied"
+          }
+        },
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon": "⌾",
+            "title": "Secure, Trackable Delivery",
+            "subtitle": "Carefully packed and tracked to you"
+          }
+        },
+        {
+          "type": "trust_item",
+          "settings": {
+            "icon": "◉",
+            "title": "Human Support",
+            "subtitle": "Real help before and after purchase"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,58 @@
+<section class="campaign-poster" id="CampaignPoster-{{ section.id }}" {%- if section.settings.image != blank -%}style="background-image: linear-gradient(90deg, #2a0018df 0%, #2a0018a8 34%, transparent 68%), url('{{ section.settings.image | image_url: width: 2000 }}');"{%- endif -%}>
+  <div>
+    <span class="eyebrow">{{ section.settings.eyebrow | default: 'RISE IN STYLE' }}</span>
+    <h2>{{ section.settings.heading | default: 'Your ambition<br/>deserves its own shine.' }}</h2>
+    <p>{{ section.settings.description | default: 'Lightweight gold and laboratory-grown diamonds for women building life on their own terms.' }}</p>
+    <a class="btn light" href="{{ section.settings.button_link | default: '#shop' }}">
+      {{ section.settings.button_label | default: 'Discover the office edit' }}
+    </a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Campaign Poster",
+  "class": "campaign-poster-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Poster Background Image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "RISE IN STYLE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your ambition<br/>deserves its own shine."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Lightweight gold and laboratory-grown diamonds for women building life on their own terms."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Discover the office edit"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Campaign Poster"
+    }
+  ]
+}
+{% endschema %}

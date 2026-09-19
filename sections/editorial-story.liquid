@@ -1,0 +1,74 @@
+<section class="editorial" id="{{ section.settings.section_id | default: 'story' }}">
+  <div class="editorial-image" {%- if section.settings.image != blank -%}style="background-image: url('{{ section.settings.image | image_url: width: 1200 }}');"{%- endif -%}>
+    <div></div>
+  </div>
+  <div class="editorial-copy">
+    <span class="eyebrow">{{ section.settings.eyebrow | default: 'ABOUT RISEON' }}</span>
+    <h2 class="founder-name">{{ section.settings.founder_name | default: 'Apurva Yadav' }}</h2>
+    <p class="founder-role">{{ section.settings.founder_role | default: 'Founder, Riseon Jewels' }}</p>
+    <p class="founder-story">{{ section.settings.story_text | default: 'Growing up with financial challenges taught me how much independence means to a woman. After my MBA and a career in an MNC, I wanted to build something that reflected women’s ambition and everyday progress. That purpose became Riseon Jewels—lightweight gold and lab-grown diamond jewellery for women creating their own identity. Each design is intended to celebrate her journey, from a first salary to a promotion or a personal new beginning. Through our Brand Partner Programme, my vision is also to help women pursue flexible earning opportunities through genuine jewellery sales. As Riseon grows, I want more women to feel confident celebrating their achievements and shaping their own future.' }}</p>
+    <a class="btn primary" href="{{ section.settings.button_link | default: '#shop' }}">
+      {{ section.settings.button_label | default: 'Explore everyday fine jewellery' }}
+    </a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial Story",
+  "class": "editorial-story-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section Anchor ID",
+      "default": "story"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Founder Portrait Image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "ABOUT RISEON"
+    },
+    {
+      "type": "text",
+      "id": "founder_name",
+      "label": "Founder Name",
+      "default": "Apurva Yadav"
+    },
+    {
+      "type": "text",
+      "id": "founder_role",
+      "label": "Founder Role",
+      "default": "Founder, Riseon Jewels"
+    },
+    {
+      "type": "textarea",
+      "id": "story_text",
+      "label": "Founder Story",
+      "default": "Growing up with financial challenges taught me how much independence means to a woman. After my MBA and a career in an MNC, I wanted to build something that reflected women’s ambition and everyday progress. That purpose became Riseon Jewels—lightweight gold and lab-grown diamond jewellery for women creating their own identity. Each design is intended to celebrate her journey, from a first salary to a promotion or a personal new beginning. Through our Brand Partner Programme, my vision is also to help women pursue flexible earning opportunities through genuine jewellery sales. As Riseon grows, I want more women to feel confident celebrating their achievements and shaping their own future."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Explore everyday fine jewellery"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Story"
+    }
+  ]
+}
+{% endschema %}
