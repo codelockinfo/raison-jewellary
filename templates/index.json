@@ -15,6 +15,7 @@
         "slide_1": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/riseon-earned-shine.png",
             "link": "#shop",
             "alt_text": "Riseon Jewels everyday diamonds campaign featuring a confident woman wearing lightweight gold and laboratory-grown diamond jewellery"
           }
@@ -22,6 +23,7 @@
         "slide_2": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/riseon-office-edit.png",
             "link": "#occasions",
             "alt_text": "Riseon Jewels office edit featuring polished lightweight jewellery for meetings, workdays and dinner"
           }
@@ -29,6 +31,7 @@
         "slide_3": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/riseon-modern-mangalsutra.png",
             "link": "/collections/mangalsutra-pendant",
             "alt_text": "Riseon Jewels modern mangalsutra collection featuring a contemporary laboratory-grown diamond mangalsutra"
           }
@@ -36,6 +39,7 @@
         "slide_4": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/riseon-trust.png",
             "link": "/pages/about-us",
             "alt_text": "Riseon Jewels trust and transparency campaign showing hallmarked gold and certified laboratory-grown diamond jewellery"
           }
@@ -106,42 +110,48 @@
           "type": "category_card",
           "settings": {
             "title": "Ring",
-            "link": "/collections/ring"
+            "link": "/collections/ring",
+            "alt_text": ""
           }
         },
         "cat_earring": {
           "type": "category_card",
           "settings": {
             "title": "Earring",
-            "link": "/collections/earring"
+            "link": "/collections/earring",
+            "alt_text": ""
           }
         },
         "cat_pendant": {
           "type": "category_card",
           "settings": {
             "title": "Pendant",
-            "link": "/collections/pendant-for-her"
+            "link": "/collections/pendant-for-her",
+            "alt_text": ""
           }
         },
         "cat_bracelet": {
           "type": "category_card",
           "settings": {
             "title": "Bracelet & Bangles",
-            "link": "/collections/bracelate-for-her"
+            "link": "/collections/bracelate-for-her",
+            "alt_text": ""
           }
         },
         "cat_nose_pin": {
           "type": "category_card",
           "settings": {
             "title": "Nose Pin",
-            "link": "/collections/nose-pin"
+            "link": "/collections/nose-pin",
+            "alt_text": ""
           }
         },
         "cat_mangalsutra": {
           "type": "category_card",
           "settings": {
             "title": "Mangalsutra",
-            "link": "/collections/mangalsutra-pendant"
+            "link": "/collections/mangalsutra-pendant",
+            "alt_text": ""
           }
         }
       },
@@ -166,9 +176,10 @@
       "settings": {
         "eyebrow": "THE RISEON EVERYDAY EDIT",
         "heading": "Shop by Collection",
+        "collection": "",
+        "products_to_show": 4,
         "view_all_text": "View all designs →",
-        "view_all_link": "/collections/ring",
-        "products_to_show": 4
+        "view_all_link": "/collections/ring"
       }
     },
     "home_promise": {
@@ -360,7 +371,7 @@
       "type": "campaign-poster",
       "settings": {
         "eyebrow": "RISE IN STYLE",
-        "heading": "Your ambition<br/>deserves its own shine.",
+        "heading": "Your ambition<br>deserves its own shine.",
         "description": "Lightweight gold and laboratory-grown diamonds for women building life on their own terms.",
         "button_label": "Discover the office edit",
         "button_link": "#shop"
@@ -399,7 +410,7 @@
       "settings": {
         "section_id": "partner",
         "eyebrow": "RISEON BRAND PARTNER",
-        "heading": "Share the style.<br/>Grow with Riseon.",
+        "heading": "Share the style.<br>Grow with Riseon.",
         "description": "Recommend jewellery you genuinely love and earn on eligible delivered orders.",
         "button_label": "Explore the programme",
         "button_link": "/pages/brand-partner-programme",
@@ -449,6 +460,7 @@
         "section_id": "journal",
         "eyebrow": "BUY WITH CLARITY",
         "heading": "The Riseon Journal",
+        "blog": "",
         "view_all_text": "Explore all guides →",
         "view_all_link": "/blogs/news"
       }
