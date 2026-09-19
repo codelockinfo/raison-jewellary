@@ -1,0 +1,207 @@
+
+<div class="faq-tabs-section color-{{ section.settings.color_scheme }}" style="--padding-desktop: {{ section.settings.section_padding_desktop }}; --padding-mobile: {{ section.settings.section_padding_mobile }};">
+  <div class="faq-container container_width">
+    {% if section.settings.title != blank %}
+      <div class="faq-section-title">
+        {% render 'heading-style-banner',
+          heading: section.settings.title,
+          heading_tag: section.settings.heading_tag,
+          heading_style: section.settings.heading_style,
+          heading_alignment: section.settings.heading_alignment,
+          wrapper_class: 'faq-tabs-section'
+        %}
+      </div>
+    {% endif %}
+
+    <div class="faq-items">
+      {% for block in section.blocks %}
+        <div class="faq-item{% if block.settings.open_by_default %} active{% endif %}" {{ block.shopify_attributes }}>
+          <button class="faq-question" aria-label="faq question" aria-expanded="{% if block.settings.open_by_default %}true{% else %}false{% endif %}">
+            {{ block.settings.question }}
+            <span class="faq-icon">
+              <svg width="12" height="12" viewBox="0 0 10 10" fill="none" xmlns="https://www.w3.org/2000/svg">
+                <path d="M1 3.5L5 7.5L9 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              {{ block.settings.answer }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+.faq-tabs-section {
+  padding: var(--padding-desktop);
+}
+@media (max-width: 768px) {
+  .faq-tabs-section {
+    padding: var(--padding-mobile);
+  }
+}
+
+  .faq-section-title {
+    text-align: {{ section.settings.title_alignment }};
+    margin-bottom: 10px;
+    color: var(--color-heading);
+  }
+  
+  .faq-item {
+    border-bottom: 1px solid var(--color-border);
+  }
+  .faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    background: none;
+    border: none !important;
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-heading);
+    transition: color 0.3s ease;
+  }
+  .faq-question:hover {
+    opacity: 0.8;
+  }
+  .faq-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--color-heading);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+  }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+  }
+  .faq-item.active .faq-answer {
+    max-height: 1000px;
+    transition: max-height 0.4s cubic-bezier(1, 0, 1, 0);
+  }
+  .faq-answer-inner {
+    padding-bottom: 20px;
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      question.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        
+        // Close all other items if needed (optional)
+        // faqItems.forEach(i => i.classList.remove('active'));
+
+        if (isActive) {
+          item.classList.remove('active');
+          question.setAttribute('aria-expanded', 'false');
+        } else {
+          item.classList.add('active');
+          question.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Dynamic FAQ Tabs",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Section Heading",
+      "default": "Frequently Asked Questions"
+    },
+     {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Title Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    { "type": "header", "content": "Section Spacing" },
+    { "type": "text", "id": "section_padding_desktop", "label": "Section Padding (Desktop)", "default": "60px 20px 60px 20px" },
+    { "type": "text", "id": "section_padding_mobile", "label": "Section Padding (Mobile)", "default": "20px 20px 20px 20px" }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "question",
+          "label": "Question",
+          "default": "<p>Add your question here</p>"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Add your detailed answer here. This content is dynamic!</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_by_default",
+          "label": "Open by default",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Dynamic FAQ Tabs",
+         "category": "Store Information",
+      "blocks": [
+        { "type": "faq" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

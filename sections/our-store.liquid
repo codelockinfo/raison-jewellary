@@ -1,0 +1,315 @@
+{% liquid
+  assign section_id = 'store-locations-' | append: section.id
+%}
+
+
+{{ 'our-store.css' | asset_url | stylesheet_tag }}
+
+<section
+  id="{{ section_id }}"
+  class="store-locations-section color-{{ section.settings.color_scheme }}"
+  style="
+    --padding-desktop: {{ section.settings.padding_desktop }};
+    --padding-mobile: {{ section.settings.padding_mobile }};
+  "
+>
+<div class="store-locations__container ">
+
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="store-locations__heading-wrapper" style="text-align: {{ section.settings.heading_alignment }};">
+        
+        {% if section.settings.heading != blank %}
+          {% render 'heading-style-banner',
+            heading: section.settings.heading,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            wrapper_class: 'store-locations'
+          %}
+        {% endif %}
+
+        {% if section.settings.subheading != blank %}
+          <p class="store-locations__subheading">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="store-layout {% if section.settings.map_position == 'right' %}map-right{% endif %}">
+      
+      <!-- STORES -->
+      <div class="store-list-wrapper">
+       
+
+        <div class="store-list">
+          {% for block in section.blocks %}
+            <div
+              class="store-card"
+              {{ block.shopify_attributes }}
+            >
+         
+
+              <div class="store-card-info">
+                <div class="store-card-header">
+                  <h3 class="store-name-link">{{ block.settings.store_name }}</h3>
+                </div>
+                
+                {% if block.settings.address != blank %}
+                  <div class="store-address-wrapper">
+                    <p class="store-address">{{ block.settings.address }}</p>
+                  </div>
+                {% endif %}
+
+        
+
+                <div class="store-details">
+                  {% if block.settings.phone != blank %}
+                    <p class="store-detail-item"><strong>Phone:</strong> {{ block.settings.phone }}</p>
+                  {% endif %}
+                  {% if block.settings.email != blank %}
+                    <p class="store-detail-item"><strong>Email:</strong> {{ block.settings.email }}</p>
+                  {% endif %}
+                  {% if block.settings.time != blank %}
+                    <div class="store-timing">
+                      {{ block.settings.time }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="store-actions">
+                  {% if block.settings.direction_url != blank %}
+                    <a href="{{ block.settings.direction_url }}" class="store-btn store-btn--primary" target="_blank">
+                      {{ block.settings.direction_text | default: 'Get Directions' }}
+                    </a>
+                  {% endif %}
+                  
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="store-map">
+        {% if section.settings.map_embed != blank %}
+          <iframe
+            src="{{ section.settings.map_embed }}"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen>
+          </iframe>
+        {% else %}
+          <div class="map-placeholder">
+            {{ 'image' | placeholder_svg_tag: 'map-placeholder-svg' }}
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+{% style %}
+  #{{ section_id }} {
+    {% liquid
+      case section.settings.heading_tag
+        when 'h1'
+          assign h_px = settings.h1_font_size | default: 42
+        when 'h2'
+          assign h_px = settings.h2_font_size | default: 38
+        when 'h3'
+          assign h_px = settings.type_header_base_size | default: 32
+        when 'h4'
+          assign h_px = settings.h4_font_size | default: 28
+        when 'h5'
+          assign h_px = settings.h5_font_size | default: 24
+        when 'h6'
+          assign h_px = settings.h6_font_size | default: 20
+        else
+          assign h_px = settings.h2_font_size | default: 38
+      endcase
+    %}
+    --heading-size: {{ h_px }}px;
+  }
+{% endstyle %}
+{% schema %}
+{
+  "name": "Store Locations",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "Our Stores"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+  {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        {
+          "value": "simple",
+          "label": "design 1"
+        },
+        {
+          "value": "line-top",
+          "label": "design 2"
+        },
+        {
+          "value": "underline",
+          "label": "design 3"
+        },
+        {
+          "value": "lines",
+          "label": "design 4"
+        },
+        {
+          "value": "diamond",
+          "label": "design 5"
+        },
+        {
+          "value": "ornament",
+          "label": "design 6"
+        },
+        {
+          "value": "x",
+          "label": "design 7"
+        }
+      ],
+      "info": "Choose the decorative style for the heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+
+    {
+      "type": "header",
+      "content": "Sub Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Sub Heading"
+    },
+ {
+      "type": "header",
+      "content": "Map Position"
+    },
+    {
+      "type": "select",
+      "id": "map_position",
+      "label": "Map Position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+     {
+      "type": "url",
+      "id": "map_embed",
+      "label": "Google Map Embed URL"
+    },
+    { "type": "header", "content": "Section Spacing" },
+    { "type": "text", "id": "padding_desktop", "label": "Section Padding (Desktop)", "default": "60px 20px 60px 20px" },
+    { "type": "text", "id": "padding_mobile", "label": "Section Padding (Mobile)", "default": "20px 20px 20px 20px" },
+
+  ],
+
+  "blocks": [
+    {
+      "type": "store",
+      "name": "Store Location",
+      "settings": [
+        {
+          "type": "text",
+          "id": "store_name",
+          "label": "Store Name",
+          "default": "South Fulton"
+        },
+        {
+          "type": "textarea",
+          "id": "address",
+          "label": "Address",
+          "default":"100 Street, Chicago, State, Zip Code: 10005, United States."
+        },
+        {
+          "type": "text",
+          "id": "phone",
+          "label": "Phone",
+        "default":"+1 (973) 435-3638"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email",
+          "default":"info@fashionwomen.com"
+        },
+        {
+          "type": "richtext",
+          "id": "time",
+          "label": "Text",
+          "default":"<p>Mon - Friday: 8:00am - 5:00pm</p><p>Saturday - Sunday: 10:00am - 5:00pm</p>"
+        },
+        {
+        "type": "text",
+        "id": "direction_text",
+        "label": "Button Text",
+        "default": "Get Directions"
+        },
+            {
+        "type": "url",
+        "id": "direction_url",
+        "label": "Get Directions URL"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Our Store",
+      "category": "Store Information",
+      "blocks": [
+        { "type": "store" },
+        { "type": "store" },
+        { "type": "store" }
+      ]
+    }
+  ]
+}
+{% endschema %}

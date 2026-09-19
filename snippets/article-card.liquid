@@ -1,0 +1,95 @@
+{% liquid
+  assign image_ratio = image_aspect_ratio | default: settings.article_image_aspect_ratio | default: '16/9'
+  assign alignment = content_alignment | default: settings.article_align_content | default: 'text-left'
+
+  assign show_date_final = show_date
+  if show_date_final == nil
+    assign show_date_final = settings.article_show_date
+  endif
+
+  assign show_excerpt_final = show_excerpt
+  if show_excerpt_final == nil
+    assign show_excerpt_final = settings.article_show_excerpt
+  endif
+
+  assign show_button_final = show_button
+  if show_button_final == nil
+    assign show_button_final = settings.article_show_button
+  endif
+
+  assign show_tags_final = show_tags
+  if show_tags_final == nil
+    assign show_tags_final = settings.article_show_tags
+  endif
+
+  assign ratio_class = image_ratio | replace: '/', '-'
+%}
+
+<div class="article-card-wrapper card-wrapper {{ class }}">
+  <div class="article-card">
+
+    {%- if show_image and article.image -%}
+      <div class="article-card__image-wrapper">
+        <a href="{{ article.url }}" class="article-card__image-link" aria-label="{{ article.title }}">
+          <div class="article-card__image media aspect-{{ ratio_class }}">
+            <img
+              srcset="
+                {{ article.image | image_url: width: 165 }} 165w,
+                {{ article.image | image_url: width: 360 }} 360w,
+                {{ article.image | image_url: width: 533 }} 533w,
+                {{ article.image | image_url: width: 720 }} 720w,
+                {{ article.image | image_url: width: 1000 }} 1000w"
+              src="{{ article.image | image_url: width: 533 }}"
+              sizes="(min-width: 960px) 450px, (min-width: 720px) 50vw, 100vw"
+              alt="{{ article.image.alt | escape }}"
+              class="motion-reduce"
+              {% unless lazy_load == false %}loading="lazy"{% endunless %}
+              width="{{ article.image.width }}"
+              height="{{ article.image.height }}"
+            >
+          </div>
+        </a>
+      </div>
+    {%- endif -%}
+
+    <div class="article-card__content {{ alignment }}">
+
+      {%- if show_tags_final and article.tags.size > 0 -%}
+        <div class="article-card__tags">
+          {% for tag in article.tags limit: 2 %}
+            <span class="article-card__tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {%- endif -%}
+
+      <div class="article-card__info">
+        {%- if show_date_final -%}
+          <span class="article-card__date">
+            {{ article.published_at | time_tag: format: 'date' }}
+          </span>
+        {%- endif -%}
+
+        {%- if show_author -%}
+          <span class="article-card__author">{{ article.author }}</span>
+        {%- endif -%}
+      </div>
+
+      <h3 class="article-card__title">
+        <a href="{{ article.url }}">{{ article.title | escape }}</a>
+      </h3>
+
+      {%- if show_excerpt_final and article.excerpt_or_content.size > 0 -%}
+        <div class="article-card__excerpt">
+          {{ article.excerpt_or_content | strip_html | truncatewords: 30 }}
+        </div>
+      {%- endif -%}
+
+      {%- if show_button_final -%}
+        <a href="{{ article.url }}" class="article-card__read-more">
+          Read More
+        </a>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,502 @@
+{% liquid
+  assign overlay_enabled = false
+  assign side_by_side = false
+  if section.settings.image != blank
+    if section.settings.layout == 'overlay'
+      assign overlay_enabled = true
+    elsif section.settings.layout == 'side_by_side'
+      assign side_by_side = true
+    endif
+  endif
+%}
+
+<section class="newsletter-section section-{{ section.id }} color-{{ section.settings.color_scheme }} skeleton-container">
+  <div class="skeleton-visible">
+    <div class="newsletter-container page-width" style="padding: {{ section.settings.section_padding }};">
+       <div style="display: flex; gap: 40px; align-items: center; justify-content: center; flex-direction: {% if side_by_side %}{% if section.settings.image_position == 'right' %}row-reverse{% else %}row{% endif %}{% else %}column{% endif %};">
+         {% if section.settings.image != blank %}
+           <div class="skeleton-box skeleton-shimmer" style="width: {% if side_by_side %}60%{% else %}100%{% endif %}; aspect-ratio: 16/9; border-radius: 20px;"></div>
+         {% endif %}
+         <div style="width: {% if side_by_side %}40%{% else %}100%{% endif %}; text-align: center;">
+            <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 40px; width: 300px; margin: 0 auto 20px;"></div>
+            <div class="skeleton-box skeleton-shimmer skeleton-text medium" style="margin: 0 auto 30px;"></div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+               <div class="skeleton-box skeleton-shimmer" style="flex: 1; height: 50px; border-radius: 5px; max-width: 300px;"></div>
+               <div class="skeleton-box skeleton-shimmer" style="width: 120px; height: 50px; border-radius: 5px;"></div>
+            </div>
+         </div>
+       </div>
+    </div>
+  </div>
+    <div
+      class="
+          newsletter-container
+          {% unless overlay_enabled %}
+          page-width
+        {% endunless %}
+
+          {% if side_by_side %} newsletter--side{% endif %}
+          image-pos--{{ section.settings.image_position }}
+          content-align--{{ section.settings.content_alignment }}
+          content-pos--{{ section.settings.overlay_position }}
+      "
+    >
+      {% if section.settings.image != blank %}
+        <div
+          class="
+            newsletter-image-wrapper
+            {% if overlay_enabled %} has-overlay full-screen-image content-pos--{{ section.settings.overlay_position }}{% endif %}
+          "
+        >
+          <picture>
+            {% if section.settings.mobile_image != blank %}
+              <source media="(max-width: 768px)" srcset="{{ section.settings.mobile_image | image_url: width: 900 }}">
+            {% endif %}
+            {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+            {% assign fetch_priority = 'low' %}
+            {% if loading_strategy == 'eager' %}
+              {% assign fetch_priority = 'high' %}
+            {% endif %}
+            <img
+              src="{{ section.settings.image | image_url: width: 1600 }}"
+              alt="{{ section.settings.image.alt | default: section.settings.heading | default: 'Newsletter image' | escape }}"
+              class="newsletter-image"
+              loading="{{ loading_strategy }}"
+              fetchpriority="{{ fetch_priority }}"
+              width="{{ section.settings.image.width }}"
+              height="{{ section.settings.image.height }}"
+            >
+          </picture>
+
+          {% if overlay_enabled %}
+            <div class="newsletter-overlay">
+              <div class="newsletter-content">
+                  <div class="newsletter-heading">
+                    {% if section.settings.heading != blank %}
+                      {% render 'heading-style-banner',
+                        heading: section.settings.heading,
+                        heading_tag: section.settings.heading_tag,
+                        heading_style: section.settings.heading_style,
+                        heading_alignment: section.settings.content_alignment,
+                        wrapper_class: 'newsletter-section'
+                      %}
+                    {% endif %}
+                  </div>
+
+                {% if section.settings.subheading != blank %}
+                  <p class="newsletter-subheading newsletter-subheading--{{ section.settings.content_alignment }}">
+                    {{ section.settings.subheading }}
+                  </p>
+                {% endif %}
+
+                {% form 'customer', class: 'newsletter-form' %}
+                  <input type="hidden" name="contact[tags]" value="newsletter">
+
+                  <div class="newsletter-form-wrapper">
+                    <input
+                      type="email"
+                      name="contact[email]"
+                      class="newsletter-input"
+                      placeholder="Enter your email"
+                      required
+                    >
+
+                    <button type="submit" class="newsletter-button" aria-label="{{ section.settings.button_text }}">
+                      {{ section.settings.button_text }}
+                    </button>
+                  </div>
+
+                  {% if form.posted_successfully? %}
+                    <p class="newsletter-success newsletter-success--{{ section.settings.content_alignment }}">
+                      {{ section.settings.success_message }}
+                    </p>
+                  {% endif %}
+                {% endform %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% unless overlay_enabled %}
+        <div class="newsletter-content">
+          <div class="newsletter-heading">
+                    {% if section.settings.heading != blank %}
+                      {% render 'heading-style-banner',
+                        heading: section.settings.heading,
+                        heading_tag: section.settings.heading_tag,
+                        heading_style: section.settings.heading_style,
+                        heading_alignment: section.settings.content_alignment,
+                        wrapper_class: 'newsletter-section'
+                      %}
+                    {% endif %}
+                  </div>
+
+          {% if section.settings.subheading != blank %}
+            <p class="newsletter-subheading newsletter-subheading--{{ section.settings.content_alignment }}">
+              {{ section.settings.subheading }}
+            </p>
+          {% endif %}
+
+          {% form 'customer', class: 'newsletter-form' %}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+
+            <div class="newsletter-form-wrapper">
+              <input
+                type="email"
+                name="contact[email]"
+                class="newsletter-input"
+                placeholder="Enter your email"
+                required
+              >
+
+              <button type="submit" class="newsletter-button" aria-label="{{ section.settings.button_text }}">
+                {{ section.settings.button_text }}
+              </button>
+            </div>
+
+            {% if form.posted_successfully? %}
+              <p class="newsletter-success newsletter-success--{{ section.settings.content_alignment }}">
+                {{ section.settings.success_message }}
+              </p>
+            {% endif %}
+          {% endform %}
+        </div>
+      {% endunless %}
+    </div>
+</section>
+
+
+<style>
+
+
+  .newsletter-section {
+    padding: {{ section.settings.section_padding }};
+  }
+  @media (max-width: 768px) {
+    .newsletter-section {
+      padding: {{ section.settings.section_padding_mobile }};
+    }
+  }
+
+  .newsletter-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding:0;
+  }
+
+  /* SIDE BY SIDE */
+  .newsletter--side {
+    display: flex;
+    gap: 40px;
+    align-items: center; /* Default fallback */
+  }
+  .newsletter--side.content-pos--top-center { align-items: flex-start; }
+  .newsletter--side.content-pos--center { align-items: center; }
+  .newsletter--side.content-pos--bottom-center { align-items: flex-end; }
+
+  .newsletter--side .newsletter-image-wrapper{
+    width: 60%;
+  }
+  .newsletter--side .newsletter-content {
+    width: 40%;
+  }
+  .image-pos--right {
+    flex-direction: row-reverse;
+  }
+
+  /* IMAGE */
+  .newsletter-image-wrapper {
+    justify-content: center;
+    position: relative;
+  }
+
+  /* FULL SCREEN IMAGE WHEN OVERLAY IS ON */
+  {% comment %} .newsletter-image-wrapper.full-screen-image {
+    width: 100%;
+    height: 100vh;
+  } {% endcomment %}
+
+  .newsletter-image-wrapper.full-screen-image .newsletter-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+ .newsletter-image-wrapper .newsletter-image {
+   {% comment %} max-height:400px; {% endcomment %}
+   width:100%;
+}
+  .newsletter-overlay .newsletter-content {
+    max-width: 520px;
+    width: 100%;
+    color: #FEFEFE;
+    padding: 0;
+  }
+
+  /* OVERLAY */
+
+  .newsletter-image-wrapper.has-overlay .newsletter-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    padding: 30px;
+  }
+
+  /* TOP */
+  .newsletter-image-wrapper.content-pos--top-center .newsletter-overlay {
+    justify-content: center;
+    align-items: flex-start;
+    top:50px;
+  }
+
+  /* CENTER */
+  .newsletter-image-wrapper.content-pos--center .newsletter-overlay {
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* BOTTOM */
+  .newsletter-image-wrapper.content-pos--bottom-center .newsletter-overlay {
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  /* HORIZONTAL ALIGNMENT OVERRIDES */
+  .content-align--left .newsletter-overlay { justify-content: flex-start !important; }
+  .content-align--center .newsletter-overlay { justify-content: center !important; }
+  .content-align--right .newsletter-overlay { justify-content: flex-end !important; }
+
+  /* CONTENT */
+  .newsletter-content {
+    max-width: 600px;
+    width: 100%;
+    padding: 20px 0 0;
+  }
+
+  .content-align--center .newsletter-content { margin-left: auto; margin-right: auto; }
+  .content-align--right .newsletter-content { margin-left: auto; margin-right: 0; }
+  .content-align--left .newsletter-content { margin-left: 0; margin-right: auto; }
+
+  /* FORM WRAPPER ALIGNMENT */
+  .content-align--left .newsletter-form-wrapper { justify-content: flex-start; }
+  .content-align--center .newsletter-form-wrapper { justify-content: center; }
+  .content-align--right .newsletter-form-wrapper { justify-content: flex-end; }
+
+  .newsletter-heading {
+    color: var(--color-heading);
+    margin-bottom: 0px;
+  }
+
+  .newsletter-subheading {
+    color: var(--color-subtext);
+    margin-bottom: 10px;
+  }
+
+  .newsletter-subheading--center,
+  .newsletter-success--center {
+    text-align: center;
+  }
+  .newsletter-subheading--right,
+  .newsletter-success--right {
+    text-align: right;
+  }
+  .newsletter-subheading--left,
+  .newsletter-success--left {
+    text-align: left;
+  }
+
+  /* Removed mobile override to respect alignment settings */
+
+
+  /* FORM */
+  .newsletter-form-wrapper {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .newsletter-input {
+    flex: 1;
+    padding: 14px;
+    border: var(--style-border-width-inputs) solid var(--color-border);
+    border-radius: var(--style-border-radius-inputs);
+  }
+
+  .newsletter-button {
+    padding: 14px 28px;
+    background: var(--color-button);
+    color: var(--color-button-text);
+    cursor: pointer;
+  }
+
+  .newsletter-button:hover {
+    background: var(--color-button-hover);
+    color: var(--color-button-text-hover);
+  }
+
+  .newsletter-success {
+    margin-top: 15px;
+    color: #28a745;
+    font-weight: 500;
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .newsletter-container:not(.page-width) {
+      padding: 0;
+    }
+
+    .newsletter--side {
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .newsletter--side .newsletter-image-wrapper,
+    .newsletter--side .newsletter-content {
+      width: 100%;
+    }
+
+    .newsletter--side .newsletter-content {
+      padding: 0 20px 20px;
+    }
+
+    .newsletter-image-wrapper.has-overlay .newsletter-overlay {
+      padding: 20px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    /* Let mobile inherit desktop alignment rules for overlay position */
+
+    .newsletter-content {
+      max-width: 100%;
+      padding: 20px 20px 0;
+      margin: 0 auto;
+    }
+    
+    .newsletter-image {
+      height: auto;
+      min-height: 300px;
+      object-fit: cover;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .newsletter-form-wrapper {
+      flex-direction: column;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .newsletter-input,
+    .newsletter-button {
+      width: 100%;
+      max-width: 100%;
+      height: 48px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Advanced Newsletter",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme" },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "side_by_side",
+      "options": [
+        { "value": "overlay", "label": "Show content over image" },
+        { "value": "side_by_side", "label": "Image & content side by side" },
+        { "value": "below", "label": "Content below image" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "overlay_position",
+      "label": "Vertical content position",
+      "default": "center",
+      "options": [
+        { "value": "top-center", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom-center", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Subscribe to our newsletter" },
+     {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h1"
+    },
+
+    { "type": "text", "id": "subheading", "label": "Sub heading", "default": "Get updates and offers" },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Subscribe" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "Thanks for subscribing!" },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "text",
+      "id": "section_padding",
+      "label": "Section Padding (Desktop)",
+      "default": "60px 0px 60px 0px"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_mobile",
+      "label": "Section Padding (Mobile)",
+      "default": "40px 0px 40px 0px"
+    }
+  ],
+  "presets": [{ "name": "Newsletter",    "category": "Store Information"}]
+}
+{% endschema %}

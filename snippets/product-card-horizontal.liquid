@@ -1,0 +1,346 @@
+{% comment %}
+  Renders a product card with horizontal hover actions
+  Horizontal layout: wishlist, quick view, compare, add to cart buttons appear horizontally on hover
+
+  @param {product} product - The product object to render
+  @param {object} settings - Section settings object with show_wishlist, show_quick_view, show_compare, show_add_to_cart
+{% endcomment %}
+
+{% liquid
+  assign show_wishlist = show_wishlist | default: settings.show_wishlist
+  assign show_quick_view = show_quick_view | default: settings.show_quick_view
+  assign show_compare = show_compare | default: settings.show_compare
+  assign show_add_to_cart = show_add_to_cart | default: settings.show_add_to_cart
+  assign show_badge = show_badge | default: settings.show_badge
+  assign show_rating = show_rating | default: settings.show_rating
+  assign show_colors = show_colors | default: settings.show_colors
+%}
+
+{% if product %}
+  <div class="image-collection-new product-card-horizontal">
+  {% render 'product-badge', product: product %}
+    {% if product.featured_image != blank %}
+      {% assign product_video = product.media | where: 'media_type', 'video' | first %}
+      <div class="product-img {% if product_video %}has-video{% endif %}">
+        {% if show_badge %}
+          {% render 'product-badge', product: product, card_settings: settings %}
+        {% endif %}
+        <a href="{{ product.url | within: collection }}">
+          {% assign loading_attr = loading | default: settings.lazy_load | default: 'lazy' %}
+          {% assign fetch_priority_attr = fetchpriority | default: 'low' %}
+          {% if loading_attr == 'eager' %}
+            {% assign fetch_priority_attr = 'high' %}
+          {% endif %}
+
+          {{ product.featured_image | image_url: width: 600 | image_tag: 
+            widths: '200, 300, 400, 500, 600, 700, 800',
+            sizes: '(min-width: 1200px) 25vw, (min-width: 768px) 33vw, 50vw',
+            class: 'main-img',
+            loading: loading_attr,
+            fetchpriority: fetch_priority_attr
+          }}
+          {% if product.images[1] != blank %}
+            {{ product.images[1] | image_url: width: 600 | image_tag: 
+              widths: '200, 300, 400, 500, 600, 700, 800',
+              sizes: '(min-width: 1200px) 25vw, (min-width: 768px) 33vw, 50vw',
+              class: 'hover-image',
+              loading: loading_attr,
+              fetchpriority: fetch_priority_attr
+            }}
+          {% endif %}
+          
+          {% if show_video %}
+            <div class="product-video-wrapper">
+              {% if product_video %}
+                {{ product_video | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true }}
+              {% endif %}
+            </div>
+          {% endif %}
+        </a>
+        {% if show_wishlist or show_quick_view or show_compare or show_add_to_cart %}
+        <div class="product-hover-actions product-hover-actions--horizontal">
+          {% if show_wishlist %}
+            {% render 'wishlist-button', product: product, class: 'hover-action-btn' %}
+          {% endif %}
+          {% if show_quick_view %}
+            <button type="button" class="hover-action-btn quick-view-btn" data-product-id="{{ product.id }}" data-product-handle="{{ product.handle }}" aria-label="Quick view {{ product.title | escape }}" title="Quick view">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+              </svg>
+            </button>
+          {% endif %}
+          {% if show_compare %}
+            {% render 'compare-button', product: product, class: 'hover-action-btn' %}
+          {% endif %}
+          {% if show_add_to_cart %}
+            <form method="post" action="{{ routes.cart_add_url }}" class="hover-action-btn add-to-cart-form{% unless product.variants.first.available %} is-disabled{% endunless %}" data-ajax-add-to-cart>
+              <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="button" 
+                class="add-to-cart-btn{% unless product.variants.first.available %} is-out-of-stock{% endunless %}" 
+                {% unless product.variants.first.available %}disabled="disabled"{% endunless %}
+                data-add-to-cart 
+                data-variant-id="{{ product.variants.first.id }}" 
+                data-inventory-policy="{{ product.variants.first.inventory_policy }}" 
+                data-inventory-quantity="{{ product.variants.first.inventory_quantity }}" 
+                data-inventory-management="{{ product.variants.first.inventory_management }}" 
+                aria-label="{% if product.variants.first.available %}Add to cart{% else %}Sold Out{% endif %}" 
+                title="{% if product.variants.first.available %}Add to cart{% else %}Sold Out{% endif %}"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
+                  <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" fill="currentColor"/>
+                  <path d="M20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" fill="currentColor"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="add-to-cart-icon-text" style="display:none;">Add</span>
+              </button>
+            </form>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    <div class="product-content-box">
+      <div class="product-title-custome">
+        <a href="{{ product.url | within: collection }}">{{ product.title }}</a>
+      </div>
+      <div class="pro-rate1">
+        {% if show_rating %}
+          <div class="product-rating-custome" style="color: var(--star-color, #FFD700); margin-bottom: 5px; display: flex; justify-content: center;">
+            {% liquid
+              assign rating = product.metafields.reviews.rating.value | default: 5
+              assign rating_int = rating | floor
+            %}
+            {% for i in (1..5) %}
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="{% if i <= rating_int %}currentColor{% else %}#E1E1E1{% endif %}">
+                <use xlink:href="#icon-rate"></use>
+              </svg>
+            {% endfor %}
+          </div>
+        {% endif %}
+        
+        <div class="product-price-custome" data-price-container>
+          {%- liquid
+            if settings.currency_code_enabled
+              assign money_compare_at_price = product.compare_at_price | money_with_currency
+              assign money_price = product.price | money_with_currency
+            else
+              assign money_compare_at_price = product.compare_at_price | money
+              assign money_price = product.price | money
+            endif
+            
+            if cart.currency.iso_code == 'EUR'
+              assign money_compare_at_price = money_compare_at_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+              assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+            elsif cart.currency.iso_code == 'INR'
+              assign money_compare_at_price = money_compare_at_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+            endif
+          -%}
+          {% if product.compare_at_price > product.price %}
+            <span class="grid-product__price--original" data-compare-price>
+              {{ money_compare_at_price }}
+            </span>
+          {% else %}
+            <span class="grid-product__price--original" data-compare-price style="display:none;"></span>
+          {% endif %}
+          <span data-regular-price>
+            {{ money_price }}
+          </span>
+        </div>
+
+        {% if show_colors %}
+          {% liquid
+            assign color_option = product.options_by_name['Color'] | default: product.options_by_name['color'] | default: product.options_by_name['Colour'] | default: product.options_by_name['colour'] | default: product.options_by_name['Farbe'] | default: product.options_by_name['Couleur']
+            
+            if color_option == nil
+              for option in product.options_with_values
+                assign downcased_option = option.name | downcase
+                if downcased_option contains 'color' or downcased_option contains 'colour' or downcased_option contains 'farbe' or downcased_option contains 'couleur'
+                  assign color_option = option
+                  break
+                endif
+              endfor
+            endif
+          %}
+          
+          {% if color_option %}
+            <div class="featured-product-section__colors">
+              {% for value in color_option.values limit: 5 %}
+                {% liquid
+                  assign swatch_style = ''
+                  if value.swatch.image
+                    assign swatch_img = value.swatch.image | image_url: width: 50
+                    assign swatch_style = 'background-image: url(' | append: swatch_img | append: '); background-color: ' | append: value.swatch.color | append: ';'
+                  elsif value.swatch.color
+                    assign swatch_style = 'background-color: ' | append: value.swatch.color | append: ';'
+                  else
+                    assign color_name_downcase = value | downcase
+                    assign custom_color = value | handle
+                    
+                    if settings.custom_color_mapping != blank
+                      assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                      for row in mapping_rows
+                        assign parts = row | split: ':'
+                        if parts.size == 2
+                          assign m_name = parts[0] | strip | downcase
+                          assign m_color = parts[1] | strip
+                          if m_name == color_name_downcase
+                            assign custom_color = m_color
+                            break
+                          endif
+                        endif
+                      endfor
+                    endif
+                    
+                    assign swatch_image = nil
+                    assign swatch_file_name = value | handle | append: '.png'
+                    if images[swatch_file_name] != blank
+                      assign swatch_image = images[swatch_file_name] | image_url: width: 50
+                    endif
+                    
+                    assign swatch_style = 'background-color: ' | append: custom_color | append: ';'
+                    if swatch_image
+                      assign swatch_style = swatch_style | append: ' background-image: url(' | append: swatch_image | append: '); background-size: cover;'
+                    endif
+                  endif
+                %}
+                {% liquid
+                  assign variant_img = ''
+                  assign variant_hover_img = ''
+                  assign variant_id = ''
+                  assign variant_price = ''
+                  assign variant_compare_price = ''
+                  assign variant_available = true
+                  
+                  # Filter for images only to ensure hover is always an image
+                  assign images_only = product.media | where: 'media_type', 'image'
+                  
+                  for variant in product.variants
+                    assign current_val = value.name | default: value
+                    if variant.options contains current_val
+                      assign variant_id = variant.id
+                      assign variant_available = variant.available
+                      
+                        if settings.currency_code_enabled
+                          assign money_v_price = variant.price | money_with_currency
+                          assign money_v_compare_price = variant.compare_at_price | money_with_currency
+                        else
+                          assign money_v_price = variant.price | money
+                          assign money_v_compare_price = variant.compare_at_price | money
+                        endif
+                        
+                        if cart.currency.iso_code == 'EUR'
+                          assign variant_price = money_v_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                          if variant.compare_at_price > variant.price
+                             assign variant_compare_price = money_v_compare_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                          endif
+                        elsif cart.currency.iso_code == 'INR'
+                          assign variant_price = money_v_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                          if variant.compare_at_price > variant.price
+                             assign variant_compare_price = money_v_compare_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                          endif
+                        else
+                          assign variant_price = money_v_price
+                          if variant.compare_at_price > variant.price
+                            assign variant_compare_price = money_v_compare_price
+                          endif
+                        endif
+                      
+                      if variant.featured_media
+                        assign variant_img = variant.featured_media | image_url: width: 600
+                        
+                        # Find path in images_only collection
+                        for img in images_only
+                           if img.id == variant.featured_media.id
+                              assign next_index = forloop.index
+                              if images_only[next_index]
+                                assign variant_hover_img = images_only[next_index] | image_url: width: 600
+                              else
+                                # Fallback to first image in images_only
+                                assign variant_hover_img = images_only[0] | image_url: width: 600
+                              endif
+                              break
+                           endif
+                        endfor
+
+                        # Final fallback if variant image and hover are still same
+                        if variant_img == variant_hover_img and images_only.size > 1
+                           assign variant_hover_img = images_only[1] | image_url: width: 600
+                        endif
+
+                        break
+                      else
+                        # If no featured media, use product images as fallback
+                        assign variant_img = product.featured_image | image_url: width: 600
+                        assign variant_hover_img = product.images[1] | image_url: width: 600
+                        break
+                      endif
+                    endif
+                  endfor
+                %}
+                <span class="featured-product-section__color-swatch" 
+                      style="{{ swatch_style }}"
+                      data-variant-image="{{ variant_img }}"
+                      data-variant-hover-image="{{ variant_hover_img }}"
+                      data-variant-id="{{ variant_id }}"
+                      data-variant-price="{{ variant_price }}"
+                      data-variant-compare-price="{{ variant_compare_price }}"
+                      data-variant-available="{{ variant_available }}"
+                      onclick="updateProductCardImage(this)"
+                      title="{{ value }}">
+                </span>
+              {% endfor %}
+              {% if color_option.values.size > 5 %}
+                <span style="font-size: 12px; color: var(--color-text); align-self: center;">+{{ color_option.values.size | minus: 5 }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {% comment %}
+        <div class="jdgm-widget jdgm-preview-badge">
+          {{ product.metafields.judgeme.badge }}
+        </div>
+        {% endcomment %}
+      </div>
+    </div>
+  </div>
+{% elsif placeholder_index %}
+  <div class="image-collection-new product-card-horizontal">
+    <div class="product-img">
+      <div class="placeholder-svg-container" style="background-color: #f4f4f4;">
+        {{ 'product-' | append: placeholder_index | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+      <div class="product-hover-actions product-hover-actions--horizontal" style="opacity: 0; visibility: hidden;">
+        <button type="button" class="hover-action-btn" aria-label="Add to wishlist"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2"/></svg></button>
+        <button type="button" class="hover-action-btn" aria-label="Quick view"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/></svg></button>
+      </div>
+    </div>
+    <div class="product-content-box">
+      <div class="product-title-custome">
+        <a href="#">Example Product {{ placeholder_index }}</a>
+      </div>
+      <div class="pro-rate1">
+        <div class="product-price-custome">
+          {%- liquid
+            if settings.currency_code_enabled
+              assign placeholder_price = 1999 | money_with_currency
+            else
+              assign placeholder_price = 1999 | money
+            endif
+            
+            if cart.currency.iso_code == 'EUR'
+              assign placeholder_price = placeholder_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+            elsif cart.currency.iso_code == 'INR'
+              assign placeholder_price = placeholder_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+            endif
+          -%}
+          {{ placeholder_price }}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+

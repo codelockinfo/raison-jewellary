@@ -1,0 +1,242 @@
+{%- if section.blocks.size > 0 -%}
+<div class="announcement-bar color-{{ section.settings.color_scheme }}" id="AnnouncementBar-{{ section.id }}">
+  <div class="container_width">
+    <div class="announcement-bar-inner">
+      <div class="announcement-slider-wrapper">
+        <div class="swiper announcement-swiper-{{ section.id }}">
+          <div class="swiper-wrapper">
+            {%- for block in section.blocks -%}
+              <div class="swiper-slide" {{ block.shopify_attributes }}>
+                {{ block.settings.text }}
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+      {%- if section.settings.enable_social_icons -%}
+        <div class="announcement-social-icons">
+          {%- render 'social-sharing'
+            show_facebook: section.settings.show_facebook,
+            show_twitter: section.settings.show_twitter,
+            show_instagram: section.settings.show_instagram,
+            show_pinterest: section.settings.show_pinterest,
+            show_youtube: section.settings.show_youtube,
+            show_tiktok: section.settings.show_tiktok
+          -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{%- endif -%}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function initAnnouncementSwiper() {
+    {% if section.blocks.size > 1 %}
+      new Swiper('.announcement-swiper-{{ section.id }}', {
+        loop: true,
+        {% if section.settings.autoplay %}
+        autoplay: {
+          delay: {{ section.settings.autoplay_delay | default: 3000 }},
+          disableOnInteraction: false
+        },
+        {% endif %}
+        speed: 600,
+      });
+    {% endif %}
+  }
+  initAnnouncementSwiper();
+  document.addEventListener('shopify:section:load', function(event) {
+    if (event.detail.sectionId === '{{ section.id }}') {
+      initAnnouncementSwiper();
+    }
+  });
+});
+</script>
+
+<style>
+/* Resetting the Shopify section wrapper aggressively */
+#shopify-section-{{ section.id }},
+.announcement-bar-section {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  border: none !important;
+}
+
+.announcement-bar {
+  padding: 10px 0;
+  margin: 0 !important;
+  position: relative;
+  width: 100%;
+  display: block;
+  align-content: center;
+  line-height: 1.5; /* Restore line height */
+  font-size: 14px; /* Restore font size */
+  background: var(--color-background);
+}
+.announcement-bar .share-button:hover{
+  background:var(--color-text);
+  border-color:var(--color-background);
+}
+.announcement-bar .share-button:hover svg{
+  fill:var(--color-background);
+}
+.announcement-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.announcement-social-icons .article-share {
+  display: flex !important;
+  align-items: center;
+  gap: 0px;
+}
+.announcement-slider-wrapper {
+  max-width: 70%;
+  text-align: center;
+}
+
+.announcement-bar .swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-heading);
+}
+
+.announcement-social-icons {
+  position: absolute;
+  right: 0;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: var(--color-text);
+}
+
+.announcement-social-icons a svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--color-text);
+}
+
+@media (max-width: 768px) {
+  .announcement-slider-wrapper {
+    max-width: 100%;
+  }
+  .announcement-social-icons {
+    display: none;
+  }
+  .announcement-bar {
+    padding: 10px 0;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "class": "announcement-bar-section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_social_icons",
+      "label": "Enable Social Icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_facebook",
+      "label": "Show Facebook",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_twitter",
+      "label": "Show Twitter (X)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instagram",
+      "label": "Show Instagram",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pinterest",
+      "label": "Show Pinterest",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_youtube",
+      "label": "Show YouTube",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tiktok",
+      "label": "Show TikTok",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "min": 1000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Autoplay Delay",
+      "default": 3000
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Announcement Text",
+          "default": "Welcome to our store!"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Announcement Bar",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

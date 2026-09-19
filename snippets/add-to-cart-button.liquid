@@ -1,0 +1,105 @@
+{% comment %}
+  Renders an add to cart button for a product
+
+  @param {product} product - The product object
+  @param {variant} variant - The variant to add (optional, defaults to first available)
+  @param {string} class - Additional CSS classes (optional)
+  @param {string} text - Custom button text (optional)
+{% endcomment %}
+
+{% liquid
+  if variant != blank
+    assign current_variant = variant
+  elsif product.selected_or_first_available_variant != blank
+    assign current_variant = product.selected_or_first_available_variant
+  else
+    assign current_variant = product.variants.first
+  endif
+
+  assign button_class = 'add-to-cart-button'
+  if class != blank
+    assign button_class = button_class | append: ' ' | append: class
+  endif
+  if text != blank
+    assign button_text = text
+  else
+    assign button_text_raw = 'products.product.add_to_cart' | t
+    if button_text_raw contains 'Translation missing'
+      assign button_text = 'Add To Cart'
+    else
+      assign button_text = button_text_raw
+    endif
+  endif
+
+  # Check if variant is out of stock
+  assign is_out_of_stock = false
+  if current_variant != blank
+    # Primary check: Use Shopify's built-in availability check
+    unless current_variant.available
+      assign is_out_of_stock = true
+    endunless
+    
+    # Additional check: If inventory is tracked and quantity is 0 or less
+    if current_variant.inventory_management != blank
+      if current_variant.inventory_quantity <= 0
+        # Check inventory policy - if "deny", don't allow backorders
+        if current_variant.inventory_policy == 'deny'
+          assign is_out_of_stock = true
+        endif
+      endif
+    endif
+  else
+    # If no variant exists, treat as out of stock
+    assign is_out_of_stock = true
+  endif
+%}
+
+{% if current_variant != blank and current_variant.id != blank %}
+  <button 
+    type="button"
+    class="{{ button_class }}"
+    data-add-to-cart
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ current_variant.id }}"
+    data-inventory-policy="{{ current_variant.inventory_policy }}"
+    data-inventory-quantity="{{ current_variant.inventory_quantity }}"
+    data-inventory-management="{{ current_variant.inventory_management }}"
+    {% if is_out_of_stock %}disabled="disabled"{% endif %}
+    aria-label="{% if is_out_of_stock %}Sold Out{% else %}Add {{ product.title | escape }} to cart{% endif %}"
+    {% if is_out_of_stock %}aria-disabled="true"{% endif %}
+  >
+    <span class="add-to-cart-button__text">
+      {% if is_out_of_stock %}
+        {{ 'products.product.sold_out' | t | default: 'Sold Out' }}
+      {% else %}
+        {{ button_text }}
+      {% endif %}
+    </span>
+    <span class="add-to-cart-button__loading" style="display: none;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="https://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="32">
+          <animate attributeName="stroke-dasharray" dur="1.5s" values="0 32;16 16;0 32;0 32" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dashoffset" dur="1.5s" values="0;-16;-32;-32" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </span>
+  </button>
+{% else %}
+  <button 
+    type="button"
+    class="{{ button_class }}"
+    disabled
+    aria-label="Product unavailable"
+  >
+    <span class="add-to-cart-button__text">{{ 'products.product.unavailable' | t | default: 'Unavailable' }}</span>
+  </button>
+
+  <div class="cart-limit-error" hidden>
+  <span class="cart-limit-icon">😞</span>
+  <span class="cart-limit-text">
+    The maximum quantity of this item is already in your cart.
+  </span>
+</div>
+
+{% endif %}
+

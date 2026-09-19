@@ -1,0 +1,985 @@
+  {% liquid
+    assign section_id = section.settings.custom_id | default: section.id
+    assign section_class = 'collection-slider-list collection-slider-list--' | append: section.settings.layout
+  %}
+  {% style %}
+  #{{ section_id }}, #{{ section_id }} * {
+    box-sizing:border-box;
+  }
+
+  #{{ section_id }} .card-slider-wrapper{
+    padding: var(--section-padding-desktop, 60px);
+  }
+  #{{ section_id }} .card-content__title{
+    display: none;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+{% comment %} Removed mobile padding override in favor of unified settings {% endcomment %}
+
+    #{{ section_id }} .collection-slider-list__container {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+{% comment %} Removed old max-width classes in favor of dynamic styles {% endcomment %}
+
+  #{{ section_id }} .card-slider-wrapper .cardSwiper{
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .swiper-wrapper{
+    align-items: stretch;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .swiper-slide{
+    width: auto !important;
+  }
+
+  #{{ section_id }} .collection-slider-list__heading-wrapper{
+    text-align: {{ section.settings.heading_alignment }};
+  }
+  #{{ section_id }} .card-slider-wrapper .collection-slider-list__subheading {
+    color: var(--color-subtext);
+    margin: 5px 0 0;
+    padding: 0 40px;
+  }
+
+    #{{ section_id }} .card-slider-wrapper .card{
+      position:relative;
+      width:380px; 
+      height:700px;
+      border-radius: var(--block-radius, 20px);
+      overflow:hidden;
+      cursor:pointer;
+      transition:width 0.5s ease;
+      will-change: width;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+@media (min-width: 769px) {
+  #{{ section_id }} .card-slider-wrapper .cardSwiper {
+    overflow: hidden;
+    padding-inline-end: 0;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .swiper-slide {
+    transition: transform 0.45s ease;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .swiper-slide:hover {
+    z-index: 10;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .swiper-slide:hover .card {
+    width: 480px;
+  }
+
+  /* Prevent flickering on the last item by extending the hover area */
+  #{{ section_id }} .card-slider-wrapper .swiper-slide {
+    position: relative;
+  }
+  
+  #{{ section_id }} .card-slider-wrapper .swiper-slide::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -40px; /* Bridge the gap between slides to prevent dead zones */
+    bottom: 0;
+    width: 40px;
+    z-index: 5;
+    background: transparent;
+  }
+
+  /* Larger buffer for the last slide to handle end-of-row layout shifts */
+  #{{ section_id }} .card-slider-wrapper .swiper-slide:last-child::after {
+    right: -100px;
+    width: 100px;
+  }
+
+  /* Use :has() to ensure we only shrink siblings when a slide is actually hovered, prevents vibration when hovering gaps */
+  #{{ section_id }} .card-slider-wrapper .swiper-wrapper:has(.swiper-slide:hover) .swiper-slide:not(:hover) .card {
+    width: 355px;
+    opacity: 0.85;
+  }
+}
+
+
+  #{{ section_id }} .card-slider-wrapper .card-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transition: none !important;
+    transform: translate3d(0,0,0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  @media (min-width: 769px) {
+    #{{ section_id }} .card-slider-wrapper .card-img {
+       width: auto;
+       min-width: 480px; /* Force image to cover expanded width */
+       position: absolute;
+       left: 50%;
+       transform: translateX(-50%) translate3d(0,0,0) !important;
+    }
+    
+    #{{ section_id }} .card:hover .card-img {
+       transform: translateX(-50%) translate3d(0,0,0) !important;
+    }
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content{
+    position:absolute;
+    bottom:10px;
+    left:24px;
+    right:24px;
+    text-align: {{ section.settings.content_alignment }};
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content h3{
+    margin:0 0 8px;
+    color: var(--color-text);
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content p{
+    margin:0;
+    opacity:0.9;
+    color: var(--color-text);
+    line-height: 20px;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content-below {
+    padding: 20px 0 0;
+    text-align: {{ section.settings.content_alignment }};
+    overflow: visible;
+    max-width: 380px; 
+    width: 100%;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content-below h3 {
+    margin: 0 0 8px;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content-below div{
+    font-weight: bold;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content-below p {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.5;
+  }
+
+    #{{ section_id }} .cardSwiper {
+      width: 100%;
+      padding-bottom: 0px;
+      margin: 18px 0 0;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-wrapper {
+      margin: 0;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-slide {
+      height: auto;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-slide .featured-collections__card {
+      width: 100%;
+      display: block;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-button-next,
+    #{{ section_id }} .cardSwiper .swiper-button-prev {
+      background-color: var(--color-arrow-bg);
+      border: 1px solid var(--color-arrow-bg);
+      color: var(--color-arrow);
+      width: 44px;
+      height: 44px;
+      border-radius: var(--button-border-radius, 50%);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #{{ section_id }} .cardSwiper--arrow-desktop-hover .swiper-button-next,
+    #{{ section_id }} .cardSwiper--arrow-desktop-hover .swiper-button-prev {
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
+    #{{ section_id }} .cardSwiper--arrow-desktop-always .swiper-button-next:not(.swiper-button-disabled),
+    #{{ section_id }} .cardSwiper--arrow-desktop-always .swiper-button-prev:not(.swiper-button-disabled) {
+      opacity: 1 !important;
+      pointer-events: auto;
+    }
+
+    #{{ section_id }} .cardSwiper--arrow-circle .swiper-button-next,
+    #{{ section_id }} .cardSwiper--arrow-circle .swiper-button-prev {
+      border-radius: 50%;
+    }
+
+    #{{ section_id }} .cardSwiper--arrow-rounded-square .swiper-button-next,
+    #{{ section_id }} .cardSwiper--arrow-rounded-square .swiper-button-prev {
+      border-radius: 33%;
+    }
+
+    #{{ section_id }} .cardSwiper--arrow-square .swiper-button-next,
+    #{{ section_id }} .cardSwiper--arrow-square .swiper-button-prev {
+      border-radius: 0;
+    }
+    #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-next:not(.swiper-button-disabled),
+    #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-prev:not(.swiper-button-disabled) {
+      opacity: 1 !important;
+      pointer-events: auto;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-button-disabled {
+      opacity: 0.4 !important;
+      pointer-events: none !important;
+      cursor: not-allowed;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-button-next:hover,
+    #{{ section_id }} .cardSwiper .swiper-button-prev:hover {
+      background-color: var(--color-arrow-hover-bg);
+      color: var(--color-arrow-hover);
+      border-color: var(--color-arrow-hover-bg);
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-button-next::after,
+    #{{ section_id }} .cardSwiper .swiper-button-prev::after {
+      font-size: 16px !important;
+      font-weight: bold;
+    }
+
+    #{{ section_id }} .cardSwiper--arrow-desktop-none .swiper-button-next,
+    #{{ section_id }} .cardSwiper--arrow-desktop-none .swiper-button-prev {
+      display: none !important;
+    }
+
+  @media (min-width: 769px) {
+
+      /* Desktop: none */
+      #{{ section_id }} .cardSwiper--arrow-desktop-none .swiper-button-next,
+      #{{ section_id }} .cardSwiper--arrow-desktop-none .swiper-button-prev {
+          display: none !important;
+      }
+
+      /* Desktop: always */
+      #{{ section_id }} .cardSwiper--arrow-desktop-always .swiper-button-next:not(.swiper-button-disabled),
+      #{{ section_id }} .cardSwiper--arrow-desktop-always .swiper-button-prev:not(.swiper-button-disabled) {
+          opacity: 1 !important;
+          pointer-events: auto;
+      }
+
+      /* Desktop: hover */
+      #{{ section_id }} .cardSwiper--arrow-desktop-hover .swiper-button-next,
+      #{{ section_id }} .cardSwiper--arrow-desktop-hover .swiper-button-prev {
+          opacity: 0;
+          pointer-events: none;
+      }
+
+      #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-next:not(.swiper-button-disabled),
+      #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-prev:not(.swiper-button-disabled) {
+          opacity: 1;
+          pointer-events: auto;
+      }
+  }
+
+  /* FIX: Hover mode should show enabled + disabled arrows on hover */
+
+/* Hide all arrows normally in desktop hover mode */
+@media (min-width: 769px) {
+  #{{ section_id }} .cardSwiper--arrow-desktop-hover .swiper-button-next,
+  #{{ section_id }} .cardSwiper--arrow-desktop-hover .swiper-button-prev {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Show all arrows on slider hover */
+  #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-next,
+  #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-prev {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Disabled arrow should also show on hover, but faded and not clickable */
+  #{{ section_id }} .cardSwiper--arrow-desktop-hover:hover .swiper-button-disabled {
+    opacity: 0.4 !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+  }
+
+  /* Disabled arrow should NOT show before hover */
+  #{{ section_id }} .cardSwiper--arrow-desktop-hover:not(:hover) .swiper-button-disabled {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+    @media (max-width: 768px) {
+      #{{ section_id }} .cardSwiper--arrow-mobile-show .swiper-button-prev:not(.swiper-button-disabled),
+      #{{ section_id }} .cardSwiper--arrow-mobile-show .swiper-button-next:not(.swiper-button-disabled) {
+        opacity: 1 !important;
+        display: flex !important;
+        pointer-events: auto !important;
+      }
+      
+      #{{ section_id }} .cardSwiper--arrow-mobile-hide .swiper-button-next,
+      #{{ section_id }} .cardSwiper--arrow-mobile-hide .swiper-button-prev {
+        display: none !important;
+      }
+    }
+
+    #{{ section_id }} .swiper-pagination {
+      position: relative;
+      margin-top: 0;
+      text-align: center;
+      --swiper-pagination-color: var(--color-pagination-bullet-active);
+      --swiper-theme-color: var(--color-pagination-bullet-active);
+    }
+
+    #{{ section_id }} .swiper-pagination-bullet {
+      width: 12px;
+      height: 12px;
+      background: var(--color-pagination-bullet) !important;
+      opacity: 0.5;
+      margin: 0 6px;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #{{ section_id }}  .swiper-pagination-bullet-active {
+      background: var(--color-pagination-bullet-active) !important;
+      opacity: 1;
+      transform: scale(1.2);
+    }
+
+    #{{ section_id }} .swiper-pagination-progressbar {
+      background: var(--color-pagination-bullet) !important;
+      height: 4px;
+      top: auto;
+      bottom: 0;
+    }
+    #{{ section_id }}  .swiper-pagination-progressbar-fill {
+      background: var(--color-pagination-bullet-active) !important;
+    }
+
+    #{{ section_id }}  .swiper-pagination-fraction {
+      color: var(--color-pagination-bullet-active) !important;
+      font-size: 16px;
+      font-weight: 500;
+      bottom: auto;
+      top: auto;
+      position: relative;
+    }
+
+    @media screen and (max-width: 768px) {
+      #{{ section_id }} .cardSwiper--pagination-fraction .swiper-pagination-fraction {
+        font-size: 14px;
+      }
+    }
+
+    #{{ section_id }} .swiper-navigation-icon {
+      font-size: 16px !important;
+      width: 25% !important;
+      font-weight: bold;
+    }
+
+    #{{ section_id }} .cardSwiper .swiper-button-next::after, #{{ section_id }} .cardSwiper .swiper-button-prev::after {
+      display: none !important;
+    }
+    #{{ section_id }} .collection-slider-list__heading {
+      font-weight: 700;
+      margin: 0;
+    }
+
+  @media(max-width:768px){
+      #{{ section_id }} .card-slider-wrapper{
+    padding: var(--section-padding-mobile, 40px);
+  }
+    #{{ section_id }} .card-slider-wrapper .card {
+    width: 240px;
+    height:480px;
+    transition: none;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card:hover {
+    width: 240px;
+    z-index: auto;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .swiper-wrapper:hover 
+  .swiper-slide:not(:hover) .card {
+    width: 240px;
+  }
+
+  #{{ section_id }} .card-slider-wrapper .card-content-below {
+    width: 240px;
+  }
+
+    #{{ section_id }} .card-slider-wrapper .collection-slider-list__subheading {
+      padding: 0 20px;
+    }
+    
+    #{{ section_id }} .cardSwiper .swiper-button-next,
+    #{{ section_id }} .cardSwiper .swiper-button-prev {
+      width: 35px;
+      height: 35px;
+    }
+  }
+
+  {% endstyle %}
+
+
+  <section
+    id="{{ section_id }}"
+    class="{{ section_class }} color-{{ section.settings.color_scheme }}"
+    style="
+    --section-padding-desktop: {{ section.settings.padding_desktop }};
+    --section-padding-mobile: {{ section.settings.padding_mobile }};
+    ">
+  <div class="collection-slider-list__container container_width">
+    <!-- SKELETON LOADER -->
+    <div class="skeleton-visible">
+       {% render 'skeleton-loader', type: 'collection-slider-list', count: 4 %}
+    </div>
+
+    <div class="skeleton-container">
+      {% liquid
+        assign desktop_layout = section.settings.layout | default: 'slider'
+        assign mobile_layout = section.settings.layout_mobile | default: desktop_layout
+      %}
+      <div class="card-slider-wrapper card-slider-wrapper--desktop-{{ desktop_layout }} card-slider-wrapper--mobile-{{ mobile_layout }}">
+        {% if section.settings.heading != blank or section.settings.subheading != blank %}
+          <div class="collection-slider-list__heading-wrapper">
+            {% if section.settings.heading != blank %}
+                {% render 'heading-style-banner',
+                  heading: section.settings.heading,
+                  heading_tag: section.settings.heading_tag,
+                  heading_style: section.settings.heading_style,
+                  heading_alignment: section.settings.heading_alignment,
+                  wrapper_class: 'collection-slider-list'
+                %}
+              {% endif %}
+            {% if section.settings.subheading != blank %}
+              <p class="collection-slider-list__subheading">{{ section.settings.subheading }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="swiper cardSwiper cardSwiper--arrow-{{ section.settings.arrow_style | default: 'circle' }} cardSwiper--arrow-desktop-{{ section.settings.arrow_visibility | default: 'hover' }} cardSwiper--arrow-mobile-{{ section.settings.arrow_visibility_mobile | default: 'hide' }}" data-slides-per-view="{{ section.settings.slides_per_view | default: 3 }}" data-space-between="{{ section.settings.space_between | default: 30 }}" data-pagination-style="{{ section.settings.pagination_style | default: 'dots' }}">
+          <div class="swiper-wrapper">
+
+            {% for block in section.blocks %}
+              {% liquid
+                assign collection_name = 'Collection'
+                assign collection_description = 'Collcetion Description'
+                assign show_image = false
+                
+                if block.settings.url != blank and block.settings.url contains '/collections/'
+                  assign url_parts = block.settings.url | split: '/collections/'
+                  if url_parts.size > 1
+                    assign collection_handle = url_parts[1] | split: '/' | first | split: '?' | first
+                    assign collection_object = collections[collection_handle]
+                    if collection_object != blank
+                      assign collection_name = collection_object.title
+                      assign collection_description = collection_object.description | strip_html
+                    endif
+                  endif
+                endif
+                
+                if block.settings.title != blank
+                  assign collection_name = block.settings.title
+                endif
+                
+                if block.settings.subtitle != blank
+                  assign collection_description = block.settings.subtitle
+                endif
+                
+                if block.settings.image != blank
+                  assign show_image = true
+                elsif collection_object != blank and collection_object.featured_image != blank
+                  assign show_image = true
+                endif
+              %}
+              <div class="swiper-slide">
+                <a href="{% if block.settings.url != blank %}{{ block.settings.url }}{% else %}#{% endif %}" class="card" {{ block.shopify_attributes }}>
+                  {% if show_image %}
+                    {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+                    {% assign fetch_priority = 'low' %}
+                    {% if loading_strategy == 'eager' %}
+                      {% assign fetch_priority = 'high' %}
+                    {% endif %}
+                    {%- liquid
+                      assign current_image = block.settings.image | default: collection_object.featured_image
+                      assign aspect_ratio = current_image.aspect_ratio | default: 1
+                    -%}
+                    <img src="{{ current_image | image_url: width: 800 }}" class="card-img" style="object-fit: cover;" loading="{{ loading_strategy }}" fetchpriority="{{ fetch_priority }}" alt="{{ collection_name | escape }}" width="800" height="{{ 800 | divided_by: aspect_ratio | round }}">
+                  {% else %}
+                    <div class="card-img" style="background-color: #ddd;">
+                      {{ 'collection-1' | placeholder_svg_tag: 'placeholder' }}
+                    </div>
+                  {% endif %}
+
+                  {% if section.settings.content_position == 'on_card' %}
+                    <div class="card-content">
+                      <div class="card-content__title">{{ collection_name }}</div>
+                      {% if collection_description != blank %}
+                        <p>{{ collection_description }}</p>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </a>
+                {% if section.settings.content_position == 'below_card' %}
+                  <div class="card-content-below">
+                    <div>{{ collection_name }}</div>
+                    {% if collection_description != blank %}
+                      <p>{{ collection_description }}</p>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+              <div class="swiper-button-next">{% render 'icon-slider-nav', direction: 'next' %}</div>
+              <div class="swiper-button-prev">{% render 'icon-slider-nav', direction: 'prev' %}</div>
+
+            {% if section.settings.pagination_visibility != 'hide' %}
+              <div class="swiper-pagination cardSwiper--pagination-{{ section.settings.pagination_style | default: 'dots' }}"></div>
+            {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+  {% javascript %}
+    (function() {
+      function initializeSwiper(container) {
+        if (!container || container.classList.contains('swiper-initialized')) return;
+        
+        if (typeof Swiper === 'undefined') {
+          const checkSwiper = setInterval(() => {
+            if (typeof Swiper !== 'undefined') {
+              clearInterval(checkSwiper);
+              initializeSwiper(container);
+            }
+          }, 100);
+          return;
+        }
+
+        // Destroy existing instance if it exists
+        if (container.swiper) {
+          container.swiper.destroy(true, true);
+        }
+
+        try {
+          const paginationEl = container.querySelector('.swiper-pagination');
+          let paginationConfig = false;
+          
+          if (paginationEl) {
+            const paginationStyle = container.dataset.paginationStyle || 'dots';
+            paginationConfig = {
+              el: paginationEl,
+              clickable: true,
+            };
+            
+            if (paginationStyle === 'progressbar') {
+              paginationConfig.type = 'progressbar';
+            } else if (paginationStyle === 'fraction') {
+              paginationConfig.type = 'fraction';
+            } else {
+              paginationConfig.type = 'bullets';
+            }
+          }
+
+          const swiperConfig = {
+            slidesPerView: 'auto',
+            spaceBetween: 20,
+            navigation: {
+              nextEl: container.querySelector('.swiper-button-next'),
+              prevEl: container.querySelector('.swiper-button-prev'),
+            },
+            observer: true,
+            observeParents: true
+          };
+
+          if (paginationConfig) {
+            swiperConfig.pagination = paginationConfig;
+          }
+
+          new Swiper(container, swiperConfig);
+        } catch (error) {
+        }
+      }
+
+      function initAllSwipers() {
+        document.querySelectorAll('.cardSwiper').forEach(el => {
+          initializeSwiper(el);
+        });
+      }
+
+      // Initial load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAllSwipers);
+      } else {
+        initAllSwipers();
+      }
+
+      // Re-initialize when theme editor updates
+      document.addEventListener('shopify:section:load', function(event) {
+        const section = document.getElementById(event.detail.sectionId);
+        if (section) {
+          const swiper = section.querySelector('.cardSwiper');
+          if (swiper) initializeSwiper(swiper);
+        }
+      });
+      
+      document.addEventListener('shopify:section:select', function(event) {
+        const section = document.getElementById(event.detail.sectionId);
+        if (section) {
+          const swiper = section.querySelector('.cardSwiper');
+          if (swiper && !swiper.swiper) initializeSwiper(swiper);
+        }
+      });
+    })();
+  {% endjavascript %}
+
+  {% schema %}
+  {
+    "name": "Collection Slider List",
+    "settings": [
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Padding (Desktop)",
+      "default": "60px",
+      "info": "Enter padding value(s). Single value (e.g., '40px') applies to all sides. Two values (e.g., '20px 40px') apply first to top/bottom, second to left/right."
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Padding (Mobile)",
+      "default": "40px",
+      "info": "Enter padding value(s). Single value (e.g., '40px') applies to all sides. Two values (e.g., '20px 40px') apply first to top/bottom, second to left/right."
+    },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "select",
+        "id": "lazy_load",
+        "label": "Image Loading",
+        "options": [
+          { "value": "lazy", "label": "Lazy" },
+          { "value": "eager", "label": "Eager" }
+        ],
+        "default": "lazy"
+      },
+      {
+        "type": "header",
+        "content": "Header"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Expandable collections"
+      },
+      {
+        "type": "select",
+        "id": "heading_tag",
+        "label": "Heading Level (Size)",
+        "options": [
+          { "value": "h1", "label": "H1" },
+          { "value": "h2", "label": "H2" },
+          { "value": "h3", "label": "H3" },
+          { "value": "h4", "label": "H4" },
+          { "value": "h5", "label": "H5" },
+          { "value": "h6", "label": "H6" }
+        ],
+        "default": "h2"
+      },
+      {
+        "type": "select",
+        "id": "heading_alignment",
+        "label": "Heading Alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "heading_style",
+        "label": "Heading Style",
+        "default": "simple",
+        "options": [
+          {
+            "value": "simple",
+            "label": "design 1"
+          },
+          {
+            "value": "line-top",
+            "label": "design 2"
+          },
+          {
+            "value": "underline",
+            "label": "design 3"
+          },
+          {
+            "value": "lines",
+            "label": "design 4"
+          },
+          {
+            "value": "diamond",
+            "label": "design 5"
+          },
+          {
+            "value": "ornament",
+            "label": "design 6"
+          },
+          {
+            "value": "x",
+            "label": "design 7"
+          }
+        ],
+        "info": "Choose the decorative style for the heading"
+      },
+      {
+        "type": "header",
+        "content": "Subheading"
+      },
+      {
+        "type": "text",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "Subheading"
+      },
+      {
+        "type": "header",
+        "content": "Content Settings"
+      },
+      {
+        "type": "select",
+        "id": "content_alignment",
+        "label": "Content Alignment",
+        "default": "left",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "content_position",
+        "label": "Content Position",
+        "default": "on_card",
+        "options": [
+          {
+            "value": "on_card",
+            "label": "On Card"
+          },
+          {
+            "value": "below_card",
+            "label": "Below Card"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Pagination Settings"
+      },
+      {
+        "type": "select",
+        "id": "pagination_style",
+        "label": "Pagination Style",
+        "default": "dots",
+        "options": [
+          {
+            "value": "dots",
+            "label": "Style 1 (Dots)"
+          },
+          {
+            "value": "progressbar",
+            "label": "Style 2 (Progress Bar)"
+          },
+          {
+            "value": "fraction",
+            "label": "Style 3 (Numbers)"
+          }
+        ],
+        "info": "Choose the pagination style for the slider"
+      },
+      {
+        "type": "select",
+        "id": "pagination_visibility",
+        "label": "Pagination Visibility",
+        "default": "show",
+        "options": [
+          {
+            "value": "show",
+            "label": "Show"
+          },
+          {
+            "value": "hide",
+            "label": "Hide"
+          }
+        ],
+        "info": "Show or hide pagination"
+      },
+      {
+        "type": "header",
+        "content": "Arrow Settings"
+      },
+      {
+        "type": "select",
+        "id": "arrow_style",
+        "label": "Arrow Style",
+        "default": "circle",
+        "options": [
+          {
+            "value": "circle",
+            "label": "Style 1"
+          },
+          {
+            "value": "rounded-square",
+            "label": "Style 2"
+          },
+          {
+            "value": "square",
+            "label": "Style 3"
+          }
+        ],
+        "info": "Choose the style for navigation arrows"
+      },
+      {
+        "type": "select",
+        "id": "arrow_visibility",
+        "label": "Arrow Visibility",
+        "default": "hover",
+        "options": [
+          {
+            "value": "hover",
+            "label": "Show on Hover"
+          },
+          {
+            "value": "always",
+            "label": "Always Visible"
+          },
+          {
+            "value": "none",
+            "label": "None (Hide)"
+          }
+        ],
+        "info": "Choose when navigation arrows should be visible"
+      },
+      {
+        "type": "select",
+        "id": "arrow_visibility_mobile",
+        "label": "Arrow Visibility (Mobile)",
+        "default": "hide",
+        "options": [
+          {
+            "value": "show",
+            "label": "Show"
+          },
+          {
+            "value": "hide",
+            "label": "Hide"
+          }
+        ],
+        "info": "Show or hide arrows on mobile devices"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "card",
+        "name": "Card",
+        "settings": [
+          {
+            "type": "url",
+            "id": "url",
+            "label": "URL",
+            "info": "Enter collection URL (e.g., /collections/collection-handle)"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Card Image",
+            "info": "Leave blank to use collection image"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "info": "Leave blank to use collection name"
+          },
+          {
+            "type": "text",
+            "id": "subtitle",
+            "label": "Subtitle",
+            "info": "Leave blank to use collection description"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection Slider List",
+            "category": "Collection",
+        "blocks": [
+          {
+            "type": "card"
+          },
+          {
+            "type": "card"
+          },
+          {
+            "type": "card"
+          },
+          {
+            "type": "card"
+          },
+          {
+            "type": "card"
+          }
+        ]
+      }
+    ]
+  }
+  {% endschema %}

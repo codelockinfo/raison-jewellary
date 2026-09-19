@@ -1,0 +1,623 @@
+{%- style -%}
+  #banner-with-slider-{{ section.id }} {
+    /* Desktop Sizing (Taking into account the slider is only ~60-70% of width) */
+    {%- assign d_cols = section.settings.slides_per_view_desktop -%}
+    {%- if d_cols >= 5 -%}
+      --btn-size: 32px; --icon-size: 14px; --btn-gap: 5px;
+    {%- elsif d_cols >= 4 -%}
+      --btn-size: 42px; --icon-size: 16px; --btn-gap: 6px;
+    {%- elsif d_cols >= 3 -%}
+      --btn-size: 40px; --icon-size: 18px; --btn-gap: 10px;
+    {%- else -%}
+      --btn-size: 52px; --icon-size: 20px; --btn-gap: 15px;
+    {%- endif -%}
+  }
+
+  @media screen and (max-width: 1280px) {
+    #banner-with-slider-{{ section.id }} {
+      /* Tablet Sizing */
+      {%- assign t_cols = section.settings.slides_per_view_tablet -%}
+      {%- if t_cols >= 4 -%}
+        --btn-size: 28px; --icon-size: 12px; --btn-gap: 5px;
+      {%- elsif t_cols >= 3 -%}
+        --btn-size: 32px; --icon-size: 14px; --btn-gap: 6px;
+      {%- else -%}
+        --btn-size: 38px; --icon-size: 16px; --btn-gap: 8px;
+      {%- endif -%}
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    #banner-with-slider-{{ section.id }} {
+      /* Mobile Sizing */
+      {%- assign m_cols = section.settings.slides_per_view_mobile | floor -%}
+      {%- if m_cols >= 2 -%}
+        --btn-size: 28px; --icon-size: 14px; --btn-gap: 4px;
+      {%- else -%}
+        --btn-size: 36px; --icon-size: 16px; --btn-gap: 8px;
+      {%- endif -%}
+    }
+  }
+
+  #banner-with-slider-{{ section.id }} .product-hover-actions {
+    gap: var(--btn-gap) !important;
+  }
+ 
+
+  /* Specific fix for horizontal style overlapping edges */
+  #banner-with-slider-{{ section.id }} .product-card-horizontal .product-hover-actions {
+    max-width: 95%;
+  }
+  #banner-with-slider-{{ section.id }} {
+    padding: {{ section.settings.section_padding_desktop }};
+  }
+
+  @media (max-width: 768px) {
+    #banner-with-slider-{{ section.id }} {
+      padding: {{ section.settings.section_padding_mobile }};
+    }
+  }
+
+  .collection-slider-header.mobile-only,
+  .mobile-only {
+    display: none !important;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .collection-slider-header.mobile-only,
+    .mobile-only {
+      display: flex !important;
+      margin-bottom: 20px;
+    }
+    .collection-slider-header.mobile-only.skeleton-title,
+    .mobile-only.skeleton-title {
+       display: block;
+    }
+    .collection-slider-box-new .collection-slider-header,
+    .desktop-only {
+      display: none !important;
+    }
+  }
+{%- endstyle -%}
+
+{% liquid
+  case section.settings.heading_tag
+    when 'h1'
+      assign h_px = settings.h1_font_size | default: 42
+    when 'h2'
+      assign h_px = settings.h2_font_size | default: 38
+    when 'h3'
+      assign h_px = settings.type_header_base_size | default: 32
+    when 'h4'
+      assign h_px = settings.h4_font_size | default: 28
+    when 'h5'
+      assign h_px = settings.h5_font_size | default: 24
+    when 'h6'
+      assign h_px = settings.h6_font_size | default: 20
+    else
+      assign h_px = settings.h2_font_size | default: 38
+  endcase
+%}
+
+<div class="newsec custom-category-section skeleton-container color-{{ section.settings.color_scheme }}" id="banner-with-slider-{{ section.id }}">
+  <div class="skeleton-visible">
+    <div class="collection-with-slider-main-new" style="background: #fdfdfd; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+      {% assign collection_link = section.settings.colurl %}
+      {% if section.settings.jewellery_type != 'all' and section.settings.colurl contains '/collections/' %}
+        {% assign collection_link = section.settings.colurl | append: '?filter.p.m.custom.jewellery_type=' | append: section.settings.jewellery_type %}
+      {% endif %}
+      <div class="width-container container_width">
+        <div class="skeleton-box skeleton-shimmer skeleton-title mobile-only" style="height: 40px; width: 300px; margin-bottom: 20px;"></div>
+        <div class="collection-img-main-box-new {% if section.settings.image_position == 'right' %}image-position-right{% endif %}">
+          <div class="collection-img-box-new">
+            <div class="skeleton-box skeleton-shimmer" style="width: 100%; height: 500px; border-radius: 10px;"></div>
+          </div>
+          <div class="collection-slider-box-new">
+            <div class="skeleton-box skeleton-shimmer skeleton-title desktop-only" style="height: 40px; width: 300px; margin-bottom: 20px;"></div>
+             <div style="display: flex; gap: 20px;">
+               {% for i in (1..3) %}
+                 <div style="flex: 1;">
+                   <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: 1/1; border-radius: 8px; margin-bottom: 10px;"></div>
+                   <div class="skeleton-box skeleton-shimmer skeleton-text" style="width: 80%;"></div>
+                   <div class="skeleton-box skeleton-shimmer skeleton-text.short"></div>
+                 </div>
+               {% endfor %}
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="width-container container_width">
+      <div class="collection-slider-header mobile-only" style="--heading-size: {{ h_px }}px;">
+        {% if section.settings.title != blank %}
+          <div style="flex: 1; display: flex; justify-content: {% if section.settings.heading_alignment == 'right' %}flex-end{% elsif section.settings.heading_alignment == 'center' %}center{% else %}flex-start{% endif %};">
+            {% render 'heading-style-banner', 
+              heading: section.settings.title,
+              heading_tag: section.settings.heading_tag,
+              heading_style: section.settings.heading_style,
+              heading_alignment: section.settings.heading_alignment,
+              wrapper_class: 'collection-slider'
+            %}
+          </div>
+        {% endif %}
+        {% if section.settings.button_label != blank and section.settings.colurl != blank %}
+          <a href="{{ collection_link }}" class="collection-slider-button">{{ section.settings.button_label }}</a>
+        {% endif %}
+      </div>
+      <div class="collection-img-main-box-new {% if section.settings.image_position == 'right' %}image-position-right{% endif %} {% unless section.settings.show_product_slider %}no-slider{% endunless %}">
+        <div class="collection-img-box-new">
+          {% if section.settings.responsive_img != blank %}
+            <div class="collection-main-img-new">
+              <a href="{{ collection_link }}">
+                {% assign fetch_priority = 'low' %}
+                {% if section.settings.lazy_load == 'eager' %}
+                  {% assign fetch_priority = 'high' %}
+                {% endif %}
+                <img src="{{ section.settings.responsive_img | image_url: width: 2000 }}" alt="{{ section.settings.responsive_img.alt | default: 'Collection image' }}" class="col-img" loading="{{ section.settings.lazy_load | default: 'lazy' }}" fetchpriority="{{ fetch_priority }}" width="{{ section.settings.responsive_img.width }}" height="{{ section.settings.responsive_img.height }}">
+              </a>
+            </div>
+          {% else %}
+            <div class="collection-main-img-new">
+              {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg col-img' }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="collection-slider-box-new">
+          <div class="collection-slider-header" style="--heading-size: {{ h_px }}px;">
+            {% if section.settings.title != blank %}
+              <div style="flex: 1; display: flex; justify-content: {% if section.settings.heading_alignment == 'right' %}flex-end{% elsif section.settings.heading_alignment == 'center' %}center{% else %}flex-start{% endif %};">
+                {% render 'heading-style-banner', 
+                  heading: section.settings.title,
+                  heading_tag: section.settings.heading_tag,
+                  heading_style: section.settings.heading_style,
+                  heading_alignment: section.settings.heading_alignment,
+                  wrapper_class: 'collection-slider'
+                %}
+              </div>
+            {% endif %}
+            {% if section.settings.button_label != blank and section.settings.colurl != blank %}
+              <a href="{{ collection_link }}" class="collection-slider-button">{{ section.settings.button_label }}</a>
+            {% endif %}
+          </div>
+          <div class="swiper collectionSwiper-custome arrow-style-{{ section.settings.navigation_arrow_style | default: 'circle' }} {% unless section.settings.show_navigation_arrows_desktop %}hide-arrows-desktop{% endunless %} {% unless section.settings.show_navigation_arrows_mobile %}hide-arrows-mobile{% endunless %}">
+            <div class="swiper-button-prev collection-swiper-button-prev">
+              {% render 'icon-slider-nav', direction: 'prev' %}
+            </div>
+            <div class="swiper-wrapper">
+              {% if section.settings.collectionproduct != blank and section.settings.collectionproduct.products.size > 0 %}
+                {% assign jewellery_type = section.settings.jewellery_type %}
+                {% for product in section.settings.collectionproduct.products %}
+                  {% assign product_type = product.metafields.custom.jewellery_type.value %}
+
+                  {% if jewellery_type == 'all' or product_type == jewellery_type %}
+                    <div class="swiper-slide">
+                      {% liquid
+                        assign card_style = section.settings.product_card_style | default: 'horizontal'
+                        if card_style == 'horizontal'
+                          render 'product-card-horizontal', product: product, settings: section.settings
+                        elsif card_style == 'vertical'
+                          render 'product-card-vertical', product: product, settings: section.settings
+                        else
+                          render 'product-card-static', product: product, settings: section.settings
+                        endif
+                      %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% for i in (1..6) %}
+                  <div class="swiper-slide">
+                    {% liquid
+                      assign card_style = section.settings.product_card_style | default: 'horizontal'
+                      if card_style == 'horizontal'
+                        render 'product-card-horizontal', placeholder_index: i, settings: section.settings
+                      elsif card_style == 'vertical'
+                        render 'product-card-vertical', placeholder_index: i, settings: section.settings
+                      else
+                        render 'product-card-static', placeholder_index: i, settings: section.settings
+                      endif
+                    %}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            <div class="swiper-button-next collection-swiper-button-next">
+              {% render 'icon-slider-nav', direction: 'next' %}
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Banner with Image",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "id": "collectionproduct",
+      "type": "collection",
+      "label": "Select collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Collection Grid"
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        {
+          "value": "simple",
+          "label": "Simple"
+        },
+        {
+          "value": "underline",
+          "label": "Underline"
+        },
+        {
+          "value": "line-top",
+          "label": "Line Top"
+        },
+        {
+          "value": "lines",
+          "label": "Lines"
+        },
+        {
+          "value": "diamond",
+          "label": "Diamond"
+        },
+        {
+          "value": "ornament",
+          "label": "Ornament"
+        },
+        {
+          "value": "x",
+          "label": "X"
+        }
+      ],
+      "info": "Choose the style for the heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Heading Typography"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "url",
+      "id": "colurl",
+      "label": "Collection URL"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "image_picker",
+      "id": "responsive_img",
+      "label": "Collection Image",
+      "info": "This image will be displayed in 40% width on desktop and full width on mobile"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "info": "Choose whether the image appears on the left or right side"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation_arrows_desktop",
+      "label": "Show Navigation Arrows (Desktop)",
+      "default": true,
+      "info": "Toggle to show or hide prev/next arrows on desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation_arrows_mobile",
+      "label": "Show Navigation Arrows (Mobile)",
+      "default": true,
+      "info": "Toggle to show or hide prev/next arrows on mobile"
+    },
+    {
+      "type": "select",
+      "id": "navigation_arrow_style",
+      "label": "Navigation Arrow Style",
+      "default": "circle",
+      "options": [
+        {
+          "value": "circle",
+          "label": "Style 1 - Circle"
+        },
+        {
+          "value": "square",
+          "label": "Style 2 - Square"
+        },
+        {
+          "value": "square-rounded",
+          "label": "Style 3 - Square with Rounded Corners"
+        }
+      ],
+      "info": "Choose the style for navigation arrows"
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_desktop",
+      "label": "Products per Row (Desktop)",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "info": "Number of products to show per row in slider view on desktop"
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_tablet",
+      "label": "Products per Row (Tablet)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "info": "Number of products to show per row in slider view on tablet"
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_mobile",
+      "label": "Products per Row (Mobile)",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.2,
+      "info": "Number of products to show per row in slider view on mobile"
+    },
+    {
+      "type": "header",
+      "content": "Product Card Style"
+    },
+    {
+      "type": "select",
+      "id": "product_card_style",
+      "label": "Product Card Style",
+      "default": "horizontal",
+      "options": [
+        {
+          "value": "horizontal",
+          "label": "style 1"
+        },
+        {
+          "value": "vertical",
+          "label": "style 2"
+        },
+        {
+          "value": "static",
+          "label": "style 3"
+        }
+      ],
+      "info": "Choose the product card style - horizontal or vertical hover actions, or static with both images always visible"
+    },
+    {
+      "type": "header",
+      "content": "Product Hover Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show Wishlist Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_view",
+      "label": "Show Quick View Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare",
+      "label": "Show Compare Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_to_cart",
+      "label": "Show Add to Cart Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_colors",
+      "label": "Show Color Swatches",
+      "default": true
+    },
+        {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_desktop",
+      "label": "Desktop Padding (Top Right Bottom Left)",
+      "default": "60px 20px 60px 20px",
+      "info": "Example: 60px 20px 60px 20px"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_mobile",
+      "label": "Mobile Padding",
+      "default": "40px 15px 40px 15px",
+      "info": "Example: 40px 15px 40px 15px"
+    },
+    {
+      "type": "select",
+      "id": "jewellery_type",
+      "label": "Jewellery Type",
+      "options": [
+        {
+          "value": "all",
+          "label": "All"
+        },
+        {
+          "value": "Silver",
+          "label": "Silver"
+        },
+        {
+          "value": "Gold",
+          "label": "Gold"
+        }
+      ],
+      "default": "all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner with collection",
+          "category": "Collection",
+      "settings": {
+        "image_position": "left",
+        "slides_per_view_desktop": 4,
+        "slides_per_view_tablet": 3,
+        "slides_per_view_mobile": 1.2
+      }
+    }
+  ]
+}
+{% endschema %}
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  initBannerSlider{{ section.id | replace: '-', '_' }}();
+});
+
+document.addEventListener('shopify:section:load', function(e) {
+  if (e.target.id === 'shopify-section-{{ section.id }}') {
+    initBannerSlider{{ section.id | replace: '-', '_' }}();
+  }
+});
+
+// Re-init on resize — this is triggered by skeleton reveal so Swiper gets correct dimensions
+window.addEventListener('resize', function() {
+  var el = document.querySelector('#banner-with-slider-{{ section.id }} .collectionSwiper-custome');
+  if (el && el.swiper) {
+    el.swiper.update();
+  }
+}, { once: false, passive: true });
+
+
+function initBannerSlider{{ section.id | replace: '-', '_' }}() {
+  const slidesPerViewDesktop = {{ section.settings.slides_per_view_desktop | default: 4 }};
+  const slidesPerViewTablet = {{ section.settings.slides_per_view_tablet | default: 3 }};
+  const slidesPerViewMobile = {{ section.settings.slides_per_view_mobile | default: 1.2 }};
+  
+  const swiperSelector = '#banner-with-slider-{{ section.id }} .collectionSwiper-custome';
+  const swiperElement = document.querySelector(swiperSelector);
+
+  if (swiperElement) {
+    if (swiperElement.swiper) {
+      swiperElement.swiper.destroy(true, true);
+    }
+
+    new Swiper(swiperElement, {
+      slidesPerView: slidesPerViewDesktop,  
+      spaceBetween: 20,
+      loop: false,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: `#banner-with-slider-{{ section.id }} .collection-swiper-button-next`,
+        prevEl: `#banner-with-slider-{{ section.id }} .collection-swiper-button-prev`,
+      },
+      breakpoints: {
+        0: {
+          slidesPerView: slidesPerViewMobile,
+          spaceBetween: 10,
+        },
+        576: {
+          slidesPerView: slidesPerViewMobile,
+          spaceBetween: 15,
+        },
+        768: {
+          slidesPerView: slidesPerViewTablet,
+          spaceBetween: 20,
+        },
+        1024: {
+          slidesPerView: slidesPerViewTablet,
+          spaceBetween: 20,
+        },
+        1200: {
+          slidesPerView: slidesPerViewDesktop,
+          spaceBetween: 20,
+        },
+      },
+    });
+  }
+}
+</script>

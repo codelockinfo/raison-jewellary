@@ -1,0 +1,1055 @@
+{% liquid
+%}
+
+<div class="careers-split-section color-{{ section.settings.color_scheme }} container_width">
+  <div class="careers-container">
+
+    <!-- LEFT IMAGE AREA -->
+    <div class="careers-left">
+
+      <!-- Primary image (base) -->
+      <div class="careers-image-layer careers-image-layer--a">
+        {% if section.settings.desktop_image != blank %}
+          <img
+            src="{{ section.settings.desktop_image | image_url: width: 2000 }}"
+            alt="{{ section.settings.desktop_image.alt | default: section.settings.overlay_heading | default: 'Careers Image' }}"
+            class="careers-bg-image main-careers-image"
+            width="{{ section.settings.desktop_image.width }}"
+            height="{{ section.settings.desktop_image.height }}"
+            loading="lazy"
+          >
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'careers-bg-image main-placeholder-svg main-careers-image' }}
+        {% endif %}
+      </div>
+      <!-- Crossfade overlay image -->
+      <div class="careers-image-layer careers-image-layer--b" aria-hidden="true">
+        <img class="careers-bg-image careers-swap-image" alt="" width="1" height="1" style="opacity:0;">
+      </div>
+
+      <div class="block-placeholders-container">
+        {% for block in section.blocks %}
+          {% capture placeholder_index %}{% cycle '1', '2', '3', '4', '5', '6' %}{% endcapture %}
+          <div class="block-placeholder-item" data-placeholder-index="{{ forloop.index0 }}" style="display: none;">
+            {{ 'collection-' | append: placeholder_index | placeholder_svg_tag: 'careers-bg-image block-placeholder-svg' }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Overlay Content -->
+      <div class="careers-overlay
+      overlay-v-{{ section.settings.overlay_vertical }}
+      overlay-h-{{ section.settings.overlay_horizontal }}">
+        {% if section.settings.overlay_heading != blank %}
+          <div class="overlay-title">{{ section.settings.overlay_heading }}</div>
+        {% endif %}
+
+        {% if section.settings.overlay_subheading != blank %}
+          <span class="overlay-sub">{{ section.settings.overlay_subheading }}</span>
+        {% endif %}
+
+        {% if section.settings.overlay_logo != blank %}
+          <img src="{{ section.settings.overlay_logo | image_url: width: 200 }}" class="overlay-logo" alt="{{ section.settings.overlay_logo.alt | default: 'Logo' }}" width="200" height="{{ 200 | divided_by: section.settings.overlay_logo.aspect_ratio | round }}">
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div class="careers-right">
+      {% if section.settings.heading != blank %}
+        <div class="custom-right-heading">
+          {% render 'heading-style-banner',
+              heading: section.settings.heading,
+              heading_tag: section.settings.heading_tag,
+              heading_style: section.settings.heading_style,
+              heading_alignment: section.settings.heading_alignment,
+              wrapper_class: 'careers-split-section'
+            %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.right_text != blank %}
+        <div class="custom-right-text">{{ section.settings.right_text }}</div>
+      {% endif %}
+
+      <!-- Desktop Accordion -->
+      <div class="careers-accordion desktop-accordion">
+        {% for block in section.blocks %}
+          <details 
+            class="accordion-item smooth-details" 
+            data-index="{{ forloop.index0 }}"
+            data-image="{% if block.settings.accordion_image != blank %}{{ block.settings.accordion_image | image_url: width: 2000 }}{% endif %}"
+            data-mobile-image="{% if block.settings.accordion_mobile_image != blank %}{{ block.settings.accordion_mobile_image | image_url: width: 1400 }}{% endif %}"
+          >
+            <summary class="accordion-title" aria-label="accordion title">
+              {{ block.settings.title }}
+              <span class="accordion-icon">
+                <svg viewBox="0 0 16.933 16.933" xmlns="https://www.w3.org/2000/svg">
+                  <path d="m2.117 5.292 6.35 6.35 6.35-6.35" class="stroke" style="fill: none; stroke: currentColor; stroke-width: 1.05831; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: none; stroke-opacity: 1;"></path>
+                </svg>
+              </span>
+            </summary>
+            <div class="smooth-collapsible">
+              <div class="accordion-content smooth-collapsible-inner">
+                {{ block.settings.content | newline_to_br }}
+              </div>
+            </div>
+          </details>
+        {% endfor %}
+      </div>
+
+      <!-- Mobile Coverflow Slider -->
+      <div class="mobile-coverflow-container">
+        <div class="coverflow-wrapper">
+          {% for block in section.blocks %}
+            <div class="coverflow-slide" data-index="{{ forloop.index0 }}">
+              <div class="coverflow-card">
+                <div class="coverflow-image-wrapper">
+                  {% if block.settings.accordion_mobile_image != blank %}
+                    <img src="{{ block.settings.accordion_mobile_image | image_url: width: 800 }}" alt="{{ block.settings.title }}" class="coverflow-image" width="300" height="{{ 300 | divided_by: block.settings.accordion_mobile_image.aspect_ratio | round }}">
+                  {% elsif block.settings.accordion_image != blank %}
+                    <img src="{{ block.settings.accordion_image | image_url: width: 800 }}" alt="{{ block.settings.title }}" class="coverflow-image" width="300" height="{{ 300 | divided_by: block.settings.accordion_image.aspect_ratio | round }}">
+                  {% else %}
+                    {% capture placeholder_index %}{% cycle '1', '2', '3', '4', '5', '6' %}{% endcapture %}
+                    {{ 'collection-' | append: placeholder_index | placeholder_svg_tag: 'coverflow-image placeholder-svg' }}
+                  {% endif %}
+                  <button class="coverflow-accordion-title" data-slide-index="{{ forloop.index0 }}" aria-label="accordion title">
+                    <span class="coverflow-title-text">{{ block.settings.title }}</span>
+                    <span class="coverflow-accordion-icon">
+                      <svg viewBox="0 0 16.933 16.933" xml:space="preserve" xmlns="https://www.w3.org/2000/svg">
+                        <path d="M15.875 8.466H1.058M5.292 4.233 1.058 8.466 5.292 12.7" class="stroke" transform="rotate(180 8.466 8.466)" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1.05831; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 4; stroke-dasharray: none; stroke-opacity: 1;"></path>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+                <div class="coverflow-content">
+                  <div class="smooth-collapsible">
+                    <div class="coverflow-text smooth-collapsible-inner">
+                      {{ block.settings.content | newline_to_br }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function initCareersAccordion(scopedContainer) {
+  const container = scopedContainer || document;
+  const sections = scopedContainer ? [scopedContainer] : document.querySelectorAll(".careers-split-section:not([data-initialized='true'])");
+
+  sections.forEach(sectionRoot => {
+    sectionRoot.dataset.initialized = "true";
+
+    const bgImage = sectionRoot.querySelector(".careers-bg-image.main-careers-image");
+    const blockPlaceholders = sectionRoot.querySelectorAll(".block-placeholder-item");
+    const pictureSource = sectionRoot.querySelector(".careers-left picture source");
+    const originalDesktopImage = bgImage && bgImage.tagName === 'IMG' ? bgImage.src : "";
+    const originalMobileImage = pictureSource ? pictureSource.srcset : "";
+    
+    let currentlyOpenAccordion = null;
+    let hoveredAccordion = null;
+    let hoverTimeout = null;
+    let restoreTimeout = null;
+    let scrollBlockTimeout = null;
+    let isScrollBlocked = false;
+    let currentSlide = 0;
+
+    // Check if mobile device
+    function isMobile() {
+      return window.innerWidth <= 1024;
+    }
+
+    // Dual-layer crossfade image switcher
+    const layerA = sectionRoot.querySelector(".careers-image-layer--a");
+    const layerB = sectionRoot.querySelector(".careers-image-layer--b");
+    const swapImg = layerB ? layerB.querySelector(".careers-swap-image") : null;
+    // Track which layer is currently the "front" visible one
+    let frontIsA = true;
+
+    function crossfadeTo(newSrc) {
+      if (!layerA || !layerB || !swapImg) return;
+
+      if (!newSrc || newSrc.trim() === "") {
+        // Snap back to primary without transition
+        layerB.style.opacity = "0";
+        layerB.style.pointerEvents = "none";
+        layerA.style.opacity = "1";
+        frontIsA = true;
+        return;
+      }
+
+      // Preload then crossfade
+      const loader = new Image();
+      loader.onload = () => {
+        swapImg.src = newSrc;
+        swapImg.style.opacity = "1";
+        // Fade B in (over A)
+        layerB.style.opacity = "1";
+        layerB.style.pointerEvents = "auto";
+        // After B is fully visible, quietly reset A's src so the next fade works
+        setTimeout(() => {
+          frontIsA = false;
+        }, 450);
+      };
+      loader.src = newSrc;
+    }
+
+    function crossfadeToOriginal() {
+      if (!layerA || !layerB) return;
+      // Fade B back out to reveal A (original)
+      swapImg.style.opacity = "0";
+      layerB.style.opacity = "0";
+      layerB.style.pointerEvents = "none";
+      frontIsA = true;
+    }
+
+    // Function to change image with crossfade effect
+    function changeImage(accordionItem) {
+      blockPlaceholders.forEach(item => {
+        item.style.display = "none";
+        item.style.opacity = "0";
+      });
+      
+      const desktopImage = accordionItem ? accordionItem.dataset.image : "";
+      const accordionIndex = accordionItem ? accordionItem.dataset.index : null;
+      
+      if (desktopImage && desktopImage.trim() !== "") {
+        crossfadeTo(desktopImage);
+      } else if (accordionIndex !== null) {
+        // No image set — use placeholder
+        crossfadeToOriginal();
+        const placeholderToShow = sectionRoot.querySelector(`.block-placeholder-item[data-placeholder-index="${accordionIndex}"]`);
+        if (placeholderToShow) {
+          placeholderToShow.style.display = "block";
+          setTimeout(() => { placeholderToShow.style.opacity = "1"; }, 50);
+        }
+      }
+    }
+
+    // Function to restore original image
+    function restoreOriginalImage() {
+      blockPlaceholders.forEach(item => {
+        item.style.display = "none";
+        item.style.opacity = "0";
+      });
+      
+      if (currentlyOpenAccordion) {
+        changeImage(currentlyOpenAccordion);
+        return;
+      }
+
+      crossfadeToOriginal();
+    }
+
+    // Mobile Slider logic
+    const wrapper = sectionRoot.querySelector(".coverflow-wrapper");
+    const slides = sectionRoot.querySelectorAll(".coverflow-slide");
+
+    function updateWrapperHeight() {
+      if (!isMobile() || !wrapper || !slides.length) return;
+      
+      const activeCard = sectionRoot.querySelector(".coverflow-card.active");
+      const currentSlideEl = slides[currentSlide];
+      const targetCard = activeCard || (currentSlideEl ? currentSlideEl.querySelector(".coverflow-card") : null);
+      
+      if (targetCard) {
+        setTimeout(() => {
+           const inner = targetCard.querySelector('.smooth-collapsible-inner');
+           const content = targetCard.querySelector('.smooth-collapsible');
+           let extra = 0;
+           if(content && content.classList.contains('active')) {
+             extra = inner ? inner.offsetHeight : 0;
+           }
+           const imgHeight = targetCard.querySelector('.coverflow-image-wrapper').offsetHeight;
+           wrapper.style.height = `${imgHeight + extra + 60}px`;
+        }, 300);
+      }
+    }
+
+    function updateCoverflowPositions() {
+      updateWrapperHeight(); 
+      if (!slides.length) return;
+      slides.forEach((slide, index) => {
+        let offset = index - currentSlide;
+        if (offset > slides.length / 2) offset -= slides.length;
+        else if (offset < -slides.length / 2) offset += slides.length;
+        
+        const absOffset = Math.abs(offset);
+        let translateX = offset * 220; 
+        let translateZ = -absOffset * 100;
+        let scale = Math.max(0.6, 1 - absOffset * 0.2);
+        let opacity = Math.max(0.2, 1 - absOffset * 0.4);
+        
+        slide.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) scale(${scale})`;
+        slide.style.opacity = opacity;
+        slide.style.zIndex = slides.length - absOffset;
+        slide.style.pointerEvents = absOffset === 0 ? 'auto' : 'none';
+      });
+    }
+
+    function goToSlide(index) {
+      if (!slides.length) return;
+      if (index < 0) currentSlide = slides.length - 1;
+      else if (index >= slides.length) currentSlide = 0;
+      else currentSlide = index;
+      updateCoverflowPositions();
+    }
+
+    if (wrapper && slides.length > 0) {
+      updateCoverflowPositions();
+      
+      let startX = 0, isDragging = false, touchStartTime = 0, touchStartY = 0;
+      
+      wrapper.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+        isDragging = true;
+      }, { passive: true });
+      
+      wrapper.addEventListener("touchend", (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diff = startX - e.changedTouches[0].clientX;
+        const diffY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        if (Math.abs(diff) > 50 && diffY < 30 && (Date.now() - touchStartTime) < 300) {
+          goToSlide(diff > 0 ? currentSlide + 1 : currentSlide - 1);
+        }
+      });
+      
+      wrapper.addEventListener("mousedown", (e) => {
+        if (e.target.closest(".coverflow-accordion-title")) return;
+        startX = e.clientX;
+        isDragging = true;
+      });
+      window.addEventListener("mouseup", (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diff = startX - e.clientX;
+        if (Math.abs(diff) > 50) goToSlide(diff > 0 ? currentSlide + 1 : currentSlide - 1);
+      });
+
+      // Mobile Custom Toggle
+      sectionRoot.querySelectorAll(".coverflow-accordion-title").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const card = btn.closest(".coverflow-card");
+            const collapsible = card ? card.querySelector(".smooth-collapsible") : null;
+            const icon = btn.querySelector(".coverflow-accordion-icon");
+            
+            if (!collapsible) return;
+            const isCurrentlyOpen = card.classList.contains("active");
+            
+            // Close others
+            sectionRoot.querySelectorAll(".coverflow-card.active").forEach(c => {
+               c.classList.remove("active");
+               const otherCollapsible = c.querySelector(".smooth-collapsible");
+               if(otherCollapsible) otherCollapsible.classList.remove("active");
+               const otherIcon = c.querySelector(".coverflow-accordion-icon");
+               if(otherIcon) otherIcon.style.transform = "rotate(0deg)";
+            });
+            
+            if (!isCurrentlyOpen) {
+              if (icon) icon.style.transform = "rotate(180deg)";
+              card.classList.add("active");
+              collapsible.classList.add("active");
+              
+              const slide = card.closest(".coverflow-slide");
+              const index = slide.dataset.index;
+              const desktopItem = sectionRoot.querySelector(`.accordion-item[data-index="${index}"]`);
+              if (desktopItem) changeImage(desktopItem);
+            } else {
+              restoreOriginalImage();
+            }
+            updateWrapperHeight();
+          });
+      });
+    }
+
+    // Desktop Accordion
+    const desktopAccordion = sectionRoot.querySelector(".careers-accordion.desktop-accordion");
+    if (desktopAccordion) {
+      sectionRoot.querySelectorAll(".accordion-item.smooth-details").forEach(details => {
+        const summary = details.querySelector('summary');
+        const icon = details.querySelector(".accordion-icon");
+
+        summary.addEventListener('click', () => {
+            if (isMobile()) return;
+            
+            // Exclusive behavior: Close others
+            if (!details.hasAttribute('open')) {
+                sectionRoot.querySelectorAll(".accordion-item.smooth-details[open]").forEach(other => {
+                    if (other !== details) {
+                        // We trigger a click on other's summary to let SmoothCollapsible handle the closing animation
+                        other.querySelector('summary').click();
+                    }
+                });
+                
+                if (icon) icon.style.transform = "rotate(180deg)";
+                currentlyOpenAccordion = details;
+                changeImage(details);
+            } else {
+                if (icon) icon.style.transform = "rotate(0deg)";
+                currentlyOpenAccordion = null;
+                restoreOriginalImage();
+            }
+        });
+
+        details.addEventListener('mouseenter', () => {
+          if (isMobile() || currentlyOpenAccordion) return;
+          clearTimeout(hoverTimeout); clearTimeout(restoreTimeout);
+          if (isScrollBlocked) {
+            hoverTimeout = setTimeout(() => {
+              if (!isScrollBlocked && !currentlyOpenAccordion) changeImage(details);
+            }, 150);
+          } else {
+            changeImage(details);
+          }
+        });
+        
+        details.addEventListener('mouseleave', () => {
+          if (isMobile() || currentlyOpenAccordion) return;
+          clearTimeout(hoverTimeout);
+          restoreTimeout = setTimeout(() => {
+            if (!currentlyOpenAccordion) restoreOriginalImage();
+          }, 100);
+        });
+      });
+    }
+
+    // Global scroll block listener (once)
+    if (!window.careersScrollListenerAdded) {
+      window.addEventListener("scroll", () => {
+        isScrollBlocked = true;
+        clearTimeout(scrollBlockTimeout);
+        scrollBlockTimeout = setTimeout(() => isScrollBlocked = false, 100);
+      }, { passive: true });
+      window.careersScrollListenerAdded = true;
+    }
+    // Resize listener to adjust height
+    window.addEventListener("resize", () => {
+      if (isMobile()) updateWrapperHeight();
+    });
+
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => initCareersAccordion());
+} else {
+  initCareersAccordion();
+}
+
+document.addEventListener("shopify:section:load", (event) => {
+  const container = event.target.querySelector('.careers-split-section') || (event.target.classList.contains('careers-split-section') ? event.target : null);
+  if (container) initCareersAccordion(container);
+});
+</script>
+
+<style>
+#shopify-section-{{ section.id }} .careers-split-section {
+    width: 100%;
+    padding: {{ section.settings.section_padding_desktop }};
+    background: transparent;
+}
+#shopify-section-{{ section.id }} .careers-container {
+    display: flex;
+    min-height: 600px;
+    align-items: stretch; 
+    margin: 0 auto;
+}
+#shopify-section-{{ section.id }} .careers-left,
+#shopify-section-{{ section.id }} .careers-right {
+    min-height: 500px;
+}
+
+#shopify-section-{{ section.id }} .careers-right {
+    width: 50%;
+    padding: 40px;
+    background: var(--color-background);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+} 
+#shopify-section-{{ section.id }} .careers-left {
+    position: relative;
+    width: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+/* Dual-layer crossfade image setup */
+#shopify-section-{{ section.id }} .careers-image-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.4s ease-in-out;
+    pointer-events: none;
+}
+#shopify-section-{{ section.id }} .careers-image-layer--a {
+    opacity: 1;
+    z-index: 1;
+}
+#shopify-section-{{ section.id }} .careers-image-layer--b {
+    opacity: 0;
+    z-index: 2;
+}
+#shopify-section-{{ section.id }} .careers-bg-image {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+    object-fit: cover;
+    display: block;
+    opacity: 1;
+    transition: opacity 0.4s ease-in-out;
+}
+#shopify-section-{{ section.id }} .block-placeholders-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+#shopify-section-{{ section.id }} .block-placeholder-item {
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s ease-in-out;
+}
+#shopify-section-{{ section.id }} .placeholder-svg {
+    background: #f4f4f4;
+}
+#shopify-section-{{ section.id }} .careers-overlay {
+    position: absolute;
+    color: #FEFEFE;
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+}
+
+/* Vertical alignment */
+#shopify-section-{{ section.id }} .overlay-v-top { top: 60px; }
+#shopify-section-{{ section.id }} .overlay-v-middle { top: 50%; transform: translateY(-50%); }
+#shopify-section-{{ section.id }} .overlay-v-bottom { bottom: 60px; }
+
+/* Horizontal alignment */
+#shopify-section-{{ section.id }} .overlay-h-left { left: 60px; align-items: start; }
+#shopify-section-{{ section.id }} .overlay-h-center { 
+    left: 50%; 
+    transform: translateX(-50%); 
+    align-items: center; 
+}
+#shopify-section-{{ section.id }} .overlay-h-right { right: 60px; align-items: end; }
+
+/* Center Center special case to prevent transform overwrite */
+#shopify-section-{{ section.id }} .overlay-v-middle.overlay-h-center {
+    transform: translate(-50%, -50%);
+}
+#shopify-section-{{ section.id }} .overlay-h-center:not(.overlay-v-middle) { transform: translateX(-50%); }
+#shopify-section-{{ section.id }} .overlay-v-middle:not(.overlay-h-center) { transform: translateY(-50%); }
+
+#shopify-section-{{ section.id }} .overlay-title {
+    font-weight: 800;
+    font-size: 32px;
+    color: var(--color-heading);
+}
+#shopify-section-{{ section.id }} .overlay-sub {
+    display: block;
+    font-size: 18px;
+    color: var(--color-subtext);
+}
+#shopify-section-{{ section.id }} .overlay-logo {
+    margin-top: 10px;
+    max-width: {{ section.settings.overlay_logo_width_desktop }}px;
+}
+#shopify-section-{{ section.id }} .careers-accordion {
+    margin-top: 19px;
+    width: 100%;
+    max-width: 100%;
+}
+#shopify-section-{{ section.id }} .accordion-title {
+    width: 100%;
+    background: none;
+    border: none !important;
+    padding: 15px 0;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 400;
+    line-height: 35.2px;
+    color: var(--color-heading);
+    transition: color 0.3s ease;
+}
+#shopify-section-{{ section.id }} .accordion-item:hover .accordion-title,
+#shopify-section-{{ section.id }} .accordion-item.active .accordion-title {
+    color: var(--color-subtext);
+}
+#shopify-section-{{ section.id }} .accordion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+#shopify-section-{{ section.id }} .accordion-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    color: var(--color-heading);
+}
+#shopify-section-{{ section.id }} .accordion-content {
+    padding-bottom: 24px;
+    font-weight: 400;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+#shopify-section-{{ section.id }} .custom-right-heading{
+    font-weight: 700;
+    text-transform:uppercase;
+    width: 100%;
+    color: var(--color-heading);
+    text-align: {{ section.settings.right_heading_alignment }};
+}
+#shopify-section-{{ section.id }} .custom-right-text{
+    font-weight: 400;
+    line-height: 27px;
+    text-align: {{ section.settings.right_text_alignment }};
+    margin-bottom: 20px;
+    color: var(--color-subtext);
+    width: 100%;
+}
+#shopify-section-{{ section.id }} .button:hover{
+    color: #00BB33 !important;
+}
+
+@media (max-width: 1024px) {
+    #shopify-section-{{ section.id }} .careers-split-section {
+        padding: {{ section.settings.section_padding_mobile }};
+    }
+    #shopify-section-{{ section.id }} .careers-container {
+        display: block;
+        max-width: 100%;
+    }
+    #shopify-section-{{ section.id }} .careers-left {
+        width: 100%;
+    }
+    #shopify-section-{{ section.id }} .careers-right {
+        width: 100%;
+        padding: 20px;
+        align-items: unset;
+        justify-content: unset;
+    }
+    #shopify-section-{{ section.id }} .custom-right-text{
+        max-width: 100%;
+    }
+    #shopify-section-{{ section.id }} .custom-right-heading {
+        text-align:center;
+        padding-bottom:20px;
+    }
+    #shopify-section-{{ section.id }} .overlay-title {
+      font-size: 24px;
+    }
+    #shopify-section-{{ section.id }} .overlay-sub {
+      font-size: 16px;
+    }
+    #shopify-section-{{ section.id }} .overlay-logo {
+        max-width: {{ section.settings.overlay_logo_width_mobile }}px;
+    }
+    
+    /* Hide desktop accordion on mobile */
+    #shopify-section-{{ section.id }} .desktop-accordion {
+        display: none !important;
+    }
+    
+    /* Mobile Coverflow Slider Styles */
+    .mobile-coverflow-container {
+        display: block;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        margin: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .coverflow-wrapper {
+        position: relative;
+        width: 100%;
+        height: 350px; /* Reduced from 460px */
+        perspective-origin: 50% 50%;
+        overflow: hidden;
+        cursor: grab;
+        -webkit-user-select: none;
+        user-select: none;
+        margin: 0;
+        padding: 0;
+        /* Ensure slides extend to edges when rotated */
+        transform-style: preserve-3d;
+        transition: height 0.3s ease;
+    }
+    
+    .coverflow-wrapper:active {
+        cursor: grabbing;
+    }
+    
+    .coverflow-slide {
+        position: absolute;
+        width: 300px;
+        height: auto;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+        transform-style: preserve-3d;
+        will-change: transform, opacity;
+        left: 50%;
+        margin-left: -150px;
+        transform-origin: center center;
+    }
+    
+    .coverflow-card {
+        display: flex;
+        flex-direction: column;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transition: height 0.3s ease;
+    }
+    
+    .coverflow-image-wrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        background: transparent;
+    }
+    
+    .coverflow-image-wrapper::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .coverflow-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+    
+    .coverflow-card:hover .coverflow-image {
+        transform: scale(1.05);
+    }
+    
+    .coverflow-content {
+        padding: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        color: var(--color-text);
+        overflow-y: auto;
+        min-height: 0;
+        background: transparent;
+    }
+    
+    .coverflow-accordion-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: none;
+        border: none !important;
+        padding: 16px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 400;
+        color: var(--color-heading);
+        transition: color 0.3s ease;
+        text-align: left;
+        z-index: 10;
+        font-size: var(--subheading-size);
+    }
+    
+    .coverflow-title-text {
+        font-weight: 600;
+        text-transform: uppercase;
+        line-height: 1.3;
+        color: var(--color-text);
+    }
+    
+    .coverflow-accordion-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+        margin-left: 12px;
+    }
+    
+    .coverflow-accordion-icon svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    
+    .coverflow-accordion-icon svg path {
+        stroke: var(--color-heading) !important;
+    }
+    
+    .coverflow-card.active .coverflow-accordion-title {
+        color: var(--color-heading);
+    }
+    
+    .coverflow-card.active .coverflow-accordion-icon svg path {
+        stroke: var(--color-heading) !important;
+    }
+    
+    .coverflow-text {
+        font-weight: 400;
+        line-height: 1.6;
+        color: var(--color-text);
+        padding: 16px;
+        background: transparent;
+        transition: all 0.3s ease;
+        max-height: 500px;
+        overflow-y: visible;
+        font-size: var(--font-body--size);
+    }
+    
+    .careers-split-section .careers-container{
+        display: block;
+    }
+    .careers-split-section .careers-left {
+        width: 100%;
+    }
+    .careers-split-section .careers-right {
+        width: 100%;
+        padding:40px 0 0 0;
+        align-items: unset;
+        justify-content: unset;
+    }
+    .careers-split-section .custom-right-text{
+        max-width: 100%;
+    }
+    #shopify-section-{{ section.id }} .accordion-item{
+        width: 100%;
+    }
+    #shopify-section-{{ section.id }} .accordion-title {
+        padding: 10px 0;
+    }
+}
+
+@media (min-width: 1025px) {
+    /* Hide coverflow on desktop */
+    .mobile-coverflow-container {
+        display: none !important;
+    }
+    
+    /* Show desktop accordion */
+    .desktop-accordion {
+        display: block;
+    }
+}
+
+/* Shopify Editor Preview Drawer Fixes */
+/* Shopify Editor Preview Drawer Fixes */
+.shopify-section-main-preview .careers-split-section .careers-container,
+[data-section-main-preview] .careers-split-section .careers-container {
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 250px !important;
+    height: 250px !important;
+    overflow: hidden !important;
+    gap: 0 !important;
+}
+.shopify-section-main-preview .careers-split-section .careers-left,
+[data-section-main-preview] .careers-split-section .careers-left,
+.shopify-section-main-preview .careers-split-section .careers-right,
+[data-section-main-preview] .careers-split-section .careers-right {
+    width: 50% !important;
+    min-height: 250px !important;
+    height: 250px !important;
+    padding: 10px !important;
+    flex: 0 0 50% !important;
+}
+.shopify-section-main-preview .desktop-accordion,
+[data-section-main-preview] .desktop-accordion {
+    display: block !important;
+    margin-top: 5px !important;
+}
+.shopify-section-main-preview .mobile-coverflow-container,
+[data-section-main-preview] .mobile-coverflow-container {
+    display: none !important;
+}
+.shopify-section-main-preview .careers-overlay,
+[data-section-main-preview] .careers-overlay {
+    padding: 5px !important;
+    left: 10px !important;
+    bottom: 10px !important;
+    transform: none !important;
+    top: auto !important;
+}
+.shopify-section-main-preview .overlay-title,
+[data-section-main-preview] .overlay-title {
+    font-size: 16px !important;
+    line-height: 1 !important;
+}
+.shopify-section-main-preview .overlay-sub,
+[data-section-main-preview] .overlay-sub {
+    font-size: 10px !important;
+    margin: 0 !important;
+}
+.shopify-section-main-preview .accordion-title,
+[data-section-main-preview] .accordion-title {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    padding: 5px 0 !important;
+}
+.shopify-section-main-preview .accordion-icon,
+[data-section-main-preview] .accordion-icon {
+    width: 10px !important;
+    height: 10px !important;
+}
+.shopify-section-main-preview .custom-right-heading,
+[data-section-main-preview] .custom-right-heading {
+    font-size: 14px !important;
+    padding-bottom: 5px !important;
+}
+.shopify-section-main-preview .custom-right-text,
+[data-section-main-preview] .custom-right-text {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 5px !important;
+}
+.shopify-section-main-preview .overlay-logo,
+[data-section-main-preview] .overlay-logo {
+    max-width: 40px !important;
+    margin-top: 5px !important;
+}
+</style>
+
+
+{% schema %}
+{
+  "name": "Careers Split Section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    { "type": "image_picker", "id": "desktop_image", "label": "Desktop Image" },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile Image" },
+    { "type": "text", "id": "overlay_heading", "label": "Overlay Heading", "default": "GROW" },
+    { "type": "text", "id": "overlay_subheading", "label": "Overlay Subheading", "default": "with" },
+    { "type": "image_picker", "id": "overlay_logo", "label": "Overlay Logo" },
+
+    { "type": "range", "id": "overlay_logo_width_desktop", "min": 50, "max": 400, "step": 5, "unit": "px", "label": "Overlay Logo Width (Desktop)", "default": 160 },
+    { "type": "range", "id": "overlay_logo_width_mobile", "min": 30, "max": 200, "step": 5, "unit": "px", "label": "Overlay Logo Width (Mobile)", "default": 100 },
+    { "type": "header", "content": "Overlay Content Positioning" },
+    {
+      "type": "select",
+      "id": "overlay_vertical",
+      "label": "Content Position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "overlay_horizontal",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    { "type": "header", "content": "Right Side Content Settings" },
+    { "type": "text", "id": "heading", "label": "Right Heading", "default": "Find your fit" },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    { "type": "textarea", "id": "right_text", "label": "Right Text" },
+    { "type": "header", "content": "Right Side Alignment" },
+    {
+      "type": "select",
+      "id": "right_heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "right_text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    { "type": "header", "content": "Section Spacing" },
+    { "type": "text", "id": "section_padding_desktop", "label": "Section Padding (Desktop)", "default": "60px 20px 60px 20px" },
+    { "type": "text", "id": "section_padding_mobile", "label": "Section Padding (Mobile)", "default": "20px 20px 20px 20px" },
+  ],
+  "blocks": [
+    {
+      "type": "accordion",
+      "name": "Accordion Item",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Title" },
+        { "type": "textarea", "id": "content", "label": "Content", "default": "Content" },
+        { "type": "image_picker", "id": "accordion_image", "label": "Accordion Image (Desktop)" },
+        { "type": "image_picker", "id": "accordion_mobile_image", "label": "Accordion Image (Mobile)" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Careers Split Section",
+    "blocks": [ { "type": "accordion" }, { "type": "accordion" }, { "type": "accordion" } ] 
+    }
+  ]
+}
+{% endschema %}
+  

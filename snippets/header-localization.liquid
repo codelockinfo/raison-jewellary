@@ -1,0 +1,126 @@
+{%- if settings.enable_currency_selector and localization.available_countries.size > 1 -%}
+  <div class="header-localization">
+    {%- assign form_id = 'HeaderLocalizationForm-' | append: section.id | append: '-' | append: forloop.index0 | default: 'main' -%}
+    {%- assign list_id = 'HeaderLocalizationList-' | append: section.id | append: '-' | append: forloop.index0 | default: 'main' -%}
+    {%- form 'localization', class: 'localization-form', id: form_id -%}
+      <div class="localization-form__select">
+        <button type="button" class="localization-form__select-button" data-localization-toggle aria-expanded="false" aria-label="{{ cart.currency.iso_code }} {{ cart.currency.symbol }}" aria-controls="{{ list_id }}">
+<span class="localization-form__select-label">
+  {{ cart.currency.iso_code }} {{ cart.currency.symbol }}
+</span>          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" class="localization-form__select-icon">
+            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul id="{{ list_id }}" class="localization-form__list" data-localization-list>
+          <div class="localization-form__list-inner">
+            {%- for country in localization.available_countries -%}
+              <li class="localization-form__item">
+                <a class="localization-form__link" 
+                   href="{% if localization.proxy_url == '/' %}/localization?country_code={{ country.iso_code }}{% else %}{{ localization.proxy_url }}?country_code={{ country.iso_code }}{% endif %}" 
+                   data-value="{{ country.iso_code }}"
+                    data-currency="{{ country.currency.iso_code }} {{ country.currency.symbol }}"
+                   {% if country.iso_code == localization.country.iso_code %}aria-current="true"{% endif %}>
+                  {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+                </a>
+              </li>
+            {%- endfor -%}
+          </div>
+        </ul>
+        <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+      </div>
+    {%- endform -%}
+  </div>
+
+  <script>
+    (function() {
+      if (window.localizeInitialized) return;
+      window.localizeInitialized = true;
+
+      function initLocalization() {
+        const containers = document.querySelectorAll('.header-localization');
+        
+        containers.forEach(container => {
+          const toggle = container.querySelector('[data-localization-toggle]');
+          const list = container.querySelector('[data-localization-list]');
+          const form = container.querySelector('form');
+          const links = container.querySelectorAll('.localization-form__link');
+          const input = form?.querySelector('input[name="country_code"]');
+
+          if (toggle && list && form && input) {
+            // Remove existing listeners by cloning if necessary (or just don't re-add)
+            if (container.dataset.ready) return;
+
+const input = container.querySelector('input[name="country_code"]');
+            const currentCountryCode = input ? input.value : '';
+
+            links.forEach(link => {
+              link.classList.remove('localization-form__link--active');
+              link.removeAttribute('aria-current');
+
+              if (currentCountryCode && link.dataset.value === currentCountryCode) {
+                 link.classList.add('localization-form__link--active');
+                 link.setAttribute('aria-current', 'true');
+              }
+            });
+            toggle.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+              
+              // Close others
+              document.querySelectorAll('[data-localization-toggle][aria-expanded="true"]').forEach(t => {
+                if (t !== toggle) {
+                  t.setAttribute('aria-expanded', 'false');
+                }
+              });
+
+              toggle.setAttribute('aria-expanded', !isExpanded);
+            });
+
+            links.forEach(link => {
+              link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const value = link.dataset.value;
+                if (!value) return;
+
+                // Show global loader instantly
+                const globalLoader = document.getElementById('global-loader');
+                if (globalLoader) {
+                  globalLoader.classList.remove('hidden');
+                }
+
+                input.value = value;
+                
+                // Show updating state
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.style.opacity = '0.5';
+                container.style.pointerEvents = 'none';
+
+                form.submit();
+              });
+            });
+
+            container.dataset.ready = 'true';
+          }
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.header-localization')) {
+          document.querySelectorAll('[data-localization-toggle][aria-expanded="true"]').forEach(t => {
+            t.setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
+
+      // Regular initialization
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLocalization);
+      } else {
+        initLocalization();
+      }
+
+      // Section load support
+      document.addEventListener('shopify:section:load', initLocalization);
+    })();
+  </script>
+{%- endif -%}

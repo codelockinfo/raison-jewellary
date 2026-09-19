@@ -1,0 +1,104 @@
+{% layout none %}
+{% comment %}
+  Search template for Recently Viewed Products.
+  Expected params in search.terms: config:settings:style=vertical|wishlist=true|...
+{% endcomment %}
+
+{%- liquid
+  assign config = search.terms | split: 'settings:' | last
+  
+  assign card_style = 'vertical'
+  if config contains 'style='
+    assign card_style = config | split: 'style=' | last | split: '|' | first
+  endif
+
+  assign show_wishlist = false
+  if config contains 'wishlist=true'
+    assign show_wishlist = true
+  endif
+
+  assign show_quick_view = false
+  if config contains 'qv=true'
+    assign show_quick_view = true
+  endif
+
+  assign show_compare = false
+  if config contains 'compare=true'
+    assign show_compare = true
+  endif
+
+  assign show_atc = false
+  if config contains 'atc=true'
+    assign show_atc = true
+  endif
+
+  assign show_badge = false
+  if config contains 'badge=true'
+    assign show_badge = true
+  endif
+
+  assign show_rating = false
+  if config contains 'rating=true'
+    assign show_rating = true
+  endif
+
+  assign show_colors = false
+  if config contains 'colors=true'
+    assign show_colors = true
+  endif
+-%}
+
+{% paginate search.results by 20 %}
+  {% for item in search.results %}
+    {% if item.object_type == 'product' %}
+      <div class="swiper-slide product-grid button-shape-{{ settings.product_card_button_shape }}" data-handle="{{ item.handle }}">
+        {% case card_style %}
+          {% when 'vertical' %}
+            {% render 'product-card-vertical', 
+              product: item, 
+              show_wishlist: show_wishlist,
+              show_quick_view: show_quick_view,
+              show_compare: show_compare,
+              show_add_to_cart: show_atc,
+              show_badge: show_badge,
+              show_rating: show_rating,
+              show_colors: show_colors
+            %}
+          {% when 'horizontal' %}
+            {% render 'product-card-horizontal', 
+              product: item, 
+              show_wishlist: show_wishlist,
+              show_quick_view: show_quick_view,
+              show_compare: show_compare,
+              show_add_to_cart: show_atc,
+              show_badge: show_badge,
+              show_rating: show_rating,
+              show_colors: show_colors
+            %}
+          {% when 'static' %}
+            {% render 'product-card-static', 
+              product: item, 
+              show_wishlist: show_wishlist,
+              show_quick_view: show_quick_view,
+              show_compare: show_compare,
+              show_add_to_cart: show_atc,
+              show_badge: show_badge,
+              show_rating: show_rating,
+              show_colors: show_colors
+            %}
+          {% else %}
+            {% render 'product-card-vertical', 
+              product: item, 
+              show_wishlist: show_wishlist,
+              show_quick_view: show_quick_view,
+              show_compare: show_compare,
+              show_add_to_cart: show_atc,
+              show_badge: show_badge,
+              show_rating: show_rating,
+              show_colors: show_colors
+            %}
+        {% endcase %}
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endpaginate %}

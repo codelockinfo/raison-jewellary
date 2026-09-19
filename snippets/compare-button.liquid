@@ -1,0 +1,36 @@
+{% comment %}
+  Renders a compare button for a product
+
+  @param {product} product - The product object
+  @param {string} class - Additional CSS classes (optional)
+{% endcomment %}
+
+{% liquid
+  assign button_class = 'compare-button'
+  if class != blank
+    assign button_class = button_class | append: ' ' | append: class
+  endif
+  assign compare_page_url = settings.compare_page.url | default: '/pages/compare'
+%}
+
+<button 
+  type="button"
+  class="{{ button_class }}"
+  data-compare-button
+  data-product-id="{{ product.id }}"
+  data-product-handle="{{ product.handle }}"
+  data-compare-page-url="{{ compare_page_url }}"
+  aria-label="Add {{ product.title | escape }} to compare"
+  title="Add to compare"
+>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+     xmlns="https://www.w3.org/2000/svg">
+  <path d="M4 6h10M4 6l3-3M4 6l3 3"
+        stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M20 18H10M20 18l-3-3M20 18l-3 3"
+        stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+

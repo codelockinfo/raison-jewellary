@@ -1,0 +1,460 @@
+{% schema %}
+{
+  "name": "Hotspot Product Set",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    { "type": "image_picker", "id": "image", "label": "Main Image" },
+
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Complete the Look" },
+ {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h1"
+    },    
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Products shown in image" },
+    {
+      "type": "select",
+      "id": "subheading_align",
+      "label": "Subheading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Desktop Padding (Top Right Bottom Left)",
+      "default": "60px 20px 60px 20px",
+      "info": "Example: 60px 20px 60px 20px"
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Mobile Padding (Top Right Bottom Left)",
+      "default": "40px 15px 40px 15px",
+      "info": "Example: 40px 15px 40px 15px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Select Product" },
+        { "type": "number", "id": "hotspot_top", "label": "Hotspot Top (%)", "default": 20 },
+        { "type": "number", "id": "hotspot_left", "label": "Hotspot Left (%)", "default": 50 }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Hotspot Product Set",
+         "category": "Product",
+      "blocks": [
+        {
+          "type": "product",
+          "settings": { "hotspot_top": 40, "hotspot_left": 30 }
+        },
+        {
+          "type": "product",
+          "settings": { "hotspot_top": 60, "hotspot_left": 60 }
+        },
+        {
+          "type": "product",
+          "settings": { "hotspot_top": 30, "hotspot_left": 70 }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+
+
+
+<section
+  class="product-hotspot-section image-{{ section.settings.image_position }} color-{{ section.settings.color_scheme }} skeleton-container"
+  style="
+    --heading-align: {{ section.settings.heading_align }};
+    --subheading-align: {{ section.settings.subheading_align }};
+    --padding-desktop: {{ section.settings.padding_desktop }};
+    --padding-mobile: {{ section.settings.padding_mobile }};
+  "
+>
+  <div class="skeleton-visible">
+    <div class="hotspot-wrapper container_width" style="display: flex; gap: 40px; flex-direction: {% if section.settings.image_position == 'right' %}row-reverse{% else %}row{% endif %};">
+       <div class="skeleton-box skeleton-shimmer" style="width: 60%; height: 600px; border-radius: 20px;"></div>
+       <div style="width: 40%;">
+          <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 40px; width: 200px; margin-bottom: 20px;"></div>
+          {% for i in (1..3) %}
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+               <div class="skeleton-box skeleton-shimmer" style="width: 80px; height: 80px; border-radius: 10px;"></div>
+               <div style="flex: 1;">
+                 <div class="skeleton-box skeleton-shimmer skeleton-text medium"></div>
+                 <div class="skeleton-box skeleton-shimmer skeleton-text short"></div>
+               </div>
+            </div>
+          {% endfor %}
+       </div>
+    </div>
+  </div>
+  <div class="hotspot-wrapper container_width">
+
+    <!-- IMAGE -->
+    <div class="product-image">
+      {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+      {% assign fetch_priority = 'low' %}
+      {% if loading_strategy == 'eager' %}
+        {% assign fetch_priority = 'high' %}
+      {% endif %}
+      {% if section.settings.image %}
+        {{ section.settings.image | image_url: width: 2000 | image_tag: loading: loading_strategy, fetchpriority: fetch_priority, alt: section.settings.image.alt }}
+      {% else %}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+
+      {% for block in section.blocks %}
+        {% assign product = all_products[block.settings.product] %}
+        <div
+          class="hotspot"
+          data-product-index="{{ forloop.index }}"
+          data-product-url="{{ product.url }}"
+          style="top: {{ block.settings.hotspot_top }}%; left: {{ block.settings.hotspot_left }}%; cursor: pointer;"
+        >
+          <span>{{ forloop.index }}</span>
+          <div class="hotspot-tooltip">
+            <span class="hotspot-tooltip-title">
+              {% if product != blank %}{{ product.title }}{% else %}Example Product{% endif %}
+            </span>
+            <span class="hotspot-tooltip-price">
+              {% if product != blank %}
+                {%- liquid
+                  if settings.currency_code_enabled
+                    assign money_product_price = product.price | money_with_currency
+                  else
+                    assign money_product_price = product.price | money
+                  endif
+                  
+                  if cart.currency.iso_code == 'EUR'
+                    assign money_product_price = money_product_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                  elsif cart.currency.iso_code == 'INR'
+                    assign money_product_price = money_product_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                  endif
+                -%}
+                {{ money_product_price }}
+              {% else %}
+                ₹19.99
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- CONTENT -->
+    <div class="product-list">
+      <div class="section-heading">
+        {% if section.settings.heading != blank %}
+          {% render 'heading-style-banner',
+            heading: section.settings.heading,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            wrapper_class: 'custom-video-banner-section'
+          %}
+        {% endif %}
+      </div>
+      <p class="section-subheading">{{ section.settings.subheading }}</p>
+
+      <ul>
+        {% for block in section.blocks %}
+          {%- assign product = all_products[block.settings.product] -%}
+          
+          <li data-product-index="{{ forloop.index }}" data-product-url="{{ product.url }}" style="cursor: pointer;">
+            <div class="product-number">{{ forloop.index }}</div>
+
+            <div class="product-info">
+              {% if product != blank %}
+                 <img src="{{ product.featured_image | image_url: width: 120 }}" alt="{{ product.title | escape }}" loading="{{ loading_strategy }}" width="120" height="{{ 120 | divided_by: product.featured_image.aspect_ratio | round }}">
+              {% else %}
+                 {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg icon-placeholder' }}
+              {% endif %}
+              
+              <div class="product-details">
+                <span class="product-title">
+                  {% if product != blank %}{{ product.title }}{% else %}Example Product{% endif %}
+                </span>
+                
+                {% if product != blank %}
+                  {% if product.variants.size > 1 %}
+                    <select class="variant-select" name="id">
+                      {% for v in product.variants %}
+                        {% capture variant_price %}
+                          {%- liquid
+                            if settings.currency_code_enabled
+                              assign money_v_price = v.price | money_with_currency
+                            else
+                              assign money_v_price = v.price | money
+                            endif
+                            
+                            if cart.currency.iso_code == 'EUR'
+                              assign money_v_price = money_v_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                            elsif cart.currency.iso_code == 'INR'
+                              assign money_v_price = money_v_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                            endif
+                          -%}
+                          {{ money_v_price }}
+                        {% endcapture %}
+                        <option value="{{ v.id }}" data-available="{{ v.available }}" data-price="{{ variant_price | strip }}">
+                          {{ v.title }} – {{ variant_price | strip }}
+                          {% unless v.available %} - Sold Out{% endunless %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  {% else %}
+                    {% assign v = product.variants.first %}
+                    <div class="variant-value">
+                       {% unless product.has_only_default_variant %}
+                         {{ v.title }} 
+                         {% if v.available == false %} – Sold Out{% endif %}
+                       {% endunless %}
+                    </div>
+                    {% capture variant_price %}
+                      {%- liquid
+                        if settings.currency_code_enabled
+                          assign money_v_price = v.price | money_with_currency
+                        else
+                          assign money_v_price = v.price | money
+                        endif
+                        
+                        if cart.currency.iso_code == 'EUR'
+                          assign money_v_price = money_v_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                        elsif cart.currency.iso_code == 'INR'
+                          assign money_v_price = money_v_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                        endif
+                      -%}
+                      {{ money_v_price }}
+                    {% endcapture %}
+                    <input type="hidden" class="variant-select" name="id" value="{{ v.id }}" data-available="{{ v.available }}" data-price="{{ variant_price | strip }}">
+                  {% endif %}
+                {% else %}
+                   <select class="variant-select" disabled>
+                      <option>Default Variant - ₹19.99</option>
+                   </select>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="price-box">
+              {% if product != blank %}
+                {% assign active_variant = product.selected_or_first_available_variant %}
+                {%- liquid
+                  if settings.currency_code_enabled
+                    assign money_active_price = active_variant.price | money_with_currency
+                  else
+                    assign money_active_price = active_variant.price | money
+                  endif
+                  
+                  if cart.currency.iso_code == 'EUR'
+                    assign money_active_price = money_active_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                  elsif cart.currency.iso_code == 'INR'
+                    assign money_active_price = money_active_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                  endif
+                -%}
+                {{ money_active_price }}
+              {% else %}
+                ₹19.99
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <button id="add-all-to-cart" aria-label="Add All To Cart">Add All To Cart</button>
+    </div>
+
+  </div>
+</section>
+<script>
+// Highlight product in list when hovering over hotspot
+document.querySelectorAll('.hotspot').forEach(hotspot => {
+  const productIndex = hotspot.getAttribute('data-product-index');
+  const productList = document.querySelector('.hotspot-wrapper .product-list ul');
+  
+  hotspot.addEventListener('mouseenter', () => {
+    // Find and highlight the corresponding product in the list
+    const productItem = document.querySelector(`li[data-product-index="${productIndex}"]`);
+    if (productItem && productList) {
+      // Add class to ul to trigger blur on all items
+      productList.classList.add('has-highlighted');
+      // Add highlighted class to specific item
+      productItem.classList.add('highlighted');
+      
+      // Scroll to the product smoothly
+      productItem.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
+  });
+  
+  hotspot.addEventListener('mouseleave', () => {
+    // Remove highlight when mouse leaves
+    const productItem = document.querySelector(`li[data-product-index="${productIndex}"]`);
+    if (productItem && productList) {
+      productList.classList.remove('has-highlighted');
+      productItem.classList.remove('highlighted');
+    }
+  });
+
+  // Redirect to product page on hotspot click
+  hotspot.addEventListener('click', () => {
+    const url = hotspot.getAttribute('data-product-url');
+    if (url && url !== "") window.location.href = url;
+  });
+});
+
+// Redirect to product page on list item click
+document.querySelectorAll('.product-list li').forEach(li => {
+  li.addEventListener('click', (e) => {
+    // Don't redirect if clicking the variant select or hidden input
+    if (e.target.closest('.variant-select')) return;
+    
+    const url = li.getAttribute('data-product-url');
+    if (url && url !== "") window.location.href = url;
+  });
+});
+
+// Update price when variant changes
+document.querySelectorAll('.variant-select').forEach(select => {
+  if (select.tagName === 'SELECT') {
+    select.addEventListener('change', () => {
+      const li = select.closest('li');
+      const priceBox = li.querySelector('.price-box');
+      const selectedOption = select.options[select.selectedIndex];
+      const price = selectedOption.dataset.price;
+      if (priceBox && price) {
+        priceBox.textContent = price;
+      }
+    });
+  }
+});
+
+// Add all products to cart
+document.getElementById('add-all-to-cart').addEventListener('click', async (e) => {
+  const btn = e.target;
+  const selects = document.querySelectorAll('.variant-select');
+  let skipped = 0;
+  let added = 0;
+
+  btn.disabled = true;
+  btn.innerText = 'Adding...';
+
+  for (let select of selects) {
+    if (!select.disabled) {
+      let variantId = select.value;
+      let isAvailable = false;
+      
+      if (select.tagName === 'SELECT') {
+        const selectedOption = select.options[select.selectedIndex];
+        isAvailable = selectedOption.dataset.available === 'true';
+      } else {
+        isAvailable = select.dataset.available === 'true';
+      }
+      
+      if (isAvailable && variantId) {
+        try {
+          await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: variantId, quantity: 1 })
+          });
+          added++;
+        } catch(err) {
+          skipped++;
+        }
+      } else if (variantId) {
+        skipped++;
+      }
+    }
+  }
+
+  if (skipped > 0) {
+    const message = skipped === selects.length 
+      ? "All items are currently out of stock." 
+      : `${skipped} item(s) were skipped as they are currently out of stock.`;
+    
+    if (typeof window.showToast === 'function') {
+      window.showToast(message, 'error');
+    } else {
+      alert(message);
+    }
+  } else if (added > 0) {
+    if (typeof window.showToast === 'function') {
+      window.showToast("All items added to cart!", 'success');
+    }
+  }
+
+  btn.disabled = false;
+  btn.innerText = 'Add All To Cart';
+
+  document.dispatchEvent(new CustomEvent('cart:refresh'));
+  document.dispatchEvent(new CustomEvent('cart:open'));
+  
+  if (window.cartDrawer && typeof window.cartDrawer.open === 'function') {
+    window.cartDrawer.open();
+  }
+});
+</script>

@@ -1,0 +1,88 @@
+{% comment %}
+  Renders a consistent discount form for cart drawer and cart page.
+  - label: Optional label text
+  - show_label: Boolean to show label
+{% endcomment %}
+
+<div class="cart-discount-form" data-discount-form-container>
+  {% if show_label and label != blank %}
+    <label class="cart-discount-label">{{ label }}</label>
+  {% endif %}
+  <div class="cart-discount-input-wrapper">
+    <input type="text" 
+           class="cart-discount-input" 
+           data-discount-input 
+           placeholder="Discount code" 
+           aria-label="Discount code">
+    <button type="button" class="cart-discount-apply-btn" aria-label="Apply" data-apply-coupon>Apply</button>
+    <button type="button" class="cart-discount-remove-btn" aria-label="Remove" data-remove-coupon style="display: none;">Remove</button>
+  </div>
+  <div class="cart-discount-message" data-discount-message></div>
+</div>
+
+<style>
+  .cart-discount-form {
+    margin: 0;
+  }
+  .cart-discount-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #000;
+  }
+  .cart-discount-input-wrapper {
+    display: flex;
+    gap: 8px;
+  }
+  .cart-discount-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #FEFEFE;
+  }
+  .cart-discount-input:focus {
+    border-color: #000;
+  }
+  .cart-discount-apply-btn, .cart-discount-remove-btn {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+    min-width: 90px;
+  }
+  .cart-discount-apply-btn {
+    background: #4E032A;
+    color: #FEFEFE;
+    border: 1px solid #4E032A;
+  }
+  .cart-discount-apply-btn:hover {
+    background: #470b29;
+  }
+  .cart-discount-apply-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .cart-discount-remove-btn {
+    background: #FEFEFE;
+    color: #000;
+    border: 1px solid #000;
+  }
+  .cart-discount-remove-btn:hover {
+    background: #f8f8f8;
+  }
+  .cart-discount-message {
+    margin-top: 0 ;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 1.2em;
+  }
+</style>

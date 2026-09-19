@@ -1,0 +1,794 @@
+{% style -%}
+  {%- # Load custom Body font if enabled -%} 
+  {%- if settings.use_custom_font_body and settings.custom_body_font != blank -%}
+    {%- assign body_font_lines = settings.custom_body_font | newline_to_br | split: '<br />' -%}
+    {%- for line in body_font_lines -%}
+      {%- assign trimmed_line = line | strip -%}
+      {%- if trimmed_line != blank -%}
+        {%- assign font_parts = trimmed_line | split: '@' -%}
+        {%- assign font_name = font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+        {%- if font_parts[2] != blank %}{% assign font_name = font_parts[2] | strip %}{% endif -%}
+        @font-face {
+          font-family: '{{ font_name }}';
+          src: url('{{ font_parts[0] }}') format('woff2');
+          font-weight: {{ font_parts[1] | default: settings.custom_body_weight }};
+          font-style: normal;
+          font-display: swap;
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- # Load custom Heading font if enabled -%}
+  {%- if settings.use_custom_font_heading and settings.custom_heading_font != blank -%}
+    {%- assign heading_font_lines = settings.custom_heading_font | newline_to_br | split: '<br />' -%}
+    {%- for line in heading_font_lines -%}
+      {%- assign trimmed_line = line | strip -%}
+      {%- if trimmed_line != blank -%}
+        {%- assign font_parts = trimmed_line | split: '@' -%}
+        {%- assign font_name = font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+        {%- if font_parts[2] != blank %}{% assign font_name = font_parts[2] | strip %}{% endif -%}
+        @font-face {
+          font-family: '{{ font_name }}';
+          src: url('{{ font_parts[0] }}') format('woff2');
+          font-weight: {{ font_parts[1] | default: settings.custom_heading_weight }};
+          font-style: normal;
+          font-display: swap;
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- # Load custom Subheading font if enabled -%}
+  {%- if settings.use_custom_font_subheading and settings.custom_subheading_font != blank -%}
+    {%- assign sub_font_lines = settings.custom_subheading_font | newline_to_br | split: '<br />' -%}
+    {%- for line in sub_font_lines -%}
+      {%- assign trimmed_line = line | strip -%}
+      {%- if trimmed_line != blank -%}
+        {%- assign font_parts = trimmed_line | split: '@' -%}
+        {%- assign font_name = font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+        {%- if font_parts[2] != blank %}{% assign font_name = font_parts[2] | strip %}{% endif -%}
+        @font-face {
+          font-family: '{{ font_name }}';
+          src: url('{{ font_parts[0] }}') format('woff2');
+          font-weight: {{ font_parts[1] | default: settings.custom_subheading_weight }};
+          font-style: normal;
+          font-display: swap;
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- # Load custom Menu font if enabled -%}
+  {%- if settings.use_custom_font_menu and settings.custom_menu_font != blank -%}
+    {%- assign menu_font_lines = settings.custom_menu_font | newline_to_br | split: '<br />' -%}
+    {%- for line in menu_font_lines -%}
+      {%- assign trimmed_line = line | strip -%}
+      {%- if trimmed_line != blank -%}
+        {%- assign font_parts = trimmed_line | split: '@' -%}
+        {%- assign font_name = font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+        {%- if font_parts[2] != blank %}{% assign font_name = font_parts[2] | strip %}{% endif -%}
+        @font-face {
+          font-family: '{{ font_name }}';
+          src: url('{{ font_parts[0] }}') format('woff2');
+          font-weight: {{ font_parts[1] | default: settings.custom_menu_weight }};
+          font-style: normal;
+          font-display: swap;
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- # Load custom Button font if enabled -%}
+  {%- if settings.use_custom_font_button and settings.custom_button_font != blank -%}
+    {%- assign btn_font_lines = settings.custom_button_font | newline_to_br | split: '<br />' -%}
+    {%- for line in btn_font_lines -%}
+      {%- assign trimmed_line = line | strip -%}
+      {%- if trimmed_line != blank -%}
+        {%- assign font_parts = trimmed_line | split: '@' -%}
+        {%- assign font_name = font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+        {%- if font_parts[2] != blank %}{% assign font_name = font_parts[2] | strip %}{% endif -%}
+        @font-face {
+          font-family: '{{ font_name }}';
+          src: url('{{ font_parts[0] }}') format('woff2');
+          font-weight: {{ font_parts[1] | default: settings.custom_button_weight }};
+          font-style: normal;
+          font-display: swap;
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- # Load Heading font variations -%}
+  {%- unless settings.use_custom_font_heading -%}
+    {%- unless settings.type_header_font.system? -%}
+      {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {{ settings.type_header_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+    {%- endunless -%}
+  {%- endunless -%}
+
+  {%- # Load Body font variations -%}
+  {%- unless settings.use_custom_font_body -%}
+    {%- unless settings.type_base_font.system? -%}
+      {{ settings.type_base_font | font_face: font_display: 'swap' }}
+      {{ settings.type_base_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+    {%- endunless -%}
+  {%- endunless -%}
+
+  {%- # Load Subheading font variations -%}
+  {%- unless settings.use_custom_font_subheading -%}
+    {%- unless settings.type_subheading_font.system? -%}
+      {{ settings.type_subheading_font | font_face: font_display: 'swap' }}
+    {%- endunless -%}
+  {%- endunless -%}
+
+  {%- # Load Menu font variations -%}
+  {%- unless settings.use_custom_font_menu -%}
+    {%- unless settings.type_menu_font.system? -%}
+      {{ settings.type_menu_font | font_face: font_display: 'swap' }}
+    {%- endunless -%}
+  {%- endunless -%}
+
+  {%- # Load Button font variations -%}
+  {%- unless settings.use_custom_font_button -%}
+    {%- unless settings.type_button_font.system? -%}
+      {{ settings.type_button_font | font_face: font_display: 'swap' }}
+    {%- endunless -%}
+  {%- endunless -%}
+
+  {% # Custom Font Faces %}
+  @font-face {
+    font-family: 'Brand';
+    src: url('https://cdn.shopify.com/s/files/1/0678/7678/2370/files/Brand.woff2?v=1766817656') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'LibreBaskerville';
+    src: url('https://cdn.shopify.com/s/files/1/0678/7678/2370/files/LibreBaskerville-VariableFont_wght.woff2?v=1766817667') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    {%- # Typography - Heading -%}
+    {%- if settings.use_custom_font_heading -%}
+      {%- assign heading_first_line = settings.custom_heading_font | newline_to_br | split: '<br />' | first | strip -%}
+      {%- assign heading_font_parts = heading_first_line | split: '@' -%}
+      {%- assign heading_font_name = heading_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+      {%- if heading_font_parts[2] != blank %}{% assign heading_font_name = heading_font_parts[2] | strip %}{% endif -%}
+      --font-heading--family: '{{ heading_font_name }}', serif;
+      --font-heading--style: normal;
+      --font-heading--weight: {{ settings.custom_heading_weight | default: 400 }};
+    {%- else -%}
+      --font-heading--family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+      --font-heading--style: {{ settings.type_header_font.style }};
+      --font-heading--weight: {{ settings.type_header_font.weight }};
+    {%- endif -%}
+    --font-heading--scale: {{ settings.type_heading_scale | divided_by: 100.0 }};
+    
+    {%- # Heading Sizes -%}
+    --h1-size: {{ settings.h1_font_size }}px;
+    --h2-size: {{ settings.h2_font_size }}px;
+    --h3-size: {{ settings.type_header_base_size }}px;
+    --h4-size: {{ settings.h4_font_size }}px;
+    --h5-size: {{ settings.h5_font_size }}px;
+    --h6-size: {{ settings.h6_font_size }}px;
+    --heading-letter-spacing: {{ settings.type_header_spacing }}px;
+
+    {%- # Typography - Body -%}
+    {%- if settings.use_custom_font_body -%}
+      {%- assign body_first_line = settings.custom_body_font | newline_to_br | split: '<br />' | first | strip -%}
+      {%- assign body_font_parts = body_first_line | split: '@' -%}
+      {%- assign body_font_name = body_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+      {%- if body_font_parts[2] != blank %}{% assign body_font_name = body_font_parts[2] | strip %}{% endif -%}
+      --font-body--family: '{{ body_font_name }}', serif;
+      --font-body--style: normal;
+      --font-body--weight: {{ settings.custom_body_weight | default: 400 }};
+    {%- else -%}
+      --font-body--family: {{ settings.type_base_font.family }}, {{ settings.type_base_font.fallback_families }};
+      --font-body--style: {{ settings.type_base_font.style }};
+      --font-body--weight: {{ settings.type_base_font.weight }};
+    {%- endif -%}
+    --font-body--scale: {{ settings.type_body_scale | divided_by: 100.0 }};
+    --font-body--size: {{ settings.type_base_size }}px;
+    --font-body--line-height: {{ settings.type_base_line_height }}px;
+
+    {%- # Typography - Subheading -%}
+    {%- if settings.use_custom_font_subheading -%}
+      {%- assign subheading_first_line = settings.custom_subheading_font | newline_to_br | split: '<br />' | first | strip -%}
+      {%- assign subheading_font_parts = subheading_first_line | split: '@' -%}
+      {%- assign subheading_font_name = subheading_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+      {%- if subheading_font_parts[2] != blank %}{% assign subheading_font_name = subheading_font_parts[2] | strip %}{% endif -%}
+      --font-subheading--family: '{{ subheading_font_name }}', serif;
+      --font-subheading--style: normal;
+      --font-subheading--weight: {{ settings.custom_subheading_weight | default: 400 }};
+    {%- else -%}
+      --font-subheading--family: {{ settings.type_subheading_font.family }}, {{ settings.type_subheading_font.fallback_families }};
+      --font-subheading--style: {{ settings.type_subheading_font.style }};
+      --font-subheading--weight: {{ settings.type_subheading_font.weight }};
+    {%- endif -%}
+    --subheading-size: {{ settings.subheading_font_size }}px;
+
+    {%- # Typography - Button -%}
+    {%- if settings.use_custom_font_button -%}
+      {%- assign button_first_line = settings.custom_button_font | newline_to_br | split: '<br />' | first | strip -%}
+      {%- assign button_font_parts = button_first_line | split: '@' -%}
+      {%- assign button_font_name = button_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+      {%- if button_font_parts[2] != blank %}{% assign button_font_name = button_font_parts[2] | strip %}{% endif -%}
+      --font-button--family: '{{ button_font_name }}', serif;
+      --font-button--style: normal;
+      --font-button--weight: {{ settings.custom_button_weight | default: 400 }};
+    {%- else -%}
+      --font-button--family: {{ settings.type_button_font.family }}, {{ settings.type_button_font.fallback_families }};
+      --font-button--style: {{ settings.type_button_font.style }};
+      --font-button--weight: {{ settings.type_button_font.weight }};
+    {%- endif -%}
+    --font-button--scale: {{ settings.type_button_scale | divided_by: 100.0 }};
+    
+    {%- # Buttons Global Settings -%}
+    --btn-font-size: {{ settings.btn_base_size }}px;
+    --btn-letter-spacing: {{ settings.btn_letter_spacing }}px;
+    --btn-line-height: {{ settings.btn_line_height }}px;
+    --btn-font-weight: {{ settings.btn_weight }};
+    --btn-text-transform: {% if settings.btn_uppercase_text %}uppercase{% else %}none{% endif %};
+
+    {%- # Typography - Menu/Navigation -%}
+    {%- if settings.use_custom_font_menu -%}
+      {%- assign menu_first_line = settings.custom_menu_font | newline_to_br | split: '<br />' | first | strip -%}
+      {%- assign menu_font_parts = menu_first_line | split: '@' -%}
+      {%- assign menu_font_name = menu_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
+      {%- if menu_font_parts[2] != blank %}{% assign menu_font_name = menu_font_parts[2] | strip %}{% endif -%}
+      --font-menu--family: '{{ menu_font_name }}', serif;
+      --font-menu--style: normal;
+      --font-menu--weight: {{ settings.custom_menu_weight | default: 400 }};
+    {%- else -%}
+      --font-menu--family: {{ settings.type_menu_font.family }}, {{ settings.type_menu_font.fallback_families }};
+      --font-menu--style: {{ settings.type_menu_font.style }};
+      --font-menu--weight: {{ settings.type_menu_font.weight }};
+    {%- endif -%}
+    --menu-font-size: {{ settings.menu_font_size }}px;
+    --font-menu--scale: {{ settings.type_menu_scale | divided_by: 100.0 }};
+
+    {%- # Legacy support - keep primary font for backward compatibility -%}
+    {%- if settings.type_body_font_source == 'brand' -%}
+      --font-primary--family: 'Brand', sans-serif;
+      --font-primary--style: normal;
+      --font-primary--weight: normal;
+    {%- else -%}
+      --font-primary--family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+      --font-primary--style: {{ settings.type_body_font.style }};
+      --font-primary--weight: {{ settings.type_body_font.weight }};
+    {%- endif -%}
+    --font-content--family: 'LibreBaskerville';
+
+    {% # Layout and Colors %}
+    --page-width: {{ settings.max_page_width }};
+    --container-width: {{ settings.container_width }}px;
+    --container-padding-top: {{ settings.container_padding_top }}px;
+    --container-padding-bottom: {{ settings.container_padding_bottom }}px;
+    --container-padding-left: {{ settings.container_padding_left }}px;
+    --container-padding-right: {{ settings.container_padding_right }}px;
+    --style-border-radius-inputs: {{ settings.inputs_border_radius }}px;
+    --style-border-width-inputs: {{ settings.inputs_border_thickness }}px;
+    --btn-border-width: {{ settings.btn_border_width }}px;
+    --btn-border-radius: {{ settings.btn_border_radius }}px;
+    
+    --product-card-radius: {{ settings.product_card_border_radius | default: 0 }}px;
+    --block-radius: {{ settings.block_border_radius | default: 0 }}px;
+
+    @media screen and (max-width: 768px) {
+      /* Update core variables for mobile to ensure standard var() usage is responsive */
+      --h1-size: {{ settings.h1_font_size_mobile }}px;
+      --h2-size: {{ settings.h2_font_size_mobile }}px;
+      --h3-size: {{ settings.type_header_base_size_mobile }}px;
+      --h4-size: {{ settings.h4_font_size_mobile }}px;
+      --h5-size: {{ settings.h5_font_size_mobile }}px;
+      --h6-size: {{ settings.h6_font_size_mobile }}px;
+      --font-body--size: {{ settings.type_base_size_mobile }}px;
+      --subheading-size: {{ settings.subheading_font_size_mobile }}px;
+      --btn-font-size: {{ settings.btn_base_size_mobile }}px;
+      --menu-font-size: {{ settings.menu_font_size_mobile }}px;
+    }
+  }
+
+  /* ========================================================================
+     Global Product Card Action Button Shapes
+     ======================================================================== */
+  
+  {% if settings.product_card_button_shape == 'round' %}
+    /* Round (Circle) Buttons */
+    .hover-action-btn,
+    .hover-action-btn.add-to-cart-form button,
+    .newsec .hover-action-btn,
+    .newsec .hover-action-btn.add-to-cart-form button,
+    .product-grid .hover-action-btn,
+    .product-grid .hover-action-btn.add-to-cart-form button,
+    .featured-product-section .hover-action-btn,
+    .featured-product-section .hover-action-btn.add-to-cart-form button,
+    .collection-tabs-section .hover-action-btn,
+    .collection-tabs-section .product-hover-actions .add-to-cart-form button,
+    .collection-tabs-section .product-hover-actions .wishlist-button,
+    .collection-tabs-section .product-hover-actions .compare-button {
+      border-radius: 50% !important;
+    }
+  {% elsif settings.product_card_button_shape == 'square-rounded' %}
+    /* Square Rounded Buttons */
+    .hover-action-btn,
+    .hover-action-btn.add-to-cart-form button,
+    .newsec .hover-action-btn,
+    .newsec .hover-action-btn.add-to-cart-form button,
+    .product-grid .hover-action-btn,
+    .product-grid .hover-action-btn.add-to-cart-form button,
+    .featured-product-section .hover-action-btn,
+    .featured-product-section .hover-action-btn.add-to-cart-form button,
+    .collection-tabs-section .hover-action-btn,
+    .collection-tabs-section .product-hover-actions .add-to-cart-form button,
+    .collection-tabs-section .product-hover-actions .wishlist-button,
+    .collection-tabs-section .product-hover-actions .compare-button {
+      border-radius: 8px !important;
+    }
+  {% elsif settings.product_card_button_shape == 'square' %}
+    /* Square (Sharp Corners) Buttons */
+    .hover-action-btn,
+    .hover-action-btn.add-to-cart-form button,
+    .newsec .hover-action-btn,
+    .newsec .hover-action-btn.add-to-cart-form button,
+    .product-grid .hover-action-btn,
+    .product-grid .hover-action-btn.add-to-cart-form button,
+    .featured-product-section .hover-action-btn,
+    .featured-product-section .hover-action-btn.add-to-cart-form button,
+    .collection-tabs-section .hover-action-btn,
+    .collection-tabs-section .product-hover-actions .add-to-cart-form button,
+    .collection-tabs-section .product-hover-actions .wishlist-button,
+    .collection-tabs-section .product-hover-actions .compare-button {
+      border-radius: 0 !important;
+    }
+  {% endif %}
+
+    {%- # Color Schemes -%}
+    {%- for scheme in settings.color_schemes -%}
+      {%- assign scheme_class = 'color-' | append: scheme.id -%}
+      
+      {%- if forloop.first -%}
+        :root, body {
+          --color-background: {{ scheme.settings.background }};
+          --color-background-secondary: {{ scheme.settings.background_secondary }};
+          {%- if scheme.settings.background_gradient != blank -%}
+            --gradient-background: {{ scheme.settings.background_gradient }};
+          {%- else -%}
+            --gradient-background: {{ scheme.settings.background }};
+          {%- endif -%}
+          
+          --color-text: {{ scheme.settings.text }};
+          --color-subtext: {{ scheme.settings.subtext }};
+          --color-heading: {{ scheme.settings.heading_text }};
+          
+          --color-button: {{ scheme.settings.button }};
+          --color-button-text: {{ scheme.settings.button_label }};
+          --color-button-outline: {{ scheme.settings.outline_button_label }};
+          
+          --color-button-hover: {{ scheme.settings.button_hover }};
+          --color-button-text-hover: {{ scheme.settings.button_text_hover }};
+          
+          --color-price-sale: {{ scheme.settings.price_sale }};
+          --color-price-regular: {{ scheme.settings.price_regular }};
+          
+          --color-form-field-bg: {{ scheme.settings.form_field }};
+          --color-form-field-text: {{ scheme.settings.form_field_label }};
+          
+          --color-tooltip-bg: {{ scheme.settings.tooltip }};
+          --color-tooltip-text: {{ scheme.settings.tooltip_label }};
+          
+          --color-border: {{ scheme.settings.border }};
+          
+          --color-arrow: {{ scheme.settings.arrow_color | default: scheme.settings.button_label }};
+          --color-arrow-bg: {{ scheme.settings.arrow_bg_color | default: scheme.settings.button }};
+          --color-arrow-hover: {{ scheme.settings.arrow_hover_color | default: scheme.settings.button_text_hover }};
+          --color-arrow-hover-bg: {{ scheme.settings.arrow_hover_bg_color | default: scheme.settings.button_hover }};
+          
+          --color-pagination-bullet: {{ scheme.settings.pagination_bullet | default: scheme.settings.border }};
+          --color-pagination-bullet-active: {{ scheme.settings.pagination_bullet_active | default: scheme.settings.button }};
+          --swiper-pagination-color: var(--color-pagination-bullet-active);
+          --swiper-theme-color: var(--color-pagination-bullet-active);
+        }
+      {%- endif -%}
+
+      .{{ scheme_class }} {
+        --color-background: {{ scheme.settings.background }};
+        --color-background-secondary: {{ scheme.settings.background_secondary }};
+        /* {%- if scheme.settings.background_gradient != blank -%}
+          --gradient-background: {{ scheme.settings.background_gradient }};
+        {%- else -%}
+          --gradient-background: {{ scheme.settings.background }};
+        {%- endif -%} */
+        
+        --color-text: {{ scheme.settings.text }};
+        --color-subtext: {{ scheme.settings.subtext }};
+        --color-heading: {{ scheme.settings.heading_text }};
+        
+        --color-button: {{ scheme.settings.button }};
+        --color-button-text: {{ scheme.settings.button_label }};
+        --color-button-outline: {{ scheme.settings.outline_button_label }};
+        
+        --color-button-hover: {{ scheme.settings.button_hover }};
+        --color-button-text-hover: {{ scheme.settings.button_text_hover }};
+        
+        --color-price-sale: {{ scheme.settings.price_sale }};
+        --color-price-regular: {{ scheme.settings.price_regular }};
+        
+        --color-form-field-bg: {{ scheme.settings.form_field }};
+        --color-form-field-text: {{ scheme.settings.form_field_label }};
+        
+        --color-tooltip-bg: {{ scheme.settings.tooltip }};
+        --color-tooltip-text: {{ scheme.settings.tooltip_label }};
+        
+        --color-border: {{ scheme.settings.border }};
+        
+        --color-arrow: {{ scheme.settings.arrow_color | default: scheme.settings.button_label }};
+        --color-arrow-bg: {{ scheme.settings.arrow_bg_color | default: scheme.settings.button }};
+        --color-arrow-hover: {{ scheme.settings.arrow_hover_color | default: scheme.settings.button_text_hover }};
+        --color-arrow-hover-bg: {{ scheme.settings.arrow_hover_bg_color | default: scheme.settings.button_hover }};
+        
+        --color-pagination-bullet: {{ scheme.settings.pagination_bullet | default: scheme.settings.border }};
+        --color-pagination-bullet-active: {{ scheme.settings.pagination_bullet_active | default: scheme.settings.button }};
+        --swiper-pagination-color: var(--color-pagination-bullet-active);
+        --swiper-theme-color: var(--color-pagination-bullet-active);
+        
+        color: var(--color-text);
+        background: var(--gradient-background);
+      }
+    {%- endfor -%}
+
+    /* Apply Default Body Scheme */
+    body {
+        background: var(--gradient-background);
+        color: var(--color-text);
+        font-family: var(--font-body--family) !important;
+        font-style: var(--font-body--style);
+        font-weight: var(--font-body--weight);
+        font-size: var(--font-body--size);
+        line-height: var(--font-body--line-height);
+    }
+    {% if settings.default_color_scheme != blank %}
+    body {
+       /* Try to apply the class of the default scheme if possible, 
+          but in pure CSS variables we might need to rely on the body class being added by Liquid or 
+          the variables being set to :root. 
+          For now, allowing the first scheme or :root definition to take precedence 
+          unless specific classes are used. */
+    }
+    {% endif %}
+
+  /* ========================================================================
+     Global Font Family Application
+     ======================================================================== */
+  
+  /* Body and general text */
+  body,
+  p,
+  li,
+  td,
+  .product-description,
+  .product-details,
+  .variant-select,
+  .common-text,
+  .product-title,
+  .product-card__title,
+  .text-above-heading,
+  .card-content h3,
+  .featured-collections__title,
+  .card-content-below h3,
+  .product-card__badge,
+  .card-content p,
+  .card-content-below p,
+  .product-title-custome a,
+  .product-price-custome,
+  .product-card__price,
+  .store-locations-section__address, 
+  .store-locations-section__phone, 
+  .store-locations-section__hours,
+  .review-card__author,
+  .review-card__verified,
+  .review-card__text,
+  .review-card__product-title,
+  .review-card__product-price,
+  .product-price,
+  .story-label,
+  .story-text,
+  .bundle-banner p,
+  .bundle-card-info h3,
+  .bundle-card-price,
+  .common-text p,
+  .product-split-price,
+  .product-split-description,
+  .product-split-select,
+  .product-split-share,
+  .accordion-summary,
+  .hotspot span,
+  .text-above-heading,
+  .price-box,
+  .custom-image-overlay-grid p,
+  .bundle-total,
+  .faq-answer-inner p,
+  .header__search-popup-input,
+  input,
+  .label,
+  .newsletter_heading,
+  .newsletter-input,
+  .header--design_3 .header__search-input--design-3,
+  .header--design_5 .header__search-input--design-5,
+  .announcement-bar-inner,
+  .stat-desc,
+  .footer-newsletter p,
+  .footer-bottom p,
+  .small_text,
+  .footer-desc,
+  .accordion-content,
+  .footer_contact_link p,
+  .field__input,
+  .sticky-cart-title {
+    font-family: var(--font-body--family);
+    font-weight: var(--font-body--weight);
+    font-size: var(--font-body--size);
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+  }
+
+  h1 { font-size: var(--h1-size); }
+  h2 { font-size: var(--h2-size); }
+  h3 { font-size: var(--h3-size); }
+  h4 { font-size: var(--h4-size); }
+  h5 { font-size: var(--h5-size); }
+  h6 { font-size: var(--h6-size); }
+
+  .heading,
+  .section-heading,
+  .common-heading,
+  .product-showcase-section__heading,
+  .flash-sale-section__heading,
+  .collection-tabs-section__heading,
+  .instagram-gallery__heading,
+  .video-heading,
+  .store-locations-section__heading,
+  .overlay-title,
+  .stat-number,
+  [class*="__heading"],
+  [class*="-heading"] {
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+  }
+
+  /* Buttons */
+  button,
+  .btn,
+  .button,
+  .common-btn,
+  .add-to-cart-button,
+  .cart-totals__checkout-btn,
+  .cart-empty__link,
+  .header__search-button--design-3,
+  .header__search-button--design-5,
+  .store-btn,
+  .wishlist-button,
+  .compare-button,
+  .collection-slider-button,
+  .flash-sale-section__button,
+  .featured-product-section__view-all-btn,
+  .collection-tabs-section__view-all-btn,
+  .store-locations-section__direction-btn,
+  .story-btn,
+  .video-button,
+  .custom-button,
+  .newsletter-button,
+  #add-all-to-cart,
+  .btn-add-bundle,
+  .btn-remove-all,
+  .collection-tabs-section__tab-btn,
+  .store-locations-section__location-btn,
+  .header__search-trending-tag,
+  .header__search-clear-all,
+  .header__search-trending-tag-close,
+  .contact__button .button,
+  .hover-action-btn,
+  a.button,
+  input[type="submit"],
+  input[type="button"] {
+    font-family: var(--font-button--family);
+    font-size: var(--btn-font-size);
+    font-weight: var(--btn-font-weight);
+    line-height: var(--btn-line-height);
+    letter-spacing: var(--btn-letter-spacing);
+    border-width: var(--btn-border-width) !important;
+    border-radius: var(--btn-border-radius) !important;
+    border-style: solid !important;
+  }
+
+  /* Subheadings and subtitles */
+  .subheading,
+  .section-sub-heading,
+  .section-subheading,
+  .common-subheading,
+  .video-subheading,
+  .store-locations-section__sub-heading,
+  .collection-tabs-section__sub-heading,
+  .accordion-title,
+  .faq-question,
+  .custom-right-text,
+  .instagram-gallery-subtitle,
+  [class*="__subheading"],
+  [class*="-subheading"],
+  [class*="__subtitle"],
+  [class*="-subtitle"] {
+    font-family: var(--font-subheading--family);
+    font-size: var(--subheading-size);
+    font-weight: var(--font-subheading--weight);
+  }
+
+  /* Navigation and menus */
+  nav,
+  .menu,
+  .navigation,
+  [class*="nav"],
+  [class*="menu"],
+  .localization-form__link,
+  .localization-form__select-button span,
+  .header__menu-item a {
+    font-family: var(--font-menu--family);
+    font-size: var(--menu-font-size) !important;
+    font-weight: var(--font-menu--weight);
+  }
+
+  /* Ensure inputs and selects use body font */
+  input,
+  select,
+  textarea {
+    font-family: var(--font-body--family);
+  }
+
+  /* Mobile Font Size Overrides to apply global theme settings on all sections */
+  @media screen and (max-width: 768px) {
+      /* Body and general text */
+  body,
+  p,
+  li,
+  td,
+  .product-description,
+  .product-details,
+  .variant-select,
+  .common-text,
+  .product-title,
+  .product-card__title,
+  .text-above-heading,
+  .card-content h3,
+  .featured-collections__title,
+  .card-content-below h3,
+  .product-card__badge,
+  .card-content p,
+  .card-content-below p,
+  .product-title-custome a,
+  .product-price-custome,
+  .product-card__price,
+  .store-locations-section__address, 
+  .store-locations-section__phone, 
+  .store-locations-section__hours,
+  .review-card__author,
+  .review-card__verified,
+  .review-card__text,
+  .review-card__product-title,
+  .review-card__product-price,
+  .product-price,
+  .story-label,
+  .story-text,
+  .bundle-banner p,
+  .bundle-card-info h3,accordion-title
+  .bundle-card-price,
+  .common-text p,
+  .product-split-price,
+  .product-split-description,
+  .product-split-description p,
+  .product-split-select,
+  .product-split-share,
+  .accordion-summary,
+  .hotspot span,
+  .text-above-heading,
+  .price-box,
+  .custom-image-overlay-grid p,
+  .bundle-total,
+  .faq-answer-inner p,
+  input,
+  .label,
+  .newsletter_heading,
+  .newsletter-input,
+  .coverflow-text,
+  .header__search-popup-input,
+  .footer-newsletter p,
+  .header--design_3 .header__search-input--design-3,
+  .header--design_5 .header__search-input--design-5,
+  .announcement-bar-inner,
+  .stat-desc,
+  .footer_contact_link p,
+  .small_text,
+  .footer-desc,
+  .footer-bottom p,
+  .field__input {
+    font-size: var(--font-body--size) !important;
+  }
+
+  /* Headings */
+  h1, .h1 { font-size: var(--h1-size) !important; }
+  h2, .h2 { font-size: var(--h2-size) !important; }
+  h3, .h3 { font-size: var(--h3-size) !important; }
+  h4, .h4 { font-size: var(--h4-size) !important; }
+  h5, .h5 { font-size: var(--h5-size) !important; }
+  h6, .h6 { font-size: var(--h6-size) !important; }
+
+
+  /* Buttons */
+  button,
+  .btn,
+  .button,
+  .common-btn,
+  .flash-sale-section__button,
+  .featured-product-section__view-all-btn,
+  .collection-tabs-section__view-all-btn,
+  .store-locations-section__direction-btn,
+  .story-btn,
+  .video-button,
+  .custom-button,
+  #add-all-to-cart,
+  .btn-add-bundle,
+  .btn-remove-all,
+  .collection-tabs-section__tab-btn,
+  .store-locations-section__location-btn,
+  .contact__button .button,
+  .header__search-trending-tag,
+  .header__search-clear-all,
+  .header__search-trending-tag-close,
+  [class*="__button"],
+  [class*="-button"],
+  a.button,
+  input[type="submit"],
+  input[type="button"] {
+    font-size: var(--btn-font-size) !important;
+  }
+
+  /* Subheadings and subtitles */
+  .subheading,
+  .section-sub-heading,
+  .section-subheading,
+  .common-subheading,
+  .video-subheading,
+  .store-locations-section__sub-heading,
+  .collection-tabs-section__sub-heading,
+  .coverflow-accordion-title,
+  .faq-question,
+  .custom-right-text,
+  .instagram-gallery-subtitle,
+  [class*="__subheading"],
+  [class*="-subheading"],
+  [class*="__subtitle"],
+  [class*="-subtitle"] {
+    font-size: var(--subheading-size) !important;
+  }
+
+  /* Navigation and menus */
+  nav,
+  .menu,
+  .navigation,
+  [class*="nav"],
+  [class*="menu"],
+  .localization-form__link,
+  .localization-form__select-button span,
+  .header__menu-item a {
+    font-size: var(--menu-font-size) !important;
+  }
+  }
+{% endstyle %}

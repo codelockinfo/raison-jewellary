@@ -1,0 +1,93 @@
+{% comment %}
+  Wishlist section - displays products saved to wishlist
+{% endcomment %}
+
+
+
+{% liquid
+  assign section_id = section.settings.custom_id | default: section.id
+  assign section_class = 'wishlist-section'
+%}
+
+<section
+  id="{{ section_id }}"
+  class="{{ section_class }} skeleton-container"
+  style="
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="skeleton-visible container_width" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="skeleton-title skeleton-shimmer" style="margin: 0 auto 30px auto; width: 250px;"></div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <div class="skeleton-box skeleton-shimmer" style="height: 350px;"></div>
+      <div class="skeleton-box skeleton-shimmer" style="height: 350px;"></div>
+      <div class="skeleton-box skeleton-shimmer" style="height: 350px;"></div>
+      <div class="skeleton-box skeleton-shimmer" style="height: 350px;"></div>
+    </div>
+  </div>
+
+  <div class="container_width">
+    {% comment %} Breadcrumb Navigation {% endcomment %}
+    <nav class="wishlist-breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}" class="wishlist-breadcrumb__link">{{ 'wishlist.breadcrumb.home' | t }}</a>
+      <span class="wishlist-breadcrumb__separator">></span>
+      <span class="wishlist-breadcrumb__current">{{ 'layout.wishlist.title' | t }}</span>
+    </nav>
+
+    {% comment %} Page Title {% endcomment %}
+    <h1 class="addwishlist_title">{{ 'layout.wishlist.title' | t }}</h1>
+
+    {% comment %} Wishlist Container {% endcomment %}
+    <div class="m-page-content m-wishlist-page-content m-mixed-layout" data-wishlist-container>
+      {% comment %} Products Grid {% endcomment %}
+      <div class="m-wishlist-page-content__wrapper m-mixed-layout__inner m:grid m:grid-2-cols md:m:grid-3-cols xl:m:grid-4-cols" data-wishlist-grid style="display: none;">
+        {% comment %} Products will be dynamically loaded via JavaScript {% endcomment %}
+      </div>
+    </div>
+
+    {% comment %} Empty State {% endcomment %}
+    <div class="m-page-content m-wishlist-no-products m:hidden" data-wishlist-empty>
+      <h3>
+        {{ 'layout.wishlist.no_products' | t }}
+        <a class="m-text-link" href="{{ routes.all_products_collection_url }}">
+          {{ 'layout.back_to_shopping' | t }}
+        </a>
+      </h3>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Wishlist",
+  "tag": "section",
+  "class": "wishlist-section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wishlist"
+    }
+  ]
+}
+{% endschema %}
+

@@ -1,0 +1,110 @@
+/* Wrapper */
+.m-terms-conditons {
+    margin: 10px 15px;
+}
+
+/* Label container */
+.form-field--checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    line-height: 1.5;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Hide native checkbox */
+.form-field--checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Checkbox box (SVG wrapper) */
+.form-field--checkbox__icon {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid #cfcfcf;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    /* IMPORTANT */
+    transition: all 0.2s ease;
+}
+
+/* SVG sizing */
+.form-field--checkbox__icon svg {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+}
+
+.form-field--checkbox input[type="checkbox"]:checked+.form-field--checkbox__icon {
+    border-color: #000;
+    background: #000;
+    color: #FEFEFE;
+}
+
+.form-field--checkbox input[type="checkbox"]:checked+.form-field--checkbox__icon svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.form-field--checkbox__label {
+    display: block !important;
+    line-height: 1.5 !important;
+    color: #111 !important;
+}
+
+.form-field--checkbox__label p {
+    margin: 0 !important;
+    display: inline !important;
+    font-size: inherit !important;
+    color: inherit !important;
+}
+
+.form-field--checkbox__label a {
+    color: #000 !important;
+    text-decoration: underline;
+}
+
+
+/* Focus (keyboard accessibility) */
+.form-field--checkbox input[type="checkbox"]:focus-visible+.form-field--checkbox__label+.form-field--checkbox__icon {
+    outline: 2px solid #000;
+    outline-offset: 3px;
+}
+
+/* Error state (HTML required) */
+.form-field--checkbox input[type="checkbox"]:invalid+.form-field--checkbox__label {
+    color: #d32f2f;
+}
+
+@media (max-width: 767px) {
+    .form-field--checkbox {
+        gap: 10px;
+    }
+}
+/* Disabled button state */
+.is-disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* Overlay for iframe-based shopify payment buttons to catch clicks */
+.shopify-payment-button.is-disabled {
+    position: relative;
+}
+.shopify-payment-button.is-disabled::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}

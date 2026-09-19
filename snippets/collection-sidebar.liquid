@@ -1,0 +1,168 @@
+{% comment %}
+  Renders the collection sidebar with filters.
+  Accepts:
+  - results: {Object} Collection or Search object containing filters.
+{% endcomment %}
+
+  <form class="filter-form">
+  <input type="hidden" name="q" value="{{ results.terms | escape }}">
+  <input type="hidden" name="sort_by" value="{{ results.sort_by | default: results.default_sort_by }}">
+  {%- for filter in results.filters -%}
+      <div class="filter-group active">
+      <div class="filter-title">
+          <span>{{ filter.label }}</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#333" stroke-width="1.5"/></svg>
+        </div>
+        
+        <div class="filter-content">
+          {%- case filter.type -%}
+            {%- when 'boolean' or 'list' -%}
+              {% if filter.label contains 'Color' or filter.label contains 'Colour' %}
+                 <!-- Color Swatches -->
+                 <div class="color-swatches">
+                   {%- for value in filter.values -%}
+                     <label 
+                       class="color-swatch {% if value.active %}active{% endif %}"
+                       {%- liquid
+                          assign color_handle = value.label | handle
+                          assign swatch_color = nil
+                          assign swatch_image_url = nil
+
+                          # 1. Native Shopify Swatches
+                          if value.swatch != blank
+                            assign swatch_color = value.swatch.color
+                            if value.swatch.image != blank
+                              assign swatch_image_url = value.swatch.image | image_url: width: 60
+                            endif
+                          endif
+
+                          # 2. Custom mapping from Theme Settings
+                          if swatch_color == blank
+                             assign raw_mappings = settings.custom_color_mapping | newline_to_br | replace: '<br />', '##' | replace: '<br>', '##' | split: '##'
+                             for row in raw_mappings
+                                if row contains ':'
+                                   assign parts = row | split: ":"
+                                   assign m_name = parts[0] | strip | downcase
+                                   assign m_color = parts[1] | strip | split: ' ' | first
+                                   
+                                   assign search_label = value.label | strip | downcase
+                                   
+                                   if m_name == search_label or m_name == color_handle
+                                      assign swatch_color = m_color
+                                      break
+                                   endif
+                                endif
+                             endfor
+                          endif
+
+                          # 3. Metaobjects Lookup
+                          if swatch_color == blank
+                            assign entry = shop.metaobjects.color[color_handle] | default: shop.metaobjects.swatch[color_handle]
+                            if entry != blank
+                              assign swatch_color = entry.color | default: entry.hex | default: entry.hex_code
+                              if entry.image != blank
+                                assign swatch_image_url = entry.image | image_url: width: 60
+                              endif
+                            endif
+                          endif
+
+                          # 4. Fallbacks
+                          if swatch_color == blank
+                             unless color_handle contains '-'
+                               assign swatch_color = color_handle
+                             endunless
+                          endif
+
+                          # 5. Asset/File PNG existence check
+                          assign swatch_file_name = color_handle | append: '.png'
+                          assign swatch_image_found = images[swatch_file_name]
+                          
+                          if swatch_image_url == blank and swatch_image_found != blank
+                            assign swatch_image_url = swatch_image_found | image_url: width: 60
+                          endif
+
+                          # Final Inline Style Construction
+                          assign color_style = ''
+                          if swatch_color != blank
+                             assign color_style = 'background-color: ' | append: swatch_color | append: ';'
+                          endif
+                          
+                          if swatch_image_url != blank
+                             assign color_style = color_style | append: ' background-image: url(' | append: swatch_image_url | append: ');'
+                          endif
+                          
+                          if color_handle == 'white' or color_handle == 'beige'
+                             assign color_style = color_style | append: ' border: 1px solid #ddd;'
+                          endif
+                          assign color_style = color_style | append: ' background-size: cover;' 
+                        -%}
+                       style="{{ color_style }}"
+                       data-color="{{ color_handle }}"
+                       title="{{ value.label }} ({{ value.count }})"
+                     >
+                       <input type="checkbox"
+                         name="{{ value.param_name }}"
+                         value="{{ value.value }}"
+                         {% if value.active %}checked{% endif %}
+                         style="display:none"
+                         onchange="this.form.submit()">
+                     </label>
+                   {%- endfor -%}
+                 </div>
+              {% else %}
+                <ul class="filter-list">
+                  {%- for value in filter.values -%}
+                  <li class="filter-item">
+                      <label>
+                        <input type="checkbox"
+                          name="{{ value.param_name }}"
+                          value="{{ value.value }}"
+                          {% if value.active %}checked{% endif %}
+                          onchange="this.form.submit()">
+                        {{ value.label }} ({{ value.count }})
+                      </label>
+                    <span class="filter-count">{{ value.count }}</span>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {% endif %}
+
+            {%- when 'price_range' -%}
+            <div class="price-slider-group">
+                <div class="price-inputs">
+                <span>{{ cart.currency.symbol }}</span>
+                <label for="Filter-{{ filter.label | escape }}-GTE" class="visually-hidden">Min price</label>
+                <input class="price-input"
+                  name="{{ filter.min_value.param_name }}"
+                  id="Filter-{{ filter.label | escape }}-GTE"
+                  {%- if filter.min_value.value -%}
+                    value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                  {%- endif -%}
+                      type="number"
+                      placeholder="0"
+                      min="0"
+                  max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                >
+                <span>to</span>
+                <span>{{ cart.currency.symbol }}</span>
+                <label for="Filter-{{ filter.label | escape }}-LTE" class="visually-hidden">Max price</label>
+                <input class="price-input"
+                  name="{{ filter.max_value.param_name }}"
+                  id="Filter-{{ filter.label | escape }}-LTE"
+                  {%- if filter.max_value.value -%}
+                    value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                  {%- endif -%}
+                      type="number"
+                      placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                      min="0"
+                  max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                >
+                </div>
+              <button type="submit" class="price-apply" aria-label="Apply">Apply</button>
+              </div>
+          {%- endcase -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </form>
+

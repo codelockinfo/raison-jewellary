@@ -1,0 +1,98 @@
+{% doc %}
+  Renders a responsive image that might be wrapped in a link.
+
+  When `width`, `height` and `crop` are provided, the image will be rendered
+  with a fixed aspect ratio.
+
+  Serves as an example of how to use the `image_url` filter and `image_tag` filter
+  as well as how you can use LiquidDoc to document your code.
+
+  @param {string} [loading] - Optional loading strategy ('lazy' or 'eager')
+  @param {image} image - The image to be rendered
+  @param {string} [url] - An optional destination URL for the image
+  @param {string} [class] - Optional class to be added to the image wrapper
+  @param {number} [width] - The highest resolution width of the image to be rendered
+  @param {number} [height] - The highest resolution height of the image to be rendered
+  @param {string} [crop] - The crop position of the image
+  @param {string} [fetchpriority] - Optional fetch priority ('auto', 'high', or 'low')
+  @param {string} [sizes] - Optional image sizes attribute
+
+  @example
+  {% render 'image', image: product.featured_image %}
+  {% render 'image', image: product.featured_image, url: product.url %}
+  {% render 'image',
+    class: 'product__image',
+    image: product.featured_image,
+    url: product.url,
+    width: 1200,
+    height: 800,
+    crop: 'center',
+  %}
+{% enddoc %}
+
+{% liquid
+  unless height
+    assign width = width | default: image.width
+  endunless
+
+  if url
+    assign wrapper = 'a'
+  else
+    assign wrapper = 'div'
+  endif
+
+  assign loading_strategy = loading | default: 'lazy'
+  assign fetch_priority = fetchpriority | default: 'auto'
+  if loading_strategy == 'eager' and fetchpriority == nil
+    assign fetch_priority = 'high'
+  endif
+
+  assign image_widths = '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+  assign image_sizes = sizes | default: '100vw'
+%}
+
+<{{ wrapper }}
+  class="optimized-image {{ class }}"
+  {% if url %}
+    href="{{ url }}"
+  {% endif %}
+  {% if width and height %}
+    style="--aspect-ratio: {{ height | times: 1.0 | divided_by: width | times: 100 }}%;"
+  {% elsif image %}
+    style="--aspect-ratio: {{ image.height | times: 1.0 | divided_by: image.width | times: 100 }}%;"
+  {% endif %}
+>
+  {% if image != blank %}
+    {{ image | image_url: width: width, height: height, crop: crop | image_tag: 
+      loading: loading_strategy, 
+      fetchpriority: fetch_priority,
+      widths: image_widths,
+      sizes: image_sizes,
+      class: 'optimized-image__img'
+    }}
+  {% else %}
+    {{ 'image' | placeholder_svg_tag: 'optimized-image__img placeholder-svg' }}
+  {% endif %}
+</{{ wrapper }}>
+
+{% stylesheet %}
+  .optimized-image {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding-bottom: var(--aspect-ratio, 100%);
+    /* background-color: var(--color-background-secondary); */
+  }
+
+  .optimized-image__img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease;
+  }
+{% endstylesheet %}

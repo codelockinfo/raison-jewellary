@@ -1,0 +1,107 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "page",
+      "disabled": true,
+      "settings": {}
+    },
+    "our_store_DRne7g": {
+      "type": "our-store",
+      "blocks": {
+        "store_GA9TdN": {
+          "type": "store",
+          "settings": {
+            "store_name": "South Fulton",
+            "address": "100 Street, Chicago, State, Zip Code: 10005, United States.",
+            "phone": "+1 (973) 435-3638",
+            "email": "info@fashionwomen.com",
+            "time": "<p>Mon - Friday: 8:00am - 5:00pm</p><p>Saturday - Sunday: 10:00am - 5:00pm</p>",
+            "direction_text": "Get Directions",
+            "direction_url": ""
+          }
+        },
+        "store_eV68b7": {
+          "type": "store",
+          "settings": {
+            "store_name": "South Fulton",
+            "address": "100 Street, Chicago, State, Zip Code: 10005, United States.",
+            "phone": "+1 (973) 435-3638",
+            "email": "info@fashionwomen.com",
+            "time": "<p>Mon - Friday: 8:00am - 5:00pm</p><p>Saturday - Sunday: 10:00am - 5:00pm</p>",
+            "direction_text": "Get Directions",
+            "direction_url": ""
+          }
+        },
+        "store_ng8XWF": {
+          "type": "store",
+          "settings": {
+            "store_name": "South Fulton",
+            "address": "100 Street, Chicago, State, Zip Code: 10005, United States.",
+            "phone": "+1 (973) 435-3638",
+            "email": "info@fashionwomen.com",
+            "time": "<p>Mon - Friday: 8:00am - 5:00pm</p><p>Saturday - Sunday: 10:00am - 5:00pm</p>",
+            "direction_text": "Get Directions",
+            "direction_url": ""
+          }
+        },
+        "store_XBVwmp": {
+          "type": "store",
+          "settings": {
+            "store_name": "South Fulton",
+            "address": "100 Street, Chicago, State, Zip Code: 10005, United States.",
+            "phone": "+1 (973) 435-3638",
+            "email": "info@fashionwomen.com",
+            "time": "<p>Mon - Friday: 8:00am - 5:00pm</p><p>Saturday - Sunday: 10:00am - 5:00pm</p>",
+            "direction_text": "Get Directions",
+            "direction_url": ""
+          }
+        },
+        "store_rGdrNQ": {
+          "type": "store",
+          "settings": {
+            "store_name": "South Fulton",
+            "address": "100 Street, Chicago, State, Zip Code: 10005, United States.",
+            "phone": "+1 (973) 435-3638",
+            "email": "info@fashionwomen.com",
+            "time": "<p>Mon - Friday: 8:00am - 5:00pm</p><p>Saturday - Sunday: 10:00am - 5:00pm</p>",
+            "direction_text": "Get Directions",
+            "direction_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "store_GA9TdN",
+        "store_eV68b7",
+        "store_ng8XWF",
+        "store_XBVwmp",
+        "store_rGdrNQ"
+      ],
+      "name": "Our Store",
+      "settings": {
+        "color_scheme": "scheme-eaf27bff-0087-4ca9-a618-2fd24d692c82",
+        "heading": "Our Stores",
+        "heading_alignment": "center",
+        "heading_style": "simple",
+        "heading_tag": "h2",
+        "subheading": "",
+        "map_position": "left",
+        "map_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3718.9538949081502!2d72.86106557597348!3d21.23367678070747!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04f3b3585c5e3%3A0x16c6d097b7fcdf9f!2sSilver%20Business%20Point%2C%20Uttran%2C%20Surat%2C%20Gujarat%20394105!5e0!3m2!1sen!2sin!4v1769150616398!5m2!1sen!2sin\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade",
+        "padding_desktop": "50px",
+        "padding_mobile": "40px 15px"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "our_store_DRne7g"
+  ]
+}

@@ -1,0 +1,290 @@
+{{ 'article.css' | asset_url | stylesheet_tag }}
+{{ 'blogs.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+{%- endstyle -%}
+
+<article class="article-template section-{{ section.id }}-padding container_width skeleton-container" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="skeleton-visible">
+    <div class="article-header">
+       <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 50px; width: 60%; margin: 0 auto 20px;"></div>
+       <div class="skeleton-box skeleton-shimmer skeleton-text short" style="margin: 0 auto 30px;"></div>
+    </div>
+    <div class="article-image">
+       <div class="skeleton-box skeleton-shimmer" style="width: 100%; height: 500px; border-radius: 20px;"></div>
+    </div>
+    <div class="article-content" style="margin-top: 40px;">
+       <div class="skeleton-box skeleton-shimmer skeleton-text long"></div>
+       <div class="skeleton-box skeleton-shimmer skeleton-text long"></div>
+       <div class="skeleton-box skeleton-shimmer skeleton-text medium"></div>
+    </div>
+  </div>
+  
+  {%- if section.settings.show_breadcrumb -%}
+      <div style="display:flex;justify-content:center; margin-bottom: 30px;">
+        {% render 'breadcrumbs' %}
+      </div>
+  {%- endif -%}
+
+  <div class="article-header" >
+    {%- if blog.title -%}
+        <span class="article-header__meta">{{ blog.title }}</span>
+    {%- endif -%}
+    
+    <h1 class="article-header__title" itemprop="headline">{{ article.title }}</h1>
+    
+    <div class="article-header__meta-text">
+      {%- if section.settings.show_author -%}
+          <span>Post by <strong>{{ article.author }}</strong></span>
+      {%- endif -%}
+      {%- if section.settings.show_date -%}
+          <span> • {{ article.published_at | time_tag: format: 'date' }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if article.image and section.settings.show_image -%}
+    <div class="article-image" itemprop="image">
+        {{ article.image | image_url: width: 1400 | image_tag: loading: 'lazy', width: article.image.width, height: article.image.height }}
+    </div>
+  {%- endif -%}
+
+  <div class="article-content" itemprop="articleBody">
+    {{ article.content }}
+  </div>
+
+  <div class="article-footer">
+    {%- if section.settings.show_tags and article.tags.size > 0 -%}
+        <div class="article-tags">
+            <span class="article-tags__label">Tags:</span>
+            {% for tag in article.tags %}
+                <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="article-tag">{{ tag }}</a>
+            {% endfor %}
+        </div>
+    {%- endif -%}
+
+{%- if section.settings.show_share -%}
+  {% render 'social-sharing',
+    article: article,
+    show_facebook: section.settings.share_facebook,
+    show_twitter: section.settings.share_twitter,
+    show_pinterest: section.settings.share_pinterest,
+    show_instagram: section.settings.share_instagram,
+    show_youtube: section.settings.share_youtube,
+    show_tiktok: section.settings.share_tiktok
+  %}
+{%- endif -%}
+
+
+
+  </div>
+
+  {%- if blog.next_article or blog.previous_article -%}
+      <div class="article-navigation">
+          {%- if blog.previous_article -%}
+            <a href="{{ blog.previous_article }}" class="nav-link nav-link--prev">
+                <span class="nav-label">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+                    </svg>
+                </span>
+                <div class="nav-text">
+                    <span>PREVIOUS</span>
+                    <span class="nav-title">{{ blog.previous_article.title }}</span>
+                  </div>
+            </a>
+          {%- else -%}
+             <div></div>
+          {%- endif -%}
+          
+          {%- if blog.next_article -%}
+            <a href="{{ blog.next_article }}" class="nav-link nav-link--next">
+                
+                <div class="nav-text">
+                    <span>NEXT</span>
+                    <span class="nav-title">{{ blog.next_article.title }}</span>
+                </div>
+                <span class="nav-label">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </span>
+            </a>
+          {%- endif -%}
+      </div>
+  {%- endif -%}
+
+</article>
+
+{%- if section.settings.show_related -%}
+    <div class="related-posts container_width">
+        <h2 class="related-posts__heading">{{ section.settings.related_title }}</h2>
+        <div class="related-grid">
+            {%- assign count = 0 -%}
+            {% for related_article in blog.articles %}
+                 {% unless related_article.id == article.id %}
+                     <div class="related-article-item">
+                         {% render 'article-card', 
+                         article: related_article, 
+                         show_image: true, 
+                         show_date: true, 
+                         show_author: false,
+                         content_alignment: settings.article_align_content,
+                         image_aspect_ratio: settings.article_image_aspect_ratio
+                         %}
+                     </div>
+                     {% assign count = count | plus: 1 %}
+                     {% if count >= 3 %}{% break %}{% endif %}
+                 {% endunless %}
+            {% endfor %}
+        </div>
+    </div>
+{%- endif -%}
+
+
+{% schema %}
+{
+  "name": "Article Page",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+       "type": "header",
+       "content": "Header Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "default": true,
+      "label": "Show Breadcrumbs"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "default": true,
+      "label": "Show Featured Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "default": true,
+      "label": "Show Date"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "default": true,
+      "label": "Show Author"
+    },
+    {
+      "type": "header",
+      "content": "Footer Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "default": true,
+      "label": "Show Tags"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "default": true,
+      "label": "Show Share Buttons"
+    },
+    {
+  "type": "header",
+  "content": "Share Platforms"
+},
+{
+  "type": "checkbox",
+  "id": "share_facebook",
+  "default": true,
+  "label": "Share on Facebook"
+},
+{
+  "type": "checkbox",
+  "id": "share_twitter",
+  "default": true,
+  "label": "Share on Twitter (X)"
+},
+{
+  "type": "checkbox",
+  "id": "share_instagram",
+  "default": false,
+  "label": "Show Instagram Icon"
+},
+{
+  "type": "checkbox",
+  "id": "share_pinterest",
+  "default": true,
+  "label": "Share on Pinterest"
+},
+{
+  "type": "checkbox",
+  "id": "share_youtube",
+  "default": false,
+  "label": "Show YouTube Icon"
+},
+{
+  "type": "checkbox",
+  "id": "share_tiktok",
+  "default": false,
+  "label": "Show TikTok Icon"
+},
+    {
+       "type": "header",
+       "content": "Related Posts"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related",
+      "default": true,
+      "label": "Show Related Posts"
+    },
+    {
+      "type": "text",
+      "id": "related_title",
+      "default": "Related Posts",
+      "label": "Related Posts Title"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}
+

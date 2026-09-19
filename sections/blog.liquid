@@ -1,0 +1,361 @@
+{{ 'blogs.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="main-blog section-{{ section.id }}-padding skeleton-container">
+  <div class="skeleton-visible">
+    <div class="blog-header">
+       <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 40px; width: 300px; margin: 0 auto 20px;"></div>
+    </div>
+    <div class="container_width blog-container" style="display: flex; gap: 40px;">
+       <div style="flex: 1;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
+             {% for i in (1..4) %}
+               <div>
+                  <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: 16/9; border-radius: 12px; margin-bottom: 20px;"></div>
+                  <div class="skeleton-box skeleton-shimmer skeleton-text medium"></div>
+                  <div class="skeleton-box skeleton-shimmer skeleton-text long"></div>
+               </div>
+             {% endfor %}
+          </div>
+       </div>
+    </div>
+  </div>
+  
+  {% comment %} Header/Banner Area {% endcomment %}
+  {% comment %} Header/Banner Area {% endcomment %}
+  <div class="blog-header">
+       {%- if section.settings.show_breadcrumb -%}
+           {% render 'breadcrumbs' %}
+       {%- endif -%}
+
+       <h1 class="blog-header__title">{{ blog.title }}</h1>
+  </div>
+
+
+  <div class="container_width blog-container blog-container--sidebar-{{ section.settings.sidebar_position }}">
+    
+    {% comment %} Sidebar Left {% endcomment %}
+    {% if section.settings.sidebar_position == 'left' %}
+        <aside class="blog-sidebar">
+             {% for block in section.blocks %}
+                 {% case block.type %}
+                    {% when 'categories' %}
+                        <div class="sidebar-block" {{ block.shopify_attributes }}>
+                            <h3 class="sidebar-block__heading">{{ block.settings.heading }}</h3>
+                            <ul class="sidebar-categories-list">
+                                {% assign menu_handle = block.settings.menu %}
+                                {% if menu_handle != blank %}
+                                    {% for link in linklists[menu_handle].links %}
+                                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li style="opacity: 0.7; font-style: italic;">Select a menu in block settings</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                     {% when 'popular_posts' %}
+                         <div class="sidebar-block" {{ block.shopify_attributes }}>
+                             <h3 class="sidebar-block__heading">{{ block.settings.heading }}</h3>
+                             <div class="popular-posts-list">
+                                 {% assign pop_limit = block.settings.limit | default: 3 %}
+                                 {% for article in blog.articles limit: pop_limit %}
+                                     <div class="popular-post-card">
+                                         {% if article.image %}
+                                         <div class="popular-post-card__image">
+                                             {{ article.image | image_url: width: 200 | image_tag: loading: 'lazy', width: 200, height: 200 }}
+                                         </div>
+                                         {% endif %}
+                                         <div class="popular-post-card__content">
+                                             <h4 class="popular-post-card__title"><a href="{{ article.url }}">{{ article.title }}</a></h4>
+                                             <span class="popular-post-card__date">{{ article.published_at | time_tag: format: 'date' }}</span>
+                                         </div>
+                                     </div>
+                                 {% endfor %}
+                             </div>
+                         </div>
+                     {% when 'tags' %}
+                         <div class="sidebar-block" {{ block.shopify_attributes }}>
+                             <h3 class="sidebar-block__heading">{{ block.settings.heading }}</h3>
+                             <div class="tag-cloud">
+                                 {% if blog.all_tags.size > 0 %}
+                                     {% for tag in blog.all_tags %}
+                                         <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="tag-cloud__item {% if current_tags contains tag %}tag-cloud__item--active{% endif %}">{{ tag }}</a>
+                                     {% endfor %}
+                                 {% else %}
+                                     <p style="opacity: 0.7; font-style: italic;">No tags found.</p>
+                                 {% endif %}
+                             </div>
+                         </div>
+                 {% endcase %}
+             {% endfor %}
+        </aside>
+    {% endif %}
+
+    {% comment %} Main Content {% endcomment %}
+    <div class="blog-main-content">
+      {%- paginate blog.articles by section.settings.posts_per_page -%}
+        <div class="blog-articles">
+          {%- for article in blog.articles -%}
+            <div class="blog-articles__article article">
+              {%- render 'article-card',
+                article: article,
+                show_image: section.settings.show_image,
+                show_author: section.settings.show_author,
+
+                show_tags: settings.article_show_tags,
+                show_excerpt: settings.article_show_excerpt,
+                show_button: settings.article_show_button,
+
+                content_alignment: settings.article_align_content,
+                image_aspect_ratio: settings.article_image_aspect_ratio
+              -%}
+
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <div class="pagination">
+            {% if paginate.previous %}
+              <a href="{{ paginate.previous.url }}" class="prev">
+                <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret" viewBox="0 0 10 6" transform="rotate(90)" style="width: 10px; height: 10px;"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path></svg>
+              </a>
+            {% endif %}
+            
+            {% for part in paginate.parts %}
+              {% if part.is_link %}
+                <a href="{{ part.url }}">{{ part.title }}</a>
+              {% else %}
+                {% if part.title == paginate.current_page %}
+                  <span class="current">{{ part.title }}</span>
+                {% else %}
+                  <span class="deco">{{ part.title }}</span>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            
+            {% if paginate.next %}
+              <a href="{{ paginate.next.url }}" class="next">
+                <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret" viewBox="0 0 10 6" transform="rotate(-90)" style="width: 10px; height: 10px;"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path></svg>
+              </a>
+            {% endif %}
+          </div>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+
+     {% comment %} Sidebar Right {% endcomment %}
+     {% if section.settings.sidebar_position == 'right' %}
+        <aside class="blog-sidebar">
+             {% for block in section.blocks %}
+                 {% case block.type %}
+                    {% when 'categories' %}
+                        <div class="sidebar-block" {{ block.shopify_attributes }}>
+                            <h3 class="sidebar-block__heading">{{ block.settings.heading }}</h3>
+                            <ul class="sidebar-categories-list">
+                                {% if block.settings.menu != blank %}
+                                    {% for link in linklists[block.settings.menu].links %}
+                                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li>Add a menu in block settings</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                     {% when 'popular_posts' %}
+                         <div class="sidebar-block" {{ block.shopify_attributes }}>
+                             <h3 class="sidebar-block__heading">{{ block.settings.heading }}</h3>
+                             <div class="popular-posts-list">
+                                 {% assign pop_limit = block.settings.limit | default: 3 %}
+                                 {% for article in blog.articles limit: pop_limit %}
+                                     <div class="popular-post-card">
+                                         {% if article.image %}
+                                         <div class="popular-post-card__image">
+                                             {{ article.image | image_url: width: 200 | image_tag: loading: 'lazy', width: 200, height: 200 }}
+                                         </div>
+                                         {% endif %}
+                                         <div class="popular-post-card__content">
+                                             <h4 class="popular-post-card__title"><a href="{{ article.url }}">{{ article.title }}</a></h4>
+                                             <span class="popular-post-card__date">{{ article.published_at | time_tag: format: 'date' }}</span>
+                                         </div>
+                                     </div>
+                                 {% endfor %}
+                             </div>
+                         </div>
+                     {% when 'tags' %}
+                         <div class="sidebar-block" {{ block.shopify_attributes }}>
+                             <h3 class="sidebar-block__heading">{{ block.settings.heading }}</h3>
+                             <div class="tag-cloud">
+                                 {% for tag in blog.all_tags %}
+                                     <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="tag-cloud__item">{{ tag }}</a>
+                                 {% endfor %}
+                             </div>
+                         </div>
+                 {% endcase %}
+             {% endfor %}
+        </aside>
+    {% endif %}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Custom Blog Page",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+       "type": "header",
+       "content": "Layout Settings"
+    },
+    {
+      "type": "range",
+      "id": "posts_per_page",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 6,
+      "label": "Blog posts per page"
+    },
+    {
+      "type": "select",
+      "id": "sidebar_position",
+      "options": [
+        {
+          "value": "none",
+          "label": "No Sidebar"
+        },
+        {
+          "value": "left",
+          "label": "Left Sidebar"
+        },
+        {
+          "value": "right",
+          "label": "Right Sidebar"
+        }
+      ],
+      "default": "right",
+      "label": "Sidebar Position"
+    },
+    {
+        "type": "header",
+        "content": "Breadcrumbs"
+    },
+    {
+        "type": "checkbox",
+        "id": "show_breadcrumb",
+        "default": true,
+        "label": "Show Breadcrumb"
+    },
+    {
+      "type": "header",
+      "content": "Article Card Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "default": true,
+      "label": "Show Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "default": false,
+      "label": "Show Author"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "categories",
+      "name": "Categories / Menu",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Blog Categories",
+          "label": "Heading"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "popular_posts",
+      "name": "Popular Posts",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Popular Posts",
+          "label": "Heading"
+        },
+         {
+          "type": "range",
+          "id": "limit",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Number of Posts",
+          "default": 3
+        }
+      ]
+    },
+    {
+      "type": "tags",
+      "name": "Tags",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Tags",
+          "label": "Heading"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

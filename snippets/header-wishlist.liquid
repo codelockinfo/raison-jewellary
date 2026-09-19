@@ -1,0 +1,6 @@
+{% if settings.show_wishlist_icon %}
+  <a href="{{ pages[settings.wishlist_page].url | default: routes.root_url }}" class="header__wishlist-link {{ class }}">
+    <span class="header__wishlist-count" data-wishlist-count>0</span>
+    {{ 'icon-wishlist.svg' | inline_asset_content }}
+  </a>
+{% endif %}

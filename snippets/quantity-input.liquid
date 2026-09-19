@@ -1,0 +1,63 @@
+{% comment %}
+  Quantity Input Snippet
+  - value: Number (default: 1)
+  - min: Number (default: 1)
+  - max: Number (optional)
+  - name: String (default: 'quantity')
+  - id: String (optional)
+  - data_attributes: String (optional, for input)
+  - container_class: String (optional)
+  - input_class: String (optional)
+  - item_key: String (optional, for cart)
+  - minus_attributes: String (optional)
+  - plus_attributes: String (optional)
+{% endcomment %}
+
+{% liquid
+  assign value = value | default: 1
+  assign min = min | default: 1
+  assign name = name | default: 'quantity'
+%}
+
+<div class="quantity-input {{ container_class }}" data-quantity-selector>
+  <button 
+    type="button" 
+    class="quantity-input__btn quantity-input__btn--minus" 
+    data-quantity-selector-button="minus" 
+    aria-label="Decrease quantity"
+    {% if item_key %}data-item-key="{{ item_key }}"{% endif %}
+    {{ minus_attributes }}
+  >
+    <svg width="12" height="2" viewBox="0 0 12 2" fill="none" xmlns="https://www.w3.org/2000/svg">
+      <path d="M0 1H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <label for="{{ id | default: name }}" class="visually-hidden">Quantity</label>
+  <input
+    type="number"
+    name="{{ name }}"
+    id="{{ id | default: name }}"
+    value="{{ value }}"
+    min="{{ min }}"
+    {% if max %}max="{{ max }}"{% endif %}
+    class="quantity-input__input {{ input_class }}"
+    data-quantity-selector-input
+    {% if item_key %}data-item-key="{{ item_key }}"{% endif %}
+    {{ data_attributes }}
+  >
+
+  <button 
+    type="button" 
+    class="quantity-input__btn quantity-input__btn--plus" 
+    data-quantity-selector-button="plus" 
+    aria-label="Increase quantity"
+    {% if item_key %}data-item-key="{{ item_key }}"{% endif %}
+    {{ plus_attributes }}
+  >
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg">
+      <path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
+

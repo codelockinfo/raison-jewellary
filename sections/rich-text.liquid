@@ -1,0 +1,248 @@
+<section
+  id="section-{{ section.id }}"
+  class="custom-content-section color-{{ section.settings.color_scheme }} skeleton-container"
+  style="text-align: {{ section.settings.text_alignment }};"
+>
+  <div class="skeleton-visible">
+    <div class="custom-content-inner" style="padding: 40px 0;">
+      <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 48px; width: 60%; margin: 0 {% if section.settings.text_alignment == 'center' %}auto{% elsif section.settings.text_alignment == 'right' %}0 0 auto{% else %}auto 0 0{% endif %} 20px;"></div>
+      <div class="skeleton-box skeleton-shimmer skeleton-text long" style="margin: 0 {% if section.settings.text_alignment == 'center' %}auto{% elsif section.settings.text_alignment == 'right' %}0 0 auto{% else %}auto 0 0{% endif %} 10px;"></div>
+      <div class="skeleton-box skeleton-shimmer skeleton-button" style="margin: 30px {% if section.settings.text_alignment == 'center' %}auto{% elsif section.settings.text_alignment == 'right' %}0 0 auto{% else %}auto 0 0{% endif %} 0;"></div>
+    </div>
+  </div>
+    <div class="custom-content-inner container_width">
+
+      {% for block in section.blocks %}
+        {% case block.type %}
+
+          {% when 'heading' %}
+            <div class="rich-text-block-{{ block.id }}">
+              {% assign heading_class = 'heading-' | append: block.id %}
+              {% render 'heading-style-banner',
+                heading: block.settings.text,
+                heading_tag: block.settings.heading_tag,
+                heading_style: block.settings.heading_style,
+                wrapper_class: 'rich-text',
+                heading_alignment: section.settings.text_alignment,
+                class_name: heading_class,
+                heading_styles: ''
+              %}
+            </div>
+
+          {% when 'subheading' %}
+            <p
+              class="custom-subheading subheading-{{ block.id }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </p>
+
+          {% when 'button' %}
+            {% if block.settings.label != blank %}
+              <a
+                href="{{ block.settings.link }}"
+                class="custom-button button-{{ block.id }}"
+                {{ block.shopify_attributes }}
+              >
+                {{ block.settings.label }}
+              </a>
+            {% endif %}
+
+        {% endcase %}
+      {% endfor %}
+
+    </div>
+</section>
+
+
+<style>
+/* ===== Container Width ===== */
+.custom-content-section {
+  margin: 0 auto;
+}
+
+
+/* ===== Section Padding ===== */
+#section-{{ section.id }} {
+  padding: {{ section.settings.section_padding_desktop }};
+}
+
+@media (max-width: 768px) {
+  #section-{{ section.id }} {
+    padding: {{ section.settings.section_padding_mobile }} !important;
+  }
+}
+
+/* ===== Button Base ===== */
+#section-{{ section.id }} .custom-button {
+  display: inline-block;
+  padding: 12px 28px;
+  text-decoration: none;
+  font-family: var(--font-button--family);
+  font-weight: var(--btn-font-weight, 600);
+  font-size: var(--btn-font-size, 14px);
+  letter-spacing: var(--btn-letter-spacing, 0);
+  text-transform: var(--btn-text-transform, none);
+  line-height: 1.5;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+</style>
+
+{% for block in section.blocks %}
+
+  {% if block.type == 'heading' %}
+  <style>
+    /* Desktop */
+    #section-{{ section.id }} .rich-text-block-{{ block.id }} {
+      --heading-color: var(--color-heading);
+    }
+    
+    #section-{{ section.id }} .rich-text-block-{{ block.id }} .rich-text__heading {
+      color: var(--color-heading);
+      margin-bottom: 0;
+      line-height: 1.2;
+    }
+
+  </style>
+{% endif %}
+
+{% if block.type == 'subheading' %}
+  <style>
+    /* Desktop */
+    #section-{{ section.id }} .subheading-{{ block.id }} {
+      color: var(--color-subtext);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+  </style>
+{% endif %}
+
+
+  {% if block.type == 'button' %}
+    <style>
+      .button-{{ block.id }} {
+        background-color: var(--color-button);
+        color: var(--color-button-text);
+        border: none;
+      }
+
+      .button-{{ block.id }}:hover {
+        background-color: var(--color-button-hover);
+        color: var(--color-button-text-hover);
+      }
+
+    </style>
+  {% endif %}
+
+{% endfor %}
+
+{% schema %}
+{
+  "name": "Rich Text (Advanced)",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    { "type": "header", "content": "Section Spacing" },
+    { "type": "text", "id": "section_padding_desktop", "label": "Section Padding (Desktop)", "default": "60px 20px 60px 20px" },
+    { "type": "text", "id": "section_padding_mobile", "label": "Section Padding (Mobile)", "default": "20px 20px 20px 20px" }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Heading Text",
+          "default": "Your Heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_style",
+          "label": "Heading Style",
+          "default": "simple",
+          "options": [
+            { "value": "simple", "label": "Design 1" },
+            { "value": "line-top", "label": "Design 2" },
+            { "value": "underline", "label": "Design 3" },
+            { "value": "lines", "label": "Design 4" },
+            { "value": "diamond", "label": "Design 5" },
+            { "value": "ornament", "label": "Design 6" },
+            { "value": "x", "label": "Design 7" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "Heading Level (Size)",
+          "options": [
+            { "value": "h1", "label": "H1" },
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" },
+            { "value": "h4", "label": "H4" },
+            { "value": "h5", "label": "H5" },
+            { "value": "h6", "label": "H6" }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subheading",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Subheading Text",
+          "default": "<p>Your subheading text</p>"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Button Label",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rich Text (Advanced)",
+      "blocks": [
+        { "type": "heading" },
+        { "type": "subheading" },
+        { "type": "button" }
+      ]
+    }
+  ]
+}
+{% endschema %}

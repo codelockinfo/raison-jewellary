@@ -1,0 +1,525 @@
+{% liquid
+  assign section_id = section.id
+  assign section_class = 'customer-reviews customer-reviews--' | append: section.settings.layout
+
+  assign card_direction = 'row'
+  assign media_width = '40%'
+  assign content_width = '60%'
+  
+  if section.settings.image_position == 'right'
+    assign card_direction = 'row-reverse'
+  elsif section.settings.image_position == 'top'
+    assign card_direction = 'column'
+    assign media_width = '100%'
+    assign content_width = '100%'
+  endif
+%}
+{{ 'customer-review.css' | asset_url | stylesheet_tag }}
+{% style %}
+  #{{ section_id }} .swiper-pagination-fraction {
+    font-size: 16px !important;
+  }
+  @media (max-width: 768px) {
+    #{{ section_id }} {
+      --heading-color: {{ section.settings.heading_color_mobile }} !important;
+    }
+    #{{ section_id }} .swiper-pagination-fraction {
+      font-size: 14px !important;
+    }
+  }
+{% endstyle %}
+{% render 'icon-rate' %}
+
+<section
+  id="{{ section_id }}"
+  class="{{ section_class }} color-{{ section.settings.color_scheme }} skeleton-container"
+  style="
+    --section-padding-desktop: {{ section.settings.padding_desktop }};
+    --section-padding-mobile: {{ section.settings.padding_mobile }};
+    --grid-columns: {{ section.settings.columns_desktop }};
+    --grid-gap: {{ section.settings.column_gap }}px;
+    --card-direction: {{ card_direction }};
+    --media-width: {{ media_width }};
+    --content-width: {{ content_width }};
+    {% if section.settings.layout == 'slider' %}overflow: hidden;{% endif %}
+  "
+>
+  <div class="skeleton-visible">
+    <div class="customer-reviews__container container_width" style="padding: var(--section-padding-desktop);">
+       <div class="customer-reviews__header" style="text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center;">
+         <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 40px; width: 300px; margin-bottom: 20px;"></div>
+         <div class="skeleton-box skeleton-shimmer skeleton-text short"></div>
+       </div>
+       <div style="display: flex; gap: var(--grid-gap); overflow: hidden;">
+         {% render 'skeleton-loader', type: 'review', count: 4, grid_class: 'grid' %}
+       </div>
+    </div>
+  </div>
+    <div class="customer-reviews__container container_width">
+      
+      {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+        <div class="customer-reviews__header customer-reviews__header--{{ section.settings.heading_alignment }}">
+          {%- if section.settings.heading != blank -%}
+            {% render 'heading-style-banner',
+              heading: section.settings.heading,
+              heading_tag: section.settings.heading_tag,
+              heading_style: section.settings.heading_style,
+              heading_alignment: section.settings.heading_alignment,
+              wrapper_class: 'customer-reviews',
+            %}
+          {%- endif -%}
+          {%- if section.settings.subheading != blank -%}
+            <div class="customer-reviews__subheading customer-reviews__subheading--{{ section.settings.heading_alignment }}">{{ section.settings.subheading }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {% liquid
+          assign desktop_layout = section.settings.layout | default: 'grid'
+          assign mobile_layout = section.settings.layout_mobile | default: desktop_layout
+      %}
+
+      <div class="customer-reviews__wrapper customer-reviews__wrapper--desktop-{{ desktop_layout }} customer-reviews__wrapper--mobile-{{ mobile_layout }}">
+          
+          {% comment %} Grid Layout Structure {% endcomment %}
+          <div class="customer-reviews__grid">
+             {% for block in section.blocks limit: section.settings.grid_items_limit %}
+                 {% render 'review-card', block: block, section: section %}
+             {% endfor %}
+          </div>
+
+          {% comment %} Slider Layout Structure (Swiper) {% endcomment %}
+          <div class="customer-reviews__slider" style="position: relative;">
+              {% if section.settings.show_arrows or section.settings.show_arrows_mobile %}
+              <div class="swiper-navigation-wrapper swiper-navigation-wrapper--{{ section.settings.nav_button_visibility }} 
+                  {% unless section.settings.show_arrows %}hidden-desktop{% endunless %}
+                  {% unless section.settings.show_arrows_mobile %}hidden-mobile{% endunless %}">
+                   <div class="swiper-button-prev">
+                     {% render 'icon-slider-nav', direction: 'prev' %}
+                   </div>
+                   <div class="swiper-button-next">
+                     {% render 'icon-slider-nav', direction: 'next' %}
+                   </div>
+              </div>
+              {% endif %}
+              <div class="swiper customer-reviews-swiper" 
+                   data-slides-desktop="{{ section.settings.slider_desktop_items }}"
+                   data-slides-tablet="{{ section.settings.slider_tablet_items }}"
+                   data-slides-mobile="{{ section.settings.slider_mobile_items }}"
+                   data-space-between="{{ section.settings.column_gap }}"
+                   data-pagination="{{ section.settings.show_pagination }}"
+                   data-pagination-type="{{ section.settings.pagination_style }}"
+                   data-arrows="{{ section.settings.show_arrows }}"
+                   data-arrows-mobile="{{ section.settings.show_arrows_mobile }}">
+                  <div class="swiper-wrapper">
+                      {% for block in section.blocks %}
+                          <div class="swiper-slide">
+                              {% render 'review-card', block: block, section: section %}
+                          </div>
+                      {% endfor %}
+                  </div>
+                  
+
+                  {% if section.settings.show_pagination %}
+                  <div class="swiper-pagination"></div>
+                  {% endif %}
+              </div>
+          </div>
+
+      </div>
+    </div>
+</section>
+
+
+
+{% javascript %}
+  (function() {
+    function initReviewsSwiper() {
+      if (typeof Swiper === 'undefined') {
+        setTimeout(initReviewsSwiper, 100);
+        return;
+      }
+
+      const swipers = document.querySelectorAll('.customer-reviews-swiper');
+      swipers.forEach(swiperEl => {
+        if (swiperEl.swiper) swiperEl.swiper.destroy(true, true);
+
+        const slidesDesktop = parseFloat(swiperEl.dataset.slidesDesktop) || 3;
+        const slidesTablet = parseFloat(swiperEl.dataset.slidesTablet) || 2;
+        const slidesMobile = parseFloat(swiperEl.dataset.slidesMobile) || 1;
+        const spaceBetween = parseInt(swiperEl.dataset.spaceBetween) || 20;
+        const showPagination = swiperEl.dataset.pagination === 'true';
+        const paginationType = swiperEl.dataset.paginationType || 'bullets';
+        const showArrows = swiperEl.dataset.arrows === 'true';
+        const showArrowsMobile = swiperEl.dataset.arrowsMobile === 'true';
+        const hasArrows = showArrows || showArrowsMobile;
+
+        let navigationConfig = false;
+        if (hasArrows) {
+             const parent = swiperEl.closest('.customer-reviews__slider');
+             navigationConfig = {
+                nextEl: parent.querySelector('.swiper-button-next'),
+                prevEl: parent.querySelector('.swiper-button-prev'),
+             };
+        }
+
+        let paginationConfig = false;
+        if (showPagination) {
+            paginationConfig = {
+                el: swiperEl.querySelector('.swiper-pagination'),
+                clickable: true,
+                type: paginationType,
+            };
+        }
+
+        new Swiper(swiperEl, {
+          slidesPerView: slidesMobile,
+          spaceBetween: 20,
+          navigation: navigationConfig,
+          pagination: paginationConfig,
+          grabCursor: true,
+          watchSlidesProgress: true,
+          breakpoints: {
+            551: { 
+              slidesPerView: 2, 
+              spaceBetween: 20 
+            },
+            768: { 
+              slidesPerView: slidesTablet, 
+              spaceBetween: 20 
+            },
+            1200: { 
+              slidesPerView: slidesDesktop, 
+              spaceBetween: spaceBetween 
+            }
+          },
+          on: {
+            init: function() {
+              window.dispatchEvent(new Event('resize'));
+            }
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initReviewsSwiper);
+    } else {
+      initReviewsSwiper();
+    }
+    
+    document.addEventListener('shopify:section:load', initReviewsSwiper);
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout Type (Desktop)",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "slider", "label": "Slider" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "select",
+      "id": "layout_mobile",
+      "label": "Layout Type (Mobile)",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "slider", "label": "Slider" }
+      ],
+      "default": "slider"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Cards per row (Desktop)",
+      "default": 3
+    },
+    {
+       "type": "header",
+       "content": "Grid Settings"
+    },
+    {
+      "type": "range",
+      "id": "grid_items_limit",
+      "min": 3,
+      "max": 24,
+      "step": 1,
+      "label": "Products to Show (Desktop)",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "label": "Gap between cards (px)",
+      "default": 30
+    },
+    {
+        "type": "header",
+        "content": "Slider Settings"
+    },
+    {
+        "type": "range",
+        "id": "slider_desktop_items",
+        "min": 1,
+        "max": 5,
+        "step": 0.5,
+        "label": "Slides to Show (Desktop)",
+        "default": 4
+    },
+    {
+        "type": "range",
+        "id": "slider_tablet_items",
+        "min": 1,
+        "max": 3,
+        "step": 0.5,
+        "label": "Slides to Show (Tablet)",
+        "default": 3
+    },
+    {
+        "type": "range",
+        "id": "slider_mobile_items",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "label": "Slides to Show (Mobile)",
+        "default": 1.2
+    },
+     {
+        "type": "checkbox",
+        "id": "show_pagination",
+        "label": "Show Pagination",
+        "default": true
+    },
+    {
+        "type": "select",
+        "id": "pagination_style",
+        "label": "Pagination Style",
+        "options": [
+            { "value": "bullets", "label": "Style 1 (Dots)" },
+            { "value": "progressbar", "label": "Style 2 (Progress Bar)" },
+            { "value": "fraction", "label": "Style 3 (Numbers)" }
+        ],
+        "default": "bullets"
+    },
+    {
+        "type": "checkbox",
+        "id": "show_arrows",
+        "label": "Show Slider Arrows",
+        "default": true
+    },
+    {
+        "type": "select",
+        "id": "nav_button_visibility",
+        "label": "Button Visibility",
+        "options": [
+            { "value": "always", "label": "Always Visible" },
+            { "value": "hover", "label": "Only on Hover" }
+        ],
+        "default": "always"
+    },
+    {
+        "type": "checkbox",
+        "id": "show_arrows_mobile",
+        "label": "Show Arrows on Mobile",
+        "default": true
+    },
+    {
+       "type": "select",
+       "id": "image_position",
+       "label": "Media Position in Card",
+       "options": [
+           { "value": "left", "label": "Left" },
+           { "value": "right", "label": "Right" },
+           { "value": "top", "label": "Top" }
+       ],
+       "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Happy Customers"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        { "value": "simple", "label": "design 1" },
+        { "value": "line-top", "label": "design 2" },
+        { "value": "underline", "label": "design 3" },
+        { "value": "lines", "label": "design 4" },
+        { "value": "diamond", "label": "design 5" },
+        { "value": "ornament", "label": "design 6" },
+        { "value": "x", "label": "design 7" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+        "type": "header",
+        "content": "Subheading Settings"
+    },
+    {
+        "type": "textarea",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "Customers love our products and we always strive to please them all."
+    },
+    {
+        "type": "header",
+        "content": "Arrow Button Settings"
+    },
+        {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Desktop Padding (Top Right Bottom Left)",
+      "default": "60px 0px 60px 0px",
+      "info": "Example: 60px 20px 60px 20px"
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Mobile Padding (Top Right Bottom Left)",
+      "default": "40px 0px 40px 0px",
+      "info": "Example: 40px 15px 40px 15px"
+    },
+  ],
+  "blocks": [
+    {
+      "type": "review_block",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Media"
+        },
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media Type",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Video" }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Star Rating",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "Customer Name",
+          "default": "John Doe"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Show 'Verified Buyer'",
+          "default": true
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review Text",
+          "default": "A perfect product, it keeps you very warm without overheating. True to size, I couldn't be happier with the purchase."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Reviews",
+      "blocks": [
+        { "type": "review_block" },
+        { "type": "review_block" },
+        { "type": "review_block" }
+      ]
+    }
+  ]
+}
+{% endschema %}

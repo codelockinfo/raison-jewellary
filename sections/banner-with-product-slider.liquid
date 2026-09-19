@@ -1,0 +1,371 @@
+<section class="hero-product-swiper section-{{ section.id }} skeleton-container">
+  <div class="skeleton-visible">
+    <div class="hero-image">
+       <div class="skeleton-box skeleton-shimmer" style="width: 100%; height: 600px;"></div>
+    </div>
+    <div class="products-swiper-wrap" style="position: absolute; bottom: 50px; width: 100%; padding: 0 40px;">
+       <div style="display: flex; gap: 20px; overflow: hidden;">
+          {% for i in (1..5) %}
+            <div style="width: 200px; flex-shrink: 0; background: #FEFEFE; padding: 10px; border-radius: 8px;">
+               <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: 1/1; border-radius: 4px; margin-bottom: 10px;"></div>
+               <div class="skeleton-box skeleton-shimmer skeleton-text medium"></div>
+               <div class="skeleton-box skeleton-shimmer skeleton-text short"></div>
+            </div>
+          {% endfor %}
+       </div>
+    </div>
+  </div>
+   <!-- HERO IMAGE -->
+  <div class="hero-image">
+
+    {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+    {% assign fetch_priority = 'low' %}
+    {% if loading_strategy == 'eager' %}
+      {% assign fetch_priority = 'high' %}
+    {% endif %}
+
+    {% if section.settings.hero_image != blank %}
+      <img
+        class="hero-img-desktop"
+        src="{{ section.settings.hero_image | image_url: width: 2000 }}"
+        alt="{{ section.settings.hero_image.alt }}"
+        loading="{{ loading_strategy }}"
+        fetchpriority="{{ fetch_priority }}"
+        width="{{ section.settings.hero_image.width }}"
+        height="{{ section.settings.hero_image.height }}"
+      >
+    {% endif %}
+
+    {% if section.settings.hero_image_mobile != blank %}
+      <img
+        class="hero-img-mobile"
+        src="{{ section.settings.hero_image_mobile | image_url: width: 1000 }}"
+        alt="{{ section.settings.hero_image_mobile.alt }}"
+        loading="{{ loading_strategy }}"
+        fetchpriority="{{ fetch_priority }}"
+        width="{{ section.settings.hero_image_mobile.width }}"
+        height="{{ section.settings.hero_image_mobile.height }}"
+      >
+    {% elsif section.settings.hero_image != blank %}
+      <!-- Fallback to desktop image on mobile -->
+      <img
+        class="hero-img-mobile"
+        src="{{ section.settings.hero_image | image_url: width: 1000 }}"
+        alt="{{ section.settings.hero_image.alt }}"
+        loading="{{ loading_strategy }}"
+        fetchpriority="{{ fetch_priority }}"
+        width="{{ section.settings.hero_image.width }}"
+        height="{{ section.settings.hero_image.height }}"
+      >
+    {% else %}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {% endif %}
+
+  </div>
+
+    <!-- PRODUCT SWIPER -->
+    <div class="products-swiper-wrap">
+      <div class="swiper products-swiper-{{ section.id }}">
+        <div class="swiper-wrapper">
+
+          {% assign collection = collections[section.settings.collection] %}
+          {% if collection.products.size > 0 %}
+            {% assign jewellery_type = section.settings.jewellery_type %}
+            {% for product in collection.products %}
+              {% assign product_type = product.metafields.custom.jewellery_type.value %}
+
+              {% if jewellery_type == 'all' or product_type == jewellery_type %}
+              <div class="swiper-slide">
+                <div class="product-card">
+                  <a href="{{ product.url }}">
+                    <div class="product-img">
+                      {% assign first_image = product.featured_image %}
+                      {% assign second_image = product.images[1] %}
+                      {% if first_image %}
+                        <img class="img-first" src="{{ first_image | image_url: width: 300 }}" alt="{{ product.title }}" loading="{{ loading_strategy }}" width="300" height="{{ 300 | divided_by: first_image.aspect_ratio | round }}">
+                      {% endif %}
+                      {% if second_image %}
+                        <img class="img-second" src="{{ second_image | image_url: width: 300 }}" alt="{{ product.title }}" loading="{{ loading_strategy }}" width="300" height="{{ 300 | divided_by: second_image.aspect_ratio | round }}">
+                      {% endif %}
+                    </div>
+                    <div class="product-info">
+                      <p class="product-title">{{ product.title }}</p>
+                      <div class="product-price">
+                        {%- liquid
+                          if settings.currency_code_enabled
+                            assign money_price = product.price | money_with_currency
+                            assign money_compare = product.compare_at_price | money_with_currency
+                          else
+                            assign money_price = product.price | money
+                            assign money_compare = product.compare_at_price | money
+                          endif
+                          
+                          if cart.currency.iso_code == 'EUR'
+                            assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                            assign money_compare = money_compare | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                          elsif cart.currency.iso_code == 'INR'
+                            assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                            assign money_compare = money_compare | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                          endif
+                        -%}
+                        {% if product.compare_at_price > product.price %}
+                          <span class="price-sale">
+                            {{ money_price }}
+                          </span>
+                          <span class="price-compare">
+                            {{ money_compare }}
+                          </span>
+                        {% else %}
+                          <span class="price-regular">
+                            {{ money_price }}
+                          </span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            {% endif %}
+            {% endfor %}
+          {% else %}
+            {% for i in (1..6) %}
+              <div class="swiper-slide">
+                <div class="product-card">
+                  <a href="#">
+                    <div class="product-img">
+                      {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                    <div class="product-info">
+                      <p class="product-title">Example Product {{ i }}</p>
+                      <div class="product-price">
+                        <span class="price-regular">$99.00</span>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+        </div>
+
+        {% unless section.settings.auto_rotate %}
+        <!-- ARROWS -->
+        <div class="swiper-button-prev">{% render 'icon-slider-nav', direction: 'prev' %}</div>
+        <div class="swiper-button-next">{% render 'icon-slider-nav', direction: 'next' %}</div>
+        {% endunless %}
+      </div>
+    </div>
+</section>
+<script>
+(function() {
+  const initSwiper = () => {
+    const swiperSelector = '.products-swiper-{{ section.id }}';
+    const swiperEl = document.querySelector(swiperSelector);
+    if (!swiperEl) return;
+
+    if (typeof Swiper === 'undefined') {
+      setTimeout(initSwiper, 100);
+      return;
+    }
+
+    if (swiperEl.swiper) {
+      swiperEl.swiper.destroy(true, true);
+    }
+
+    {% liquid
+      assign auto_rotate = section.settings.auto_rotate
+      if auto_rotate == nil
+        assign auto_rotate = true
+      endif
+    %}
+
+    const swiperConfig = {
+      slidesPerView: 5,
+      spaceBetween: 16,
+      loop: true,
+      speed: {% if auto_rotate %}{{ section.settings.rotate_speed | default: 5 | times: 1000 }}{% else %}400{% endif %},
+      {% if auto_rotate %}
+        allowTouchMove: false,
+        simulateTouch: false,
+        shortSwipes: false,
+        longSwipes: false,
+      {% else %}
+        allowTouchMove: true,
+      {% endif %}
+      observer: true,
+      observeParents: true,
+      {% if auto_rotate %}
+      autoplay: {
+        delay: 0,
+        disableOnInteraction: false,
+      },
+      {% endif %}
+      {% unless auto_rotate %}
+      navigation: {
+        nextEl: '.section-{{ section.id }} .swiper-button-next',
+        prevEl: '.section-{{ section.id }} .swiper-button-prev'
+      },
+      {% endunless %}
+      breakpoints: {
+        0: { slidesPerView: 1.5, spaceBetween: 10 },
+        640: { slidesPerView: 2.5, spaceBetween: 15 },
+        1024: { slidesPerView: 5, spaceBetween: 16 }
+      }
+    };
+
+    const swiper = new Swiper(swiperEl, swiperConfig);
+    const wrapper = swiperEl.querySelector('.swiper-wrapper');
+
+    {% if section.settings.pause_on_hover and auto_rotate %}
+    const stopSlider = () => {
+      if (swiper.autoplay) {
+        const computedStyle = window.getComputedStyle(wrapper);
+        const matrix = computedStyle.transform || computedStyle.webkitTransform;
+        if (!matrix || matrix === 'none') return;
+
+        // Correctly parse both matrix (2D) and matrix3d (3D)
+        const values = matrix.split('(')[1].split(')')[0].split(',');
+        const currentTransform = (values.length === 16) ? parseFloat(values[12]) : parseFloat(values[4]);
+
+        swiper.autoplay.stop();
+        wrapper.style.transitionDuration = '0ms';
+        swiper.setTranslate(currentTransform);
+      }
+    };
+
+    const startSlider = () => {
+      if (swiper.autoplay) {
+        wrapper.style.transitionDuration = '';
+        
+        // Update Swiper's internal progress and index based on the current translate
+        // This prevents the "jump" to the next slide
+        swiper.updateProgress();
+        swiper.updateActiveIndex();
+        swiper.updateSlidesClasses();
+        
+        swiper.animating = false;
+        swiper.autoplay.start();
+      }
+    };
+
+    swiperEl.addEventListener('mouseenter', stopSlider);
+    swiperEl.addEventListener('mouseleave', startSlider);
+    {% endif %}
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSwiper);
+  } else {
+    initSwiper();
+  }
+
+  document.addEventListener('shopify:section:load', (e) => {
+    if (e.detail.sectionId === '{{ section.id }}') initSwiper();
+  });
+})();
+</script>
+<style>
+  .section-{{ section.id }} {
+    padding: {{ section.settings.section_padding }};
+  }
+  @media (max-width: 768px) {
+    .section-{{ section.id }} {
+      padding: {{ section.settings.section_padding_mobile }} !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Hero Image Product Slider",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_mobile",
+      "label": "Hero Image (Mobile)",
+      "info": "Optional. If empty, desktop image will be used on mobile."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Product Collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "Auto-rotate slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "rotate_speed",
+      "label": "Change slides every",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+        {
+      "type": "text",
+      "id": "section_padding",
+      "label": "Section Padding (Desktop)",
+      "default": "40px 20px 40px 20px"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_mobile",
+      "label": "Section Padding (Mobile)",
+      "default": "20px 10px 20px 10px"
+    },
+    {
+      "type": "select",
+      "id": "jewellery_type",
+      "label": "Jewellery Type",
+      "options": [
+        {
+          "value": "all",
+          "label": "All"
+        },
+        {
+          "value": "Silver",
+          "label": "Silver"
+        },
+        {
+          "value": "Gold",
+          "label": "Gold"
+        }
+      ],
+      "default": "all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Image Product Slider",
+         "category": "Product",
+    }
+  ]
+}
+{% endschema %}

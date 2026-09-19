@@ -1,0 +1,188 @@
+{%- liquid
+  assign filter_tags = block.settings.tags_list | split: ','
+  assign collection_tags_downcase = collection.all_tags | join: '|||' | downcase | split: '|||'
+
+  assign has_any_tag = false
+  for tag in filter_tags
+    assign tag_downcase = tag | strip | downcase
+    if collection_tags_downcase contains tag_downcase
+      assign has_any_tag = true
+      break
+    endif
+  endfor
+-%}
+
+{% if has_any_tag or request.design_mode %}
+<div class="filter-group {% if block.settings.expand_by_default %}active{% endif %}" data-block-id="{{ block.id }}">
+  {% if block.settings.title != blank %}
+    <div class="filter-title {% if block.settings.enable_collapsible %}is-collapsible{% endif %}">
+      <span>{{ block.settings.title }}</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#333" stroke-width="1.5"/></svg>
+    </div>
+  {% endif %}
+  
+  <div class="filter-content" {% unless block.settings.expand_by_default %}style="display:none;"{% endunless %}>
+    {%- if request.design_mode -%}
+      <!-- 
+        Debug Tag Filter:
+        Requested Tags: {{ block.settings.tags_list }}
+        Collection Tags: {{ collection.all_tags | join: ', ' }}
+      -->
+    {%- endif -%}
+
+    {% if block.settings.design == 'list' %}
+      <ul class="filter-list">
+        {%- for tag in filter_tags -%}
+          {%- liquid
+            assign tag_stripped = tag | strip
+            if tag_stripped == blank
+              continue
+            endif
+            assign tag_downcase = tag_stripped | downcase
+          -%}
+          
+          {%- if collection_tags_downcase contains tag_downcase or request.design_mode -%}
+            <li class="filter-item">
+              <label class="{% if current_tags contains tag_stripped %}active{% endif %}">
+                <input type="checkbox"
+                  value="{{ tag_stripped | handle }}"
+                  {% if current_tags contains tag_stripped %}checked{% endif %}
+                  onchange="toggleTagFilter('{{ tag_stripped | handle }}')">
+                
+                {%- if block.settings.work_with_filter_colors -%}
+                   {%- liquid
+                     assign color_name_downcase = tag_stripped | downcase
+                     assign custom_swatch_color = tag_stripped | handle
+                     
+                     if settings.custom_color_mapping != blank
+                       assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                       for row in mapping_rows
+                         assign parts = row | split: ':'
+                         if parts.size == 2
+                           assign m_name = parts[0] | strip | downcase
+                           assign m_color = parts[1] | strip
+                           if m_name == color_name_downcase
+                             assign custom_swatch_color = m_color
+                             break
+                           endif
+                         endif
+                       endfor
+                     endif
+                     assign color_handle = tag_stripped | handle
+                   -%}
+                   {%- liquid
+                     assign swatch_image = nil
+                     assign swatch_file_name = color_handle | append: '.png'
+                     if images[swatch_file_name] != blank
+                       assign swatch_image = images[swatch_file_name] | image_url: width: 40
+                     endif
+                   -%}
+                   <span class="color-swatch-small" style="background-color: {{ custom_swatch_color }};{% if swatch_image %} background-image: url({{ swatch_image }});{% endif %}"></span>
+                {%- endif -%}
+
+                <span>{{ tag_stripped }}</span>
+              </label>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <div class="tag-buttons">
+        {%- for tag in filter_tags -%}
+          {%- liquid
+            assign tag_stripped = tag | strip
+            if tag_stripped == blank
+              continue
+            endif
+            assign tag_downcase = tag_stripped | downcase
+          -%}
+
+          {%- if collection_tags_downcase contains tag_downcase or request.design_mode -%}
+            <button type="button" 
+              class="tag-button {% if current_tags contains tag_stripped %}active{% endif %}"
+              aria-label="{{ tag_stripped }}"
+              onclick="toggleTagFilter('{{ tag_stripped | handle }}')">
+              
+              {%- if block.settings.work_with_filter_colors and block.settings.show_color_with_label -%}
+                 {%- liquid
+                   assign color_name_downcase = tag_stripped | downcase
+                   assign custom_swatch_color = tag_stripped | handle
+                   
+                   if settings.custom_color_mapping != blank
+                     assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                     for row in mapping_rows
+                       assign parts = row | split: ':'
+                       if parts.size == 2
+                         assign m_name = parts[0] | strip | downcase
+                         assign m_color = parts[1] | strip
+                         if m_name == color_name_downcase
+                           assign custom_swatch_color = m_color
+                           break
+                         endif
+                       endif
+                     endfor
+                   endif
+                   assign color_handle = tag_stripped | handle
+                 -%}
+                 {%- liquid
+                   assign swatch_image = nil
+                   assign swatch_file_name = color_handle | append: '.png'
+                   if images[swatch_file_name] != blank
+                     assign swatch_image = images[swatch_file_name] | image_url: width: 40
+                   endif
+                 -%}
+                 <span class="color-swatch-small" style="background-color: {{ custom_swatch_color }};{% if swatch_image %} background-image: url({{ swatch_image }});{% endif %}"></span>
+              {%- endif -%}
+              
+              {{ tag_stripped }}
+            </button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+{% endif %}
+
+<style>
+  .tag-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 0;
+  }
+  .tag-button {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: #FEFEFE;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tag-button.active {
+    background: #000;
+    color: #FEFEFE;
+    border-color: #000;
+  }
+  .color-swatch-small {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #ccc;
+    background-size: cover;
+  }
+  .filter-item label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .filter-item input[type="checkbox"] {
+    margin: 0;
+  }
+</style>

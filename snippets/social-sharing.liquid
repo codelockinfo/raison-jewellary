@@ -1,0 +1,65 @@
+<div class="article-share" style="display: flex; align-items: center; gap: 10px;">
+
+
+
+  {% assign facebook_link  = settings.facebook_url  | default: 'https://www.facebook.com/' %}
+  {% assign twitter_link   = settings.twitter_url   | default: 'https://twitter.com/' %}
+  {% assign instagram_link = settings.instagram_url | default: 'https://www.instagram.com/' %}
+  {% assign pinterest_link = settings.pinterest_url | default: 'https://www.pinterest.com/' %}
+  {% assign youtube_link   = settings.youtube_url   | default: 'https://www.youtube.com/' %}
+  {% assign tiktok_link    = settings.tiktok_url    | default: 'https://www.tiktok.com/' %}
+
+  {% if show_facebook %}
+    <a href="{{ facebook_link }}"
+       class="share-button"
+       target="_blank"
+       rel="noopener">
+      {% render 'icon-facebook' %}
+    </a>
+  {% endif %}
+
+  {% if show_twitter %}
+    <a href="{{ twitter_link }}"
+       class="share-button"
+       target="_blank"
+       rel="noopener">
+      {% render 'icon-twitter' %}
+    </a>
+  {% endif %}
+
+  {% if show_pinterest and article.image %}
+    <a href="{{ pinterest_link }}"
+       class="share-button"
+       target="_blank"
+       rel="noopener">
+      {% render 'icon-pinterest' %}
+    </a>
+  {% endif %}
+
+  {% if show_instagram %}
+    <a href="{{ instagram_link }}"
+       class="share-button"
+       target="_blank"
+       rel="noopener">
+      {% render 'icon-instagram' %}
+    </a>
+  {% endif %}
+
+  {% if show_youtube %}
+    <a href="{{ youtube_link }}"
+       class="share-button"
+       target="_blank"
+       rel="noopener">
+      {% render 'icon-youtube' %}
+    </a>
+  {% endif %}
+
+  {% if show_tiktok %}
+    <a href="{{ tiktok_link }}"
+       class="share-button"
+       target="_blank"
+       rel="noopener">
+      {% render 'icon-tiktok' %}
+    </a>
+  {% endif %}
+</div>

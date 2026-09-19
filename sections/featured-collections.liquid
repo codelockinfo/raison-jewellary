@@ -1,0 +1,952 @@
+{{ 'custom-style.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign section_id = section.settings.custom_id | default: section.id
+  assign section_class = 'featured-collections featured-collections--' | append: section.settings.layout
+
+%}
+
+<section
+  id="{{ section_id }}"
+  class="{{ section_class }} color-{{ section.settings.color_scheme }} section-padding container_width skeleton-container"
+  style="
+    --grid-columns: {{ section.settings.columns_desktop }};
+    --grid-columns-mobile: {{ section.settings.columns_mobile | default: 2 }};
+    --grid-gap: {{ section.settings.grid_gap | default: 20 }}px;
+    --grid-gap-mobile: {{ section.settings.grid_gap_mobile | default: 15 }}px;
+    --section-padding: {{ section.settings.section_padding }};
+    --section-padding-mobile: {{ section.settings.section_padding_mobile }};
+    --image-aspect-ratio: {% if section.settings.image_aspect_ratio == 'circle' %}1{% else %}{{ section.settings.image_aspect_ratio }}{% endif %};
+    --image-border-radius: {% if section.settings.image_aspect_ratio == 'circle' %}50%{% else %}var(--block-radius, 20px){% endif %};
+    {% if section.settings.layout == 'slider' %}overflow: visible;{% endif %}
+    --circle-size: {{ section.settings.circle_size | default: 100 }}%;
+    --slider-per-view: {{ section.settings.slides_per_view | default: 6 }};
+    --slider-per-view-tablet: {{ section.settings.slides_per_view_tablet | default: 4 }};
+    --slider-per-view-mobile: {{ section.settings.slides_per_view_mobile | default: 2.2 }};
+    --slider-space-between: {{ section.settings.space_between | default: 30 }}px;
+    --slider-space-between-mobile: {{ section.settings.space_between_mobile | default: 15 }}px;
+  "
+>
+  {%- style -%}
+    #{{ section_id }} {
+      padding: var(--section-padding);
+    }
+    @media screen and (max-width: 768px) {
+      #{{ section_id }} {
+        padding: var(--section-padding-mobile) !important;
+      }
+    }
+    #{{ section_id }} .featured-collections__container {
+      {% if section.settings.image_aspect_ratio == 'circle' %}
+        max-width: calc(var(--container-width) * ({{ section.settings.circle_size | default: 100 }} / 100)) !important;
+        margin: 0 auto !important;
+      {% endif %}
+    }
+
+    @media screen and (max-width: 768px) {
+      #{{ section_id }} .featured-collections__container {
+        {% if section.settings.image_aspect_ratio == 'circle' %}
+          max-width: {{ section.settings.circle_size_mobile | default: 100 }}% !important;
+        {% endif %}
+        {% if section.settings.full_width_mobile %}
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          max-width: 100% !important;
+        {% endif %}
+      }
+      {% if section.settings.full_width_mobile %}
+      #{{ section_id }} .featured-collections__grid,
+      #{{ section_id }} .featured-collections__slider-wrapper {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+      {% endif %}
+    }
+
+    #{{ section_id }} .featured-collections__card {
+      width: 100% !important;
+    }
+    
+    #{{ section_id }} .featured-collections__image {
+      width: 100% !important;
+    }
+
+    /* Pagination Styles */
+    #{{ section_id }} .swiper-pagination {
+      position: relative !important;
+      margin-top: 10px !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+    }
+
+    #{{ section_id }} .swiper-pagination-bullet {
+      width: 10px !important;
+      height: 10px !important;
+      background: var(--color-pagination-bullet) !important;
+      opacity: 0.5 !important;
+      margin: 0 6px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    #{{ section_id }} .swiper-pagination-bullet-active {
+      background: var(--color-pagination-bullet-active) !important;
+      opacity: 1 !important;
+      transform: scale(1.2) !important;
+    }
+
+    #{{ section_id }} .swiper-pagination-progressbar {
+      background: var(--color-pagination-bullet) !important;
+      height: 4px !important;
+      position: relative !important;
+      margin: 10px auto 0 !important;
+      border-radius: 2px !important;
+    }
+
+    #{{ section_id }} .swiper-pagination-progressbar-fill {
+      background: var(--color-pagination-bullet-active) !important;
+    }
+
+    #{{ section_id }} .swiper-pagination-fraction {
+      color: var(--color-text) !important;
+      font-weight: 600 !important;
+      font-size: 16px !important;
+    }
+
+    @media screen and (max-width: 768px) {
+      #{{ section_id }} .swiper-pagination-fraction {
+        font-size: 14px !important;
+      }
+    }
+
+  {%- endstyle -%}
+  <div class="skeleton-visible">
+    {% if section.settings.heading != blank %}
+        <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 40px; width: 300px; margin: 0 auto 20px;"></div>
+    {% endif %}
+    <div style="display: grid; grid-template-columns: repeat(var(--grid-columns), 1fr); gap: var(--grid-gap);">
+      {% for i in (1..section.settings.columns_desktop) %}
+        <div>
+           <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: var(--image-aspect-ratio); border-radius: var(--image-border-radius); margin-bottom: 10px;"></div>
+           <div class="skeleton-box skeleton-shimmer skeleton-text short" style="margin: 0 auto;"></div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+    <div>
+        {% if section.settings.heading != blank %}
+          {% render 'heading-style-banner',
+            heading: section.settings.heading,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            wrapper_class: 'featured-collections',
+            color_desktop: section.settings.heading_color,
+            color_mobile: section.settings.heading_color_mobile,
+          %}
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="common-subheading featured-collections__subheading--{{ section.settings.heading_alignment }}">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+    </div>
+
+
+  {% liquid
+    assign desktop_layout = section.settings.layout | default: 'grid'
+    assign mobile_layout = section.settings.layout_mobile | default: desktop_layout
+  %}
+  
+  <!-- Grid Layout -->
+  <div class="featured-collections__container">
+    <div class="featured-collections__grid featured-collections__grid--desktop-{{ desktop_layout }} featured-collections__grid--mobile-{{ mobile_layout }}">
+        {% for block in section.blocks %}
+          {% liquid
+            assign collection_name = 'Collection'
+            if block.settings.url != blank and block.settings.url contains '/collections/'
+              assign url_parts = block.settings.url | split: '/collections/'
+              if url_parts.size > 1
+                assign collection_handle = url_parts[1] | split: '/' | first | split: '?' | first
+                assign collection_object = collections[collection_handle]
+                if collection_object != blank
+                  assign collection_name = collection_object.title
+                endif
+              endif
+            endif
+            if block.settings.title != blank
+              assign collection_name = block.settings.title
+            endif
+            assign show_block = true
+            if block.settings.url == blank and block.settings.image == blank
+              assign show_block = true
+            elsif block.settings.url == blank and block.settings.image != blank
+              assign show_block = true
+            elsif block.settings.url == blank
+              assign show_block = false
+            endif
+          %}
+          {% if show_block %}
+            {% assign collection_url = block.settings.url %}
+
+            {% if section.settings.jewellery_type != 'all'
+              and block.settings.url contains '/collections/' %}
+              {% assign collection_url = block.settings.url
+                | append: '?filter.p.m.custom.jewellery_type='
+                | append: section.settings.jewellery_type %}
+            {% endif %}
+
+            <a href="{% if collection_url != blank %}{{ collection_url }}{% else %}#{% endif %}" class="featured-collections__card">
+              <div class="featured-collections__image">
+                {% if block.settings.image %}
+                  {% render 'image',
+                    image: block.settings.image,
+                    width: 600,
+                    height: 600,
+                    crop: 'center'
+                  %}
+                {% else %}
+                  {{ 'collection-1' | placeholder_svg_tag: 'placeholder' }}
+                {% endif %}
+                {% if section.settings.title_position == 'on_card' %}
+                  <div class="featured-collections__title featured-collections__title--{{ section.settings.title_alignment }}">
+                    {{ collection_name }}
+                  </div>
+                {% endif %}
+              </div>
+              {% if section.settings.title_position == 'below_card' %}
+                <div class="featured-collections__title featured-collections__title--{{ section.settings.title_alignment }}">
+                  {{ collection_name }}
+                </div>
+              {% endif %}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  
+  <!-- Slider Layout -->
+  <div class="featured-collections__container">
+    {% liquid
+      assign slider_per_view = section.settings.slides_per_view | default: 6
+      assign space_between = section.settings.space_between | default: 30
+    %}
+    <div class="featured-collections__slider-wrapper featured-collections__slider-wrapper--desktop-{{ desktop_layout }} featured-collections__slider-wrapper--mobile-{{ mobile_layout }}">
+        <div class="swiper featured-collections-swiper  
+        featured-collections-swiper--arrow-desktop-{{ section.settings.arrow_visibility | default: 'hover' }}
+        featured-collections-swiper--arrow-mobile-{{ section.settings.arrow_visibility_mobile | default: 'hide' }}"
+          data-arrow-style="{{ section.settings.arrow_style | default: 'circle' }}"
+          data-slides-per-view="{{ slider_per_view }}" 
+          data-space-between="{{ space_between }}" 
+          data-slides-per-view-tablet="{{ section.settings.slides_per_view_tablet | default: 4 }}"
+          data-slides-per-view-mobile="{{ section.settings.slides_per_view_mobile | default: 2.2 }}"
+          data-space-between-mobile="{{ section.settings.space_between_mobile | default: 15 }}"
+          data-pagination-style="{{ section.settings.pagination_style | default: 'dots' }}">
+        <div class="swiper-wrapper">
+          {% for block in section.blocks %}
+            {% liquid
+              assign collection_name = 'Collection'
+              if block.settings.url != blank and block.settings.url contains '/collections/'
+                assign url_parts = block.settings.url | split: '/collections/'
+                if url_parts.size > 1
+                  assign collection_handle = url_parts[1] | split: '/' | first | split: '?' | first
+                  assign collection_object = collections[collection_handle]
+                  if collection_object != blank
+                    assign collection_name = collection_object.title
+                  endif
+                endif
+              endif
+              if block.settings.title != blank
+                assign collection_name = block.settings.title
+              endif
+              assign show_block = true
+              if block.settings.url == blank and block.settings.image == blank
+                assign show_block = true
+              elsif block.settings.url == blank and block.settings.image != blank
+                assign show_block = true
+              elsif block.settings.url == blank
+                assign show_block = false
+              endif
+            %}
+            {% if show_block %}
+              <div class="swiper-slide">
+                {% assign collection_url = block.settings.url %}
+
+                {% if section.settings.jewellery_type != 'all'
+                  and block.settings.url contains '/collections/' %}
+                  {% assign collection_url = block.settings.url
+                    | append: '?filter.p.m.custom.jewellery_type='
+                    | append: section.settings.jewellery_type %}
+                {% endif %}
+
+                <a href="{% if collection_url != blank %}{{ collection_url }}{% else %}#{% endif %}" class="featured-collections__card">
+                  <div class="featured-collections__image">
+                    {% if block.settings.image %}
+                      {% render 'image',
+                        image: block.settings.image,
+                        width: 600,
+                        height: 600,
+                        crop: 'center'
+                      %}
+                    {% else %}
+                      {{ 'collection-1' | placeholder_svg_tag: 'placeholder' }}
+                    {% endif %}
+                    {% if section.settings.title_position == 'on_card' %}
+                      <div class="featured-collections__title featured-collections__title--{{ section.settings.title_alignment }}">
+                        {{ collection_name }}
+                      </div>
+                    {% endif %}
+                  </div>
+                  {% if section.settings.title_position == 'below_card' %}
+                    <div class="featured-collections__title featured-collections__title--{{ section.settings.title_alignment }}">
+                      {{ collection_name }}
+                    </div>
+                  {% endif %}
+                </a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+          <button type="button" class="swiper-button-next" aria-label="Next">
+            {% render 'icon-slider-nav', direction: 'next' %}
+          </button>
+          <button type="button" class="swiper-button-prev" aria-label="Previous">
+            {% render 'icon-slider-nav', direction: 'prev' %}
+          </button>
+        {% if section.settings.pagination_visibility != 'hide' %}
+          <div class="swiper-pagination featured-collections-swiper--pagination-{{ section.settings.pagination_style | default: 'dots' }}"></div>
+        {% endif %}
+        </div>
+    </div>
+  </div>
+  </section>
+{% javascript %}
+  (function() {
+    let swiperInstance = null;
+    
+    function initializeSwiper() {
+      const swiperEls = document.querySelectorAll('.featured-collections-swiper');
+      
+      swiperEls.forEach(swiperEl => {
+        if (typeof Swiper === 'undefined') {
+          setTimeout(initializeSwiper, 100);
+          return;
+        }
+
+        // Destroy existing instance if it exists
+        if (swiperEl.swiper) {
+          swiperEl.swiper.destroy(true, true);
+        }
+
+      // Get settings from data attributes or defaults
+      const slidesPerView = parseFloat(swiperEl.dataset.slidesPerView) || 3;
+      const spaceBetween = parseInt(swiperEl.dataset.spaceBetween) || 30;
+      const slidesPerViewMobile = parseFloat(swiperEl.dataset.slidesPerViewMobile) || 2.2;
+      const slidesPerViewTablet = parseFloat(swiperEl.dataset.slidesPerViewTablet) || 4;
+      const spaceBetweenMobile = parseInt(swiperEl.dataset.spaceBetweenMobile) || 15;
+
+      try {
+        const paginationEl = swiperEl.querySelector('.swiper-pagination');
+        let paginationConfig = false;
+        
+        if (paginationEl) {
+          const paginationStyle = swiperEl.dataset.paginationStyle || 'dots';
+          paginationConfig = {
+            el: paginationEl,
+            clickable: true,
+          };
+          
+          if (paginationStyle === 'progressbar') {
+            paginationConfig.type = 'progressbar';
+          } else if (paginationStyle === 'fraction') {
+            paginationConfig.type = 'fraction';
+          } else {
+            paginationConfig.type = 'bullets';
+          }
+        }
+
+        const swiperConfig = {
+          slidesPerView: slidesPerViewMobile,
+          spaceBetween: spaceBetweenMobile,
+          centerInsufficientSlides: true,
+          navigation: {
+            nextEl: swiperEl.querySelector('.swiper-button-next'),
+            prevEl: swiperEl.querySelector('.swiper-button-prev'),
+          },
+          breakpoints: {
+            768: {
+              slidesPerView: slidesPerViewTablet,
+              spaceBetween: spaceBetween,
+            },
+            1025: {
+              slidesPerView: slidesPerView,
+              spaceBetween: spaceBetween,
+            },
+          },
+        };
+
+        if (paginationConfig) {
+          swiperConfig.pagination = paginationConfig;
+        }
+
+        swiperInstance = new Swiper(swiperEl, swiperConfig);
+      } catch (error) {
+      }
+      });
+    }
+
+    // Wait for DOM and Swiper library
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(initializeSwiper, 300);
+      });
+    } else {
+      setTimeout(initializeSwiper, 300);
+    }
+
+    // Re-initialize when theme editor updates
+    if (typeof window.Shopify !== 'undefined' && window.Shopify.designMode) {
+      document.addEventListener('shopify:section:load', function(event) {
+        if (event.detail.sectionId && document.querySelector('.featured-collections-swiper')) {
+          setTimeout(initializeSwiper, 100);
+        }
+      });
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Featured Collections",
+  "tag": "section",
+  "class": "featured-collections-section",
+  "settings": [
+     {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout Type",
+      "default": "grid",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "slider",
+          "label": "Slider"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "layout_mobile",
+      "label": "Layout Type (Mobile)",
+      "default": "grid",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "slider",
+          "label": "Slider"
+        }
+      ],
+      "info": "Choose the layout type for mobile devices"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width_mobile",
+      "label": "Full Width on Mobile",
+      "default": false,
+      "info": "Removes side padding on mobile for an edge-to-edge look"
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Collections"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        {
+          "value": "simple",
+          "label": "design 1"
+        },
+        {
+          "value": "line-top",
+          "label": "design 2"
+        },
+        {
+          "value": "underline",
+          "label": "design 3"
+        },
+        {
+          "value": "lines",
+          "label": "design 4"
+        },
+        {
+          "value": "diamond",
+          "label": "design 5"
+        },
+        {
+          "value": "ornament",
+          "label": "design 6"
+        },
+        {
+          "value": "x",
+          "label": "design 7"
+        }
+      ],
+      "info": "Choose the decorative style for the heading"
+    },
+    {
+      "type": "header",
+      "content": "Subheading Settings"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "header",
+      "content": "Collection text settings"
+    },
+    {
+      "type": "select",
+      "id": "title_position",
+      "label": "Title Position",
+      "default": "on_card",
+      "options": [
+        {
+          "value": "on_card",
+          "label": "On Card (Overlay)"
+        },
+        {
+          "value": "below_card",
+          "label": "Below Card"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Title Alignment",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "text",
+      "id": "section_padding",
+      "label": "Section Padding (Desktop)",
+      "default": "60px 0px 60px 0px"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_mobile",
+      "label": "Section Padding (Mobile)",
+      "default": "40px 0px 40px 0px"
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image Aspect Ratio",
+      "default": "1",
+      "options": [
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "circle",
+          "label": "Circle"
+        },
+        {
+          "value": "0.75",
+          "label": "Portrait"
+        }
+      ],
+      "info": "Choose the aspect ratio for collection images"
+    },
+    {
+      "type": "range",
+      "id": "circle_size",
+      "label": "Circle Size (Desktop)",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80,
+      "info": "Only applies when Circle aspect ratio is selected"
+    },
+    {
+      "type": "range",
+      "id": "circle_size_mobile",
+      "label": "Circle Size (Mobile)",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 90,
+      "info": "Only applies when Circle aspect ratio is selected"
+    },
+    {
+      "type": "header",
+      "content": "Grid Settings",
+      "info": "Settings for grid layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Collections per row (Desktop)",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Collections per row (Mobile)",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Column Gap (Desktop)",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_mobile",
+      "label": "Column Gap (Mobile)",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Slider Settings",
+      "info": "Settings for slider layout"
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view",
+      "label": "Slides per view (Desktop)",
+      "min": 1,
+      "max": 12,
+      "step": 0.5,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_tablet",
+      "label": "Slides per view (Tablet)",
+      "min": 1,
+      "max": 8,
+      "step": 0.5,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "space_between",
+      "label": "Space between slides",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_mobile",
+      "label": "Slides per view (Mobile)",
+      "min": 1,
+      "max": 6,
+      "step": 0.1,
+      "default": 2.2,
+      "info": "To make circles bigger, reduce this number (e.g. 2.5). To make them smaller, increase it (e.g. 5.5)."
+    },
+    {
+      "type": "range",
+      "id": "space_between_mobile",
+      "label": "Space between slides (Mobile)",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Pagination Settings"
+    },
+    {
+      "type": "select",
+      "id": "pagination_style",
+      "label": "Pagination Style",
+      "default": "dots",
+      "options": [
+        {
+          "value": "dots",
+          "label": "Style 1 (Dots)"
+        },
+        {
+          "value": "progressbar",
+          "label": "Style 2 (Progress Bar)"
+        },
+        {
+          "value": "fraction",
+          "label": "Style 3 (Numbers)"
+        }
+      ],
+      "info": "Choose the pagination style for the slider"
+    },
+    {
+      "type": "select",
+      "id": "pagination_visibility",
+      "label": "Pagination Visibility",
+      "default": "show",
+      "options": [
+        {
+          "value": "show",
+          "label": "Show"
+        },
+        {
+          "value": "hide",
+          "label": "Hide"
+        }
+      ],
+      "info": "Show or hide pagination"
+    },
+    {
+      "type": "header",
+      "content": "Arrow Settings"
+    },
+     {
+      "type": "select",
+      "id": "arrow_style",
+      "label": "Arrow Style",
+      "default": "circle",
+      "options": [
+        {
+          "value": "circle",
+          "label": "Style 1"
+        },
+        {
+          "value": "rounded-square",
+          "label": "Style 2"
+        },
+        {
+          "value": "square",
+          "label": "Style 3"
+        }
+      ],
+      "info": "Choose the style for navigation arrows"
+    },
+    {
+      "type": "select",
+      "id": "arrow_visibility",
+      "label": "Arrow Visibility",
+      "default": "hover",
+      "options": [
+        {
+          "value": "hover",
+          "label": "Show on Hover"
+        },
+        {
+          "value": "always",
+          "label": "Always Visible"
+        },
+        {
+          "value": "none",
+          "label": "None (Hide)"
+        }
+      ],
+      "info": "Choose when navigation arrows should be visible"
+    },
+    {
+      "type": "select",
+      "id": "arrow_visibility_mobile",
+      "label": "Arrow Visibility (Mobile)",
+      "default": "hide",
+      "options": [
+        {
+          "value": "show",
+          "label": "Show"
+        },
+        {
+          "value": "hide",
+          "label": "Hide"
+        }
+      ],
+      "info": "Show or hide arrows on mobile devices"
+    },
+    {
+      "type": "select",
+      "id": "jewellery_type",
+      "label": "Jewellery Type",
+      "options": [
+        {
+          "value": "all",
+          "label": "All"
+        },
+        {
+          "value": "Silver",
+          "label": "Silver"
+        },
+        {
+          "value": "Gold",
+          "label": "Gold"
+        }
+      ],
+      "default": "all"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "info": "If left blank and URL is a collection, the collection name will be used"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Featured Collections",
+      "category": "Collection",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

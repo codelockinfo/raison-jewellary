@@ -1,0 +1,452 @@
+{% liquid
+  assign section_id = section.settings.custom_id | default: section.id
+  assign section_class = 'store-locations-section'
+  assign layout_class = 'layout-' | append: section.settings.content_image_position | default: 'layout-image-left'
+%}
+
+<section
+  id="{{ section_id }}"
+  class="{{ section_class }} {{ layout_class }} color-{{ section.settings.color_scheme }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="store-locations-section__container container_width">
+    <!-- SKELETON LOADER -->
+    <div class="skeleton-visible">
+       {% render 'skeleton-loader', type: 'store-locations' %}
+    </div>
+
+    <div class="skeleton-container">
+
+      {% if section.settings.heading != blank or section.settings.sub_heading != blank %}
+        <div class="store-locations-section__heading-wrapper">
+          {% render 'heading-style-banner',
+            heading: section.settings.heading,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            wrapper_class: 'store-locations-section'
+          %}
+          {% if section.settings.sub_heading != blank %}
+            <p class="store-locations-section__sub-heading text-align-{{ section.settings.sub_heading_alignment | default: 'left' }}">
+              {{ section.settings.sub_heading }}
+            </p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.blocks.size > 0 %}
+        <div class="store-locations-section__wrapper">
+          <!-- Location Selector - Outside content blocks, positioned above right content -->
+          <div class="store-locations-section__selector-wrapper">
+            <div class="store-locations-section__selector">
+              {% for block in section.blocks %}
+                <button
+                  type="button"
+                  class="store-locations-section__location-btn {% if forloop.first %}active{% endif %}"
+                  data-location-id="{{ block.id }}"
+                  data-block-index="{{ forloop.index0 }}"
+                  aria-label="Select {{ block.settings.location_name }}"
+                >
+                  {{ block.settings.location_name | upcase }}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Store Details Content -->
+          <div class="store-locations-section__content-wrapper">
+            {% for block in section.blocks %}
+              <div
+                class="store-locations-section__store-content {% if forloop.first %}active{% endif %}"
+                data-location-content="{{ block.id }}"
+              >
+                <div class="store-locations-section__image">
+                  {% if block.settings.store_image %}
+                    {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+                    {% assign fetch_priority = 'low' %}
+                    {% if loading_strategy == 'eager' %}
+                      {% assign fetch_priority = 'high' %}
+                    {% endif %}
+                    {{
+                      block.settings.store_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        loading: loading_strategy,
+                        fetchpriority: fetch_priority,
+                        alt: block.settings.store_name,
+                        widths: '375, 550, 750, 1100, 1500'
+                    }}
+                  {% else %}
+                    <div class="store-locations-section__image-placeholder">
+                      {{ 'image' | placeholder_svg_tag: 'placeholder' }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="store-locations-section__details-wrapper">
+                  <div class="store-locations-section__details content-position-{{ section.settings.content_position | default: 'left' }}">
+                    {% if block.settings.store_name != blank %}
+                      <h3 class="store-locations-section__store-name">
+                        {{ block.settings.store_name | upcase }}
+                      </h3>
+                    {% endif %}
+
+                    {% if block.settings.address != blank %}
+                      <div class="store-locations-section__address">
+                        {{ block.settings.address }}
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.phone != blank %}
+                      <div class="store-locations-section__phone">
+                        {{ block.settings.phone }}
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.hours != blank %}
+                      <div class="store-locations-section__hours">
+                        {{ block.settings.hours }}
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.direction_url != blank %}
+                      <a
+                        href="{{ block.settings.direction_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="store-locations-section__direction-btn"
+                      >
+                        GET DIRECTION
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="https://www.w3.org/2000/svg">
+                          <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% style %}
+  #{{ section_id }} {
+    {% liquid
+      case section.settings.heading_tag
+        when 'h1'
+          assign h_px = settings.h1_font_size | default: 42
+        when 'h2'
+          assign h_px = settings.h2_font_size | default: 38
+        when 'h3'
+          assign h_px = settings.type_header_base_size | default: 32
+        when 'h4'
+          assign h_px = settings.h4_font_size | default: 28
+        when 'h5'
+          assign h_px = settings.h5_font_size | default: 24
+        when 'h6'
+          assign h_px = settings.h6_font_size | default: 20
+        else
+          assign h_px = settings.h2_font_size | default: 38
+      endcase
+    %}
+    --heading-font-size-desktop: {{ h_px }}px;
+    --section-padding: {{ section.settings.padding_desktop }};
+  }
+  @media (max-width: 768px) {
+    #{{ section_id }} {
+      --section-padding: {{ section.settings.padding_mobile }};
+    }
+  }
+{% endstyle %}
+
+{{ 'store-locations.css' | asset_url | stylesheet_tag }}
+{% schema %}
+{
+  "name": "Store Locations",
+  "tag": "section",
+  "class": "store-locations-section",
+  "settings": [
+    {
+      "type": "color_scheme", 
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Our Store Locations"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        {
+          "value": "simple",
+          "label": "design 1"
+        },
+        {
+          "value": "underline",
+          "label": "design 2"
+        },
+        {
+          "value": "lines",
+          "label": "design 3"
+        },
+        {
+          "value": "line-top",
+          "label": "design 4"
+        },
+        {
+          "value": "diamond",
+          "label": "design 5"
+        },
+        {
+          "value": "ornament",
+          "label": "design 6"
+        },
+        {
+          "value": "x",
+          "label": "design 7"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Heading Style"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "header",
+      "content": "Sub Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "sub_heading",
+      "label": "Sub Heading"
+    },
+    {
+      "type": "select",
+      "id": "sub_heading_alignment",
+      "label": "Sub Heading Alignment",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "select",
+      "id": "content_image_position",
+      "label": "Content and Image Position",
+      "default": "image-left",
+      "options": [
+        {
+          "value": "image-left",
+          "label": "Image Left / Content Right"
+        },
+        {
+          "value": "image-right",
+          "label": "Image Right / Content Left"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content Position",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "info": "Position of content block alignment"
+    },
+        {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Section Padding (Desktop)",
+      "default": "60px 0px 60px 0px",
+      "info": "Values: top right bottom left (e.g., 60px 20px 60px 20px)"
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Section Padding (Mobile)",
+      "default": "40px 0px 40px 0px",
+      "info": "Values: top right bottom left (e.g., 40px 15px 40px 15px)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "store_location",
+      "name": "Store Location",
+      "settings": [
+        {
+          "type": "text",
+          "id": "location_name",
+          "label": "Location Name",
+          "default": "London",
+          "info": "This appears in the location selector buttons"
+        },
+        {
+          "type": "text",
+          "id": "store_name",
+          "label": "Store Name",
+          "default": "London Store"
+        },
+        {
+          "type": "textarea",
+          "id": "address",
+          "label": "Address",
+          "default": "123 Store Street, London, UK"
+        },
+        {
+          "type": "text",
+          "id": "phone",
+          "label": "Phone Number",
+          "default": "(+44) 20 1234 5678"
+        },
+        {
+          "type": "textarea",
+          "id": "hours",
+          "label": "Opening Hours",
+          "default": "Monday-Thursday: 10am-6pm\nFriday-Sunday: 11am-5pm",
+          "info": "Each line will be displayed as a separate line"
+        },
+        {
+          "type": "url",
+          "id": "direction_url",
+          "label": "Get Direction URL",
+          "info": "Google Maps or other map service URL"
+        },
+        {
+          "type": "image_picker",
+          "id": "store_image",
+          "label": "Store Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Store Locations",
+          "category": "Store Information",
+      "blocks": [
+        {
+          "type": "store_location",
+          "settings": {
+            "location_name": "London",
+            "store_name": "London Store",
+            "address": "123 Store Street, London, UK",
+            "phone": "(+44) 20 1234 5678",
+            "hours": "Monday-Thursday: 10am-6pm\nFriday-Sunday: 11am-5pm"
+          }
+        },
+        {
+          "type": "store_location",
+          "settings": {
+            "location_name": "New York",
+            "store_name": "New York Store",
+            "address": "94A Spring Street, SoHo, New York, NY 10012, United States",
+            "phone": "(+1) 2125 5501 94",
+            "hours": "Monday-Thursday: 10am-6pm\nFriday-Sunday: 11am-5pm"
+          }
+        },
+        {
+          "type": "store_location",
+          "settings": {
+            "location_name": "Paris",
+            "store_name": "Paris Store",
+            "address": "456 Rue de la Mode, Paris, France",
+            "phone": "(+33) 1 23 45 67 89",
+            "hours": "Monday-Thursday: 10am-6pm\nFriday-Sunday: 11am-5pm"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

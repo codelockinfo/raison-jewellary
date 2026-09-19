@@ -1,0 +1,209 @@
+<div class="marquee-section color-{{ section.settings.color_scheme }} skeleton-container"
+  style="
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --margin-top: {{ section.settings.margin_top }}px;
+    --margin-bottom: {{ section.settings.margin_bottom }}px;
+    --margin-top-mobile: {{ section.settings.margin_top_mobile }}px;
+    --margin-bottom-mobile: {{ section.settings.margin_bottom_mobile }}px;
+    --marquee-speed-desktop: {{ section.settings.speed }}s;
+    --marquee-speed-mobile: {{ section.settings.speed_mobile }}s;
+    --marquee-gap-desktop: {{ section.settings.gap_desktop }}px;
+    --marquee-gap-mobile: {{ section.settings.gap_mobile }}px;
+    --marquee-img-height-desktop: {{ section.settings.image_height_desktop }}px;
+    --marquee-img-height-mobile: {{ section.settings.image_height_mobile }}px;
+  "
+>
+  <div class="skeleton-visible">
+    <div class="marquee-container">
+       <div style="display: flex; gap: var(--marquee-gap-desktop); overflow: hidden; padding: 20px 0;">
+         {% for i in (1..6) %}
+            <div class="skeleton-box skeleton-shimmer" style="width: 150px; height: var(--marquee-img-height-desktop); border-radius: 4px; flex-shrink: 0;"></div>
+         {% endfor %}
+       </div>
+    </div>
+  </div>
+  <div class="marquee-container">
+    <div class="marquee-wrapper {% if section.settings.pause_on_hover %}pause-on-hover{% endif %}">
+      
+      <!-- Track 1: Original Content -->
+      <div class="marquee-track">
+        {% for block in section.blocks %}
+          <div class="marquee-item" {{ block.shopify_attributes }}>
+            {% if block.type == 'image' %}
+              {% assign marquee_link = block.settings.link %}
+
+              {% if section.settings.jewellery_type != 'all'
+                and block.settings.link contains '/collections/' %}
+                {% assign marquee_link = block.settings.link
+                  | append: '?filter.p.m.custom.jewellery_type='
+                  | append: section.settings.jewellery_type %}
+              {% endif %}
+
+              {% if block.settings.link != blank %}
+                <a href="{{ marquee_link }}">
+              {% endif %}
+              
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: height: 400 | image_tag: loading: 'eager', alt: block.settings.image.alt, width: block.settings.image.width, height: block.settings.image.height }}
+              {% else %}
+                <div class="marquee-placeholder">
+                  {{ 'logo' | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+              {% endif %}
+              
+              {% if block.settings.link != blank %}</a>{% endif %}
+              
+            {% elsif block.type == 'text' %}
+              {% assign marquee_link = block.settings.link %}
+
+              {% if section.settings.jewellery_type != 'all' and block.settings.link contains '/collections/' %}
+                {% assign marquee_link = block.settings.link | append: '?filter.p.m.custom.jewellery_type=' | append: section.settings.jewellery_type %}
+              {% endif %}
+
+              {% if block.settings.link != blank %}
+                <a href="{{ marquee_link }}" class="common-text">
+              {% else %}
+                <span class="common-text">
+              {% endif %}
+                {{ block.settings.text }}
+              {% if block.settings.link != blank %}</a>{% else %}</span>{% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Track 2: Duplicate for Loop -->
+      <div class="marquee-track" aria-hidden="true">
+        {% for block in section.blocks %}
+          <div class="marquee-item">
+            {% if block.type == 'image' %}
+              {% assign marquee_link = block.settings.link %}
+
+              {% if section.settings.jewellery_type != 'all' and block.settings.link contains '/collections/' %}
+                {% assign marquee_link = block.settings.link | append: '?filter.p.m.custom.jewellery_type=' | append: section.settings.jewellery_type %}
+              {% endif %}
+
+              {% if block.settings.link != blank %}
+                <a href="{{ marquee_link }}">
+              {% endif %}
+              
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: height: 400 | image_tag: loading: 'lazy', alt: block.settings.image.alt, width: block.settings.image.width, height: block.settings.image.height }}
+              {% else %}
+                 {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+              
+              {% if block.settings.link != blank %}</a>{% endif %}
+              
+            {% elsif block.type == 'text' %}
+              {% if block.settings.link != blank %}<a href="{{ block.settings.link }}" class="common-text">{% else %}<span class="common-text">{% endif %}
+                {{ block.settings.text }}
+              {% if block.settings.link != blank %}</a>{% else %}</span>{% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>   
+</div>
+{% schema %}
+{
+  "name": "Marquee Slider (Custom)",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+
+    { "type": "range", "id": "speed", "label": "Speed (Desktop)", "min": 5, "max": 60, "step": 1, "default": 20 },
+    { "type": "range", "id": "speed_mobile", "label": "Speed (Mobile)", "min": 5, "max": 60, "step": 1, "default": 15 },
+
+    { "type": "range", "id": "gap_desktop", "label": "Gap (Desktop)", "min": 0, "max": 200, "step": 5, "default": 60 },
+    { "type": "range", "id": "gap_mobile", "label": "Gap (Mobile)", "min": 0, "max": 100, "step": 5, "default": 30 },
+
+    { "type": "checkbox", "id": "pause_on_hover", "label": "Pause on Hover", "default": true },
+
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    { "type": "range", "id": "image_height_desktop", "label": "Image Height (Desktop)", "min": 20, "max": 200, "step": 5, "default": 60 },
+    { "type": "range", "id": "image_height_mobile", "label": "Image Height (Mobile)", "min": 20, "max": 150, "step": 5, "default": 40 },
+    
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    { "type": "range", "id": "padding_top", "label": "Padding Top (Desktop)", "min": 0, "max": 100, "step": 2, "default": 20 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding Bottom (Desktop)", "min": 0, "max": 100, "step": 2, "default": 20 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding Top (Mobile)", "min": 0, "max": 60, "step": 2, "default": 10 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding Bottom (Mobile)", "min": 0, "max": 60, "step": 2, "default": 10 },
+
+    {
+      "type": "header",
+      "content": "Margin"
+    },
+    { "type": "range", "id": "margin_top", "label": "Margin Top (Desktop)", "min": 0, "max": 200, "step": 5, "default": 40 },
+    { "type": "range", "id": "margin_bottom", "label": "Margin Bottom (Desktop)", "min": 0, "max": 200, "step": 5, "default": 40 },
+    { "type": "range", "id": "margin_top_mobile", "label": "Margin Top (Mobile)", "min": 0, "max": 120, "step": 5, "default": 20 },
+    { "type": "range", "id": "margin_bottom_mobile", "label": "Margin Bottom (Mobile)", "min": 0, "max": 120, "step": 5, "default": 20 },
+    {
+      "type": "select",
+      "id": "jewellery_type",
+      "label": "Jewellery Type",
+      "options": [
+        {
+          "value": "all",
+          "label": "All"
+        },
+        {
+          "value": "Silver",
+          "label": "Silver"
+        },
+        {
+          "value": "Gold",
+          "label": "Gold"
+        }
+      ],
+      "default": "all"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Welcome to our store" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Slider (Custom)",
+      "blocks": [
+        { "type": "text" },
+        { "type": "image" },
+        { "type": "text" }
+      ]
+    }
+  ]
+}
+{% endschema %}

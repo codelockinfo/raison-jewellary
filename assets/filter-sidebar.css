@@ -1,0 +1,533 @@
+.collection-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--header-height, 130px) + 20px);
+    align-self: flex-start;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    padding-right: 10px;
+    z-index: 10;
+    margin-right: 40px;
+}
+
+.collection-sidebar::-webkit-scrollbar,
+.filter-form::-webkit-scrollbar,
+.filter-drawer::-webkit-scrollbar {
+    width: 4px;
+}
+
+.collection-sidebar::-webkit-scrollbar-thumb,
+.filter-form::-webkit-scrollbar-thumb,
+.filter-drawer::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 4px;
+}
+
+.collection-sidebar::-webkit-scrollbar-track,
+.filter-form::-webkit-scrollbar-track,
+.filter-drawer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.collection-sidebar .sidebar-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    position: sticky;
+    top: 0;
+    background: #FEFEFE;
+    z-index: 20;
+}
+
+
+.filter-content {
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.filter-group.active .filter-content {
+    display: block;
+}
+
+.filter-group:not(.active) .filter-content {
+    display: none;
+}
+
+.filter-title {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filter-title svg {
+    transition: transform 0.3s ease;
+}
+
+.filter-group.active .filter-title svg {
+    transform: rotate(180deg);
+}
+
+.filter-content {
+    display: block;
+    overflow-y: auto;
+}
+
+.filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.filter-item {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #555;
+    cursor: pointer;
+}
+
+.filter-item input[type="checkbox"] {
+    margin-right: 10px;
+    accent-color: #000;
+}
+
+.filter-item label {
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+.filter-count {
+    color: #999;
+}
+
+.color-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.color-swatch {
+    display: inline-block;
+    vertical-align: middle;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.color-swatch:hover {
+    transform: scale(1);
+    border-color: #000;
+}
+
+.color-swatch.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: #FEFEFE;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.price-inputs span {
+    font-size: 14px;
+}
+
+.price-input {
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    padding: 8px 10px;
+}
+
+.price-apply {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 14px;
+    padding: 8px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+}
+
+.price-apply:hover {
+    background: #e0e0e0;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+.active-filters-label {
+    font-weight: 500;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.active-filter-tag {
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+    gap: 8px;
+    background: #f5f5f5;
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.active-filter-tag:hover {
+    background: #e0e0e0;
+}
+
+.clear-all-filters {
+    text-decoration: underline;
+    color: #000;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+.filter-drawer-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.filter-drawer-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.filter-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    background: #FEFEFE;
+    z-index: 1000;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-drawer.active {
+    transform: translateX(0);
+}
+
+.filter-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    background: #FEFEFE;
+    z-index: 10;
+}
+
+.filter-drawer-title {
+    font-weight: 600;
+    margin: 0;
+}
+
+.filter-drawer-close {
+    border: none !important;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-drawer-close:hover {
+    background: #000;
+    color: #FEFEFE;
+}
+
+.filter-drawer-close svg {
+    width: 28px;
+    height: 28px;
+}
+
+.filter-drawer-content {
+    padding: 20px;
+}
+
+@media (max-width: 991px) {
+    .collection-sidebar {
+        display: none !important;
+    }
+
+    .toolbar-options {
+        display: none !important;
+    }
+
+    .collection-toolbar {
+        border-bottom: none !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .filter-drawer {
+        display: none !important;
+        /* Hide fixed drawer on desktop */
+    }
+
+    .collection-sidebar.is-drawer-mode {
+        width: 0;
+        opacity: 0;
+        visibility: hidden;
+        margin-right: 0;
+        overflow: hidden;
+        /* Only horizontal overflow needs hiding for transition initially */
+        transition: width 0.3s ease, margin-right 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
+        padding: 0;
+        background: #FEFEFE;
+        /* Sticky positioning setup for the sidebar itself */
+        position: sticky;
+        top: calc(var(--header-height, 130px) + 20px);
+        height: calc(100vh - 130px);
+        /* Flex layout to manage button vs form scrolling */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .collection-sidebar.is-drawer-mode.active {
+        width: 330px;
+        opacity: 1;
+        visibility: visible;
+        margin-right: 40px;
+    }
+
+    /* Hide the redundant 'FILTERS' title inside the sidebar when in drawer mode */
+    .collection-sidebar.is-drawer-mode h3 {
+        display: none;
+    }
+
+    /* Make the filter form the scrollable area */
+    .filter-form {
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
+        padding: 0 10px 0 20px;
+        position: static;
+        height: auto;
+    }
+
+    /* Sidebar Filter Button Styling */
+    .sidebar-header-btn-wrapper {
+        display: block;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        width: 100%;
+        background: #FEFEFE;
+        z-index: 100;
+        padding-top: 10px;
+        border-bottom: 1px solid #eee;
+        flex-shrink: 0;
+    }
+
+    .desktop-filter-btn {
+        display: inline-flex;
+        font-size: 16px;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sidebar-header-btn-wrapper .desktop-filter-btn {
+        width: 100%;
+        justify-content: flex-start;
+        border: none !important;
+        padding-left: 0;
+        background: transparent;
+    }
+
+    .sidebar-header-btn-wrapper .desktop-filter-btn:hover {
+        background: transparent;
+    }
+}
+
+/* Hide main toolbar button when sidebar is active to simulate 'move' */
+body.sidebar-open .collection-page-header.is-drawer .desktop-filter-btn {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+}
+
+/* =========================================Global Toolbar & Sort Styles (Moved from Collection)========================================= */
+.collection-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.collection-title,
+.search-title {
+    font-weight: 600;
+    margin: 0;
+}
+
+.toolbar-options {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.toolbar-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+}
+
+.toolbar-select {
+    padding: 8px 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    background: #FEFEFE;
+    outline: none;
+    cursor: pointer;
+}
+
+.mobile-toolbar-buttons {
+    display: none;
+}
+
+.mobile-filter-btn,
+.mobile-sort-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #FEFEFE;
+    border: 1px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    flex: 1;
+    font-size: 14px;
+}
+
+.mobile-filter-btn:hover,
+.mobile-sort-btn:hover {
+    background: #f5f5f5;
+}
+
+.mobile-filter-btn svg,
+.mobile-sort-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.mobile-filter-btn .arrow,
+.mobile-sort-btn .arrow {
+    margin-left: auto;
+}
+
+.mobile-sort-dropdown {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    background: #FEFEFE;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transition: bottom 0.3s ease;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.mobile-sort-dropdown.active {
+    bottom: 0;
+}
+
+.mobile-sort-header {
+    padding: 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.mobile-sort-options {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.mobile-sort-option {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px !important;
+}
+
+.mobile-sort-option:hover {
+    background: #f9f9f9;
+}
+
+.mobile-sort-option.active {
+    background: #f0f0f0;
+    font-weight: 700;
+}
+
+@media (max-width: 991px) {
+    .collection-toolbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mobile-toolbar-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+    }
+}

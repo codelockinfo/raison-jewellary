@@ -1,0 +1,86 @@
+{% comment %}
+  Renders a review card.
+  Accepts:
+  - block: {Object} The block object containing review settings.
+  - section: {Object} The section object containing layout settings.
+{% endcomment %}
+
+<div class="review-card">
+  <div class="review-card__media">
+    {%- if block.settings.media_type == 'video' and block.settings.video != blank -%}
+      {{ block.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false, image_size: '600x' }}
+    {%- elsif block.settings.image != blank -%}
+      <img
+        src="{{ block.settings.image | image_url: width: 600 }}"
+        alt="{{ block.settings.image.alt | default: block.settings.author_name | escape }}"
+        loading="{{ section.settings.lazy_load | default: 'lazy' }}"
+        {% if section.settings.lazy_load == 'eager' %}fetchpriority="high"{% else %}fetchpriority="low"{% endif %}
+        width="600"
+        height="600"
+      >
+    {%- else -%}
+      {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+
+  <div class="review-card__content">
+    <div class="review-card__rating">
+      {%- for i in (1..5) -%}
+        {%- if i <= block.settings.rating -%}
+          <svg width="14" height="14" fill="none" class="rate-color">
+            <use href="#icon-rate"></use>
+          </svg>
+        {%- else -%}
+          <svg width="14" height="14" fill="none" style="opacity: 0.3; color: var(--star-color);">
+            <use href="#icon-rate"></use>
+          </svg>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="review-card__author">
+      {{ block.settings.author_name }}
+      {%- if block.settings.verified -%}
+        <span class="review-card__verified">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg">
+            <path d="M6 0L7.34708 4.1459H11.7063L8.17963 6.7082L9.52671 10.8541L6 8.2918L2.47329 10.8541L3.82037 6.7082L0.293661 4.1459H4.65292L6 0Z" fill="currentColor"/>
+          </svg>
+          Verified Buyer
+        </span>
+      {%- endif -%}
+    </div>
+
+    <div class="review-card__text">
+      {{ block.settings.text }}
+    </div>
+
+    {%- if block.settings.product != blank -%}
+      {%- assign product = block.settings.product -%}
+      <a href="{{ product.url }}" class="review-card__product">
+        {%- if product.featured_image != blank -%}
+           <img class="review-card__product-image" src="{{ product.featured_image | image_url: width: 100 }}" alt="{{ product.title }}" width="50" height="50" loading="{{ section.settings.lazy_load | default: 'lazy' }}" {% if section.settings.lazy_load == 'eager' %}fetchpriority="high"{% else %}fetchpriority="low"{% endif %}>
+        {%- endif -%}
+        <div class="review-card__product-info">
+          <span class="review-card__product-title">{{ product.title }}</span>
+          <span class="review-card__product-price">
+            {%- liquid
+              if settings.currency_code_enabled
+                assign money_price = product.price | money_with_currency
+              else
+                assign money_price = product.price | money
+              endif
+            -%}
+            {%- liquid
+              if cart.currency.iso_code == 'EUR'
+                assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+              elsif cart.currency.iso_code == 'INR'
+                assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              endif
+            -%}
+            {{ money_price }}
+          </span>
+        </div>
+      </a>
+    {%- endif -%}
+  </div>
+</div>

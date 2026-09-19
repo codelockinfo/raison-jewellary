@@ -1,0 +1,475 @@
+{% comment %}
+  Renders a product popup modal with product details and action buttons
+
+  @param {product} product - The product object to display
+{% endcomment %}
+
+{% liquid
+  assign has_video = false
+  assign product_video = null
+  assign product_image = product.featured_image
+  
+  for media in product.media
+    if media.media_type == 'video'
+      assign has_video = true
+      assign product_video = media
+      break
+    endif
+  endfor
+
+  assign rating = product.metafields.reviews.rating.value
+  assign reviews_count = product.metafields.reviews.rating_count.value
+  assign rating_value = rating | default: 0 | times: 1.0 | round
+  assign reviews_count_value = reviews_count | default: 2
+%}
+
+{% comment %} Desktop Popup (unchanged) {% endcomment %}
+<div class="product-popup product-popup--desktop" id="product-popup-{{ product.id }}" data-product-id="{{ product.id }}" role="dialog" aria-modal="true" aria-labelledby="product-popup-title-{{ product.id }}">
+  <div class="product-popup__overlay" data-popup-close></div>
+  
+  <div class="product-popup__content">
+    <button class="product-popup__close" data-popup-close aria-label="Close popup">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="product-popup__inner">
+      {% comment %} Left side: Product Video {% endcomment %}
+      <div class="product-popup__video-section">
+        {% if has_video and product_video %}
+          <div class="product-popup__video-wrapper">
+            {{ product_video | video_tag: 
+              image_size: '800x800',
+              autoplay: true,
+              loop: true,
+              controls: true,
+              muted: true,
+              playsinline: true,
+              class: 'product-popup__video'
+            }}
+          </div>
+        {% elsif product_image %}
+          <div class="product-popup__video-wrapper">
+            <img 
+              src="{{ product_image | image_url: width: 800 }}"
+              srcset="{{ product_image | image_url: width: 400 }} 400w,
+                      {{ product_image | image_url: width: 800 }} 800w,
+                      {{ product_image | image_url: width: 1200 }} 1200w"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              alt="{{ product_image.alt | escape }}"
+              class="product-popup__video-image"
+              loading="lazy"
+              width="{{ product_image.width }}"
+              height="{{ product_image.height }}"
+            >
+          </div>
+        {% else %}
+          <div class="product-popup__video-wrapper product-popup__video-wrapper--placeholder">
+            {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+          </div>
+        {% endif %}
+      </div>
+
+      {% comment %} Right side: White background with product details {% endcomment %}
+      <div class="product-popup__details-section">
+        {% comment %} Scrollable content: Images, Title, Reviews {% endcomment %}
+        <div class="product-popup__scrollable-content">
+          <div class="product-popup__content-wrapper">
+            {% comment %} Top: Product Images {% endcomment %}
+            {% if product.images.size > 0 %}
+              <div class="product-popup__images">
+                {% for image in product.images limit: 2 %}
+                  <div class="product-popup__image-wrapper">
+                    <img 
+                      src="{{ image | image_url: width: 300 }}"
+                      srcset="{{ image | image_url: width: 150 }} 150w,
+                              {{ image | image_url: width: 300 }} 300w,
+                              {{ image | image_url: width: 450 }} 450w"
+                      sizes="(max-width: 768px) 50vw, 150px"
+                      alt="{{ image.alt | escape }}"
+                      class="product-popup__image"
+                      loading="lazy"
+                      width="{{ image.width }}"
+                      height="{{ image.height }}"
+                    >
+                  </div>
+                {% endfor %}
+                {% comment %} If only one image, duplicate it {% endcomment %}
+                {% if product.images.size == 1 %}
+                  <div class="product-popup__image-wrapper">
+                    <img 
+                      src="{{ product.images.first | image_url: width: 300 }}"
+                      srcset="{{ product.images.first | image_url: width: 150 }} 150w,
+                              {{ product.images.first | image_url: width: 300 }} 300w,
+                              {{ product.images.first | image_url: width: 450 }} 450w"
+                      sizes="(max-width: 768px) 50vw, 150px"
+                      alt="{{ product.images.first.alt | escape }}"
+                      class="product-popup__image"
+                      loading="lazy"
+                      width="{{ product.images.first.width }}"
+                      height="{{ product.images.first.height }}"
+                    >
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            {% comment %} Title and Rating {% endcomment %}
+            <div class="product-popup__details">
+              <h2 class="product-popup__title" id="product-popup-title-{{ product.id }}">
+                {{ product.title | escape }}
+              </h2>
+
+              {% if rating != blank or reviews_count != blank %}
+                <div class="product-popup__rating">
+                  <div class="product-popup__stars">
+                    {% for i in (1..5) %}
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="https://www.w3.org/2000/svg">
+                        <path d="M10 1L12.09 7.26L19 8.27L14 12.14L15.18 19.02L10 15.77L4.82 19.02L6 12.14L1 8.27L7.91 7.26L10 1Z" 
+                          fill="{% if i <= rating_value %}#FFD700{% else %}#E0E0E0{% endif %}" 
+                          stroke="{% if i <= rating_value %}#FFD700{% else %}#E0E0E0{% endif %}" 
+                          stroke-width="1"/>
+                      </svg>
+                    {% endfor %}
+                  </div>
+                  <span class="product-popup__reviews-count">{{ reviews_count_value }} reviews</span>
+                </div>
+              {% else %}
+                {% comment %} Default rating display if no metafields {% endcomment %}
+                <div class="product-popup__rating">
+                  <div class="product-popup__stars">
+                    {% for i in (1..5) %}
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="https://www.w3.org/2000/svg">
+                        <path d="M10 1L12.09 7.26L19 8.27L14 12.14L15.18 19.02L10 15.77L4.82 19.02L6 12.14L1 8.27L7.91 7.26L10 1Z" 
+                          fill="#FFD700" 
+                          stroke="#FFD700" 
+                          stroke-width="1"/>
+                      </svg>
+                    {% endfor %}
+                  </div>
+                  <span class="product-popup__reviews-count">2 reviews</span>
+                </div>
+              {% endif %}
+            </div>
+
+             {% comment %} Price {% endcomment %}
+          <div class="product-popup__price product-popup__price--desktop">
+            {%- liquid
+              if settings.currency_code_enabled
+                assign money_price = product.price | money_with_currency
+                assign money_compare = product.compare_at_price | money_with_currency
+              else
+                assign money_price = product.price | money
+                assign money_compare = product.compare_at_price | money
+              endif
+              
+              if cart.currency.iso_code == 'EUR'
+                assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                assign money_compare = money_compare | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+              elsif cart.currency.iso_code == 'INR'
+                assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                assign money_compare = money_compare | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              endif
+            -%}
+            {% if product.compare_at_price > product.price %}
+              <span class="product-popup__price--sale">
+                {{ money_price }}
+              </span>
+              <span class="product-popup__price--compare">
+                {{ money_compare }}
+              </span>
+            {% else %}
+              <span>
+                {{ money_price }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% comment %} Description {% endcomment %}
+          {% if product.description != blank %}
+            <div class="product-popup__description product-popup__description--desktop">
+              {{ product.description | strip_html | truncate: 150 }}
+            </div>
+          {% endif %}
+
+          {% comment %} View Details Button {% endcomment %}
+          <a href="{{ product.url }}" class="product-popup__view-details-btn product-popup__view-details-btn--desktop" data-view-details>
+            View details >>
+          </a>
+          </div>
+        </div>
+
+        {% comment %} Sticky bottom section: Price, Description, View Details, Actions {% endcomment %}
+        <div class="product-popup__sticky-bottom">
+         
+
+          {% comment %} Actions section - Always at bottom {% endcomment %}
+          <div class="product-popup__actions">
+            {% render 'add-to-cart-button', product: product %}
+            
+            <div class="product-popup__action-icons">
+              {% render 'wishlist-button', product: product %}
+              {% render 'compare-button', product: product %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} Mobile First Popup (Video, Name, Price, Shop Now) {% endcomment %}
+<div class="product-popup product-popup--mobile product-popup--mobile-first" id="product-popup-mobile-first-{{ product.id }}" data-product-id="{{ product.id }}" role="dialog" aria-modal="true" aria-labelledby="product-popup-mobile-first-title-{{ product.id }}">
+  <div class="product-popup__overlay" data-popup-close></div>
+  
+  <div class="product-popup__content product-popup__content--mobile-first">
+    <button class="product-popup__close" data-popup-close aria-label="Close popup">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="product-popup__inner product-popup__inner--mobile-first">
+      {% comment %} Video Section {% endcomment %}
+      {% if has_video and product_video %}
+        <div class="product-popup__video-section product-popup__video-section--mobile-first">
+          <div class="product-popup__video-wrapper">
+            {{ product_video | video_tag: 
+              image_size: '800x800',
+              autoplay: true,
+              loop: true,
+              controls: true,
+              muted: true,
+              playsinline: true,
+              class: 'product-popup__video'
+            }}
+          </div>
+        </div>
+      {% endif %}
+
+     
+
+      {% comment %} Product Info Section {% endcomment %}
+      <div class="product-popup__mobile-first-info">
+       {% comment %} Product Image Section {% endcomment %}
+      {% if product_image %}
+        <div class="product-popup__image-section product-popup__image-section--mobile-first">
+          <div class="product-popup__image-wrapper--mobile-first">
+            <img 
+              src="{{ product_image | image_url: width: 800 }}"
+              srcset="{{ product_image | image_url: width: 400 }} 400w,
+                      {{ product_image | image_url: width: 800 }} 800w,
+                      {{ product_image | image_url: width: 1200 }} 1200w"
+              sizes="100vw"
+              alt="{{ product_image.alt | escape }}"
+              class="product-popup__image--mobile-first"
+              loading="lazy"
+              width="{{ product_image.width }}"
+              height="{{ product_image.height }}"
+            >
+          </div>
+        </div>
+      {% elsif has_video == false %}
+        <div class="product-popup__image-section product-popup__image-section--mobile-first">
+          <div class="product-popup__image-wrapper--mobile-first product-popup__image-wrapper--placeholder">
+            {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+          </div>
+        </div>
+      {% endif %}
+       <div class="product-image-with-details">
+        <h2 class="product-popup__mobile-first-title" id="product-popup-mobile-first-title-{{ product.id }}">
+          {{ product.title | escape }}
+        </h2>
+        <div class="product-popup__mobile-first-price">
+          {%- liquid
+            if settings.currency_code_enabled
+              assign money_price = product.price | money_with_currency
+              assign money_compare = product.compare_at_price | money_with_currency
+            else
+              assign money_price = product.price | money
+              assign money_compare = product.compare_at_price | money
+            endif
+            
+            if cart.currency.iso_code == 'EUR'
+              assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+              assign money_compare = money_compare | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+            elsif cart.currency.iso_code == 'INR'
+              assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              assign money_compare = money_compare | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+            endif
+          -%}
+          {% if product.compare_at_price > product.price %}
+            <span class="product-popup__mobile-first-price--sale">
+              {{ money_price }}
+            </span>
+            <span class="product-popup__mobile-first-price--compare">
+              {{ money_compare }}
+            </span>
+          {% else %}
+            <span>
+              {{ money_price }}
+            </span>
+          {% endif %}
+        </div>
+       </div>
+
+       <div class="product-popup__mobile-first-actions">
+        <button class="product-popup__shop-now-btn" aria-label="Shop" data-shop-now data-product-id="{{ product.id }}">
+          Shop
+        </button>
+       
+
+       
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} Mobile Nested Popup (Images, Title, Reviews, Price, Description, View Details, Actions) {% endcomment %}
+<div class="product-popup product-popup--mobile product-popup--mobile-nested" id="product-popup-mobile-nested-{{ product.id }}" data-product-id="{{ product.id }}" role="dialog" aria-modal="true" aria-labelledby="product-popup-mobile-nested-title-{{ product.id }}">
+  <div class="product-popup__overlay" data-popup-close></div>
+  
+  <div class="product-popup__content product-popup__content--mobile-nested">
+    <button class="product-popup__close" data-popup-close aria-label="Close popup">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="product-popup__inner product-popup__inner--mobile-nested">
+      {% comment %} Product Images {% endcomment %}
+      {% if product.images.size > 0 %}
+        <div class="product-popup__images product-popup__images--mobile-nested">
+          {% for image in product.images limit: 2 %}
+            <div class="product-popup__image-wrapper">
+              <img 
+                src="{{ image | image_url: width: 300 }}"
+                srcset="{{ image | image_url: width: 150 }} 150w,
+                        {{ image | image_url: width: 300 }} 300w,
+                        {{ image | image_url: width: 450 }} 450w"
+                sizes="50vw"
+                alt="{{ image.alt | escape }}"
+                class="product-popup__image"
+                loading="lazy"
+                width="{{ image.width }}"
+                height="{{ image.height }}"
+              >
+            </div>
+          {% endfor %}
+          {% if product.images.size == 1 %}
+            <div class="product-popup__image-wrapper">
+              <img 
+                src="{{ product.images.first | image_url: width: 300 }}"
+                srcset="{{ product.images.first | image_url: width: 150 }} 150w,
+                        {{ product.images.first | image_url: width: 300 }} 300w,
+                        {{ product.images.first | image_url: width: 450 }} 450w"
+                sizes="50vw"
+                alt="{{ product.images.first.alt | escape }}"
+                class="product-popup__image"
+                loading="lazy"
+                width="{{ product.images.first.width }}"
+                height="{{ product.images.first.height }}"
+              >
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% comment %} Product Details {% endcomment %}
+      <div class="product-popup__details product-popup__details--mobile-nested">
+        <h2 class="product-popup__title product-popup__title--mobile-nested" id="product-popup-mobile-nested-title-{{ product.id }}">
+          {{ product.title | escape }}
+        </h2>
+
+        {% comment %} Reviews {% endcomment %}
+        {% if rating != blank or reviews_count != blank %}
+          <div class="product-popup__rating">
+            <div class="product-popup__stars">
+              {% for i in (1..5) %}
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="https://www.w3.org/2000/svg">
+                  <path d="M10 1L12.09 7.26L19 8.27L14 12.14L15.18 19.02L10 15.77L4.82 19.02L6 12.14L1 8.27L7.91 7.26L10 1Z" 
+                    fill="{% if i <= rating_value %}#FFD700{% else %}#E0E0E0{% endif %}" 
+                    stroke="{% if i <= rating_value %}#FFD700{% else %}#E0E0E0{% endif %}" 
+                    stroke-width="1"/>
+                </svg>
+              {% endfor %}
+            </div>
+            <span class="product-popup__reviews-count">{{ reviews_count_value }} reviews</span>
+          </div>
+        {% else %}
+          <div class="product-popup__rating">
+            <div class="product-popup__stars">
+              {% for i in (1..5) %}
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="https://www.w3.org/2000/svg">
+                  <path d="M10 1L12.09 7.26L19 8.27L14 12.14L15.18 19.02L10 15.77L4.82 19.02L6 12.14L1 8.27L7.91 7.26L10 1Z" 
+                    fill="#FFD700" 
+                    stroke="#FFD700" 
+                    stroke-width="1"/>
+                </svg>
+              {% endfor %}
+            </div>
+            <span class="product-popup__reviews-count">2 reviews</span>
+          </div>
+        {% endif %}
+
+        {% comment %} Price {% endcomment %}
+        <div class="product-popup__price product-popup__price--mobile-nested">
+          {%- liquid
+            if settings.currency_code_enabled
+              assign money_price = product.price | money_with_currency
+              assign money_compare = product.compare_at_price | money_with_currency
+            else
+              assign money_price = product.price | money
+              assign money_compare = product.compare_at_price | money
+            endif
+            
+            if cart.currency.iso_code == 'EUR'
+              assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+              assign money_compare = money_compare | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+            elsif cart.currency.iso_code == 'INR'
+              assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              assign money_compare = money_compare | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+            endif
+          -%}
+          {% if product.compare_at_price > product.price %}
+            <span class="product-popup__price--sale">
+              {{ money_price }}
+            </span>
+            <span class="product-popup__price--compare">
+              {{ money_compare }}
+            </span>
+          {% else %}
+            <span>
+              {{ money_price }}
+            </span>
+          {% endif %}
+        </div>
+
+        {% comment %} Description {% endcomment %}
+        {% if product.description != blank %}
+          <div class="product-popup__description">
+            {{ product.description | strip_html | truncate: 150 }}
+          </div>
+        {% endif %}
+
+        {% comment %} View Details Button {% endcomment %}
+        <a href="{{ product.url }}" class="product-popup__view-details-btn" data-view-details>
+          View details >>
+        </a>
+      </div>
+
+      {% comment %} Actions section - At bottom {% endcomment %}
+      <div class="product-popup__actions product-popup__actions--mobile-nested">
+        {% render 'add-to-cart-button', product: product %}
+        
+        <div class="product-popup__action-icons">
+          {% render 'wishlist-button', product: product %}
+          {% render 'compare-button', product: product %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

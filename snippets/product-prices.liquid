@@ -1,0 +1,134 @@
+{%- liquid
+  assign selected_variant = product.selected_or_first_available_variant
+
+  if use_variant
+    assign target = selected_variant
+  else
+    assign target = product
+  endif
+
+  assign price = target.price
+  assign compare_at_price = target.compare_at_price
+  assign available = target.available
+
+  assign sale_badge_type = sale_badge_type | default: 'percentage'
+
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_compare = compare_at_price | money_with_currency
+  else
+    assign money_price = price | money
+    assign money_compare = compare_at_price | money
+  endif
+-%}
+
+<div
+  class="m-price{% if compare_at_price > price %} m-price--on-sale{% endif %}{% if available == false %} m-price--sold-out{% endif %}"
+  data-sale-badge-type="{{ sale_badge_type }}"
+>
+  <!-- Regular price -->
+  <div class="m-price__regular">
+    <span class="m-price-item m-price-item--regular {{ price_text_size }}">
+      {%- liquid
+        if cart.currency.iso_code == 'EUR'
+          assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+        elsif cart.currency.iso_code == 'INR'
+          assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+        endif
+      -%}
+      {{ money_price }}
+    </span>
+  </div>
+
+  <!-- Sale price: price and compare-at price inline -->
+  {% if compare_at_price > price %}
+    <div class="m-price__sale">
+        {%- liquid
+          assign money_price_sale = money_price
+          assign money_compare_sale = money_compare
+          
+          if cart.currency.iso_code == 'EUR'
+            assign money_price_sale = money_price_sale | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+            assign money_compare_sale = money_compare_sale | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+          elsif cart.currency.iso_code == 'INR'
+            assign money_price_sale = money_price_sale | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+            assign money_compare_sale = money_compare_sale | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+          endif
+        -%}
+        <span class="m-price-item m-price-item--sale {{ price_text_size }}">
+          {{ money_price_sale }}
+        </span>
+        <s class="m-price-item m-price-item--compare">
+          {{ money_compare_sale }}
+        </s>
+    </div>
+  {% endif %}
+
+  <!-- Unit price -->
+  {% if selected_variant.unit_price_measurement %}
+    <div class="m-price__unit">
+      <span>
+        {%- liquid
+          if settings.currency_code_enabled
+            assign unit_money = selected_variant.unit_price | money_with_currency
+          else
+            assign unit_money = selected_variant.unit_price | money
+          endif
+        -%}
+        {% if cart.currency.iso_code == 'EUR' %}
+          {{ unit_money | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ',' }}
+        {% elsif cart.currency.iso_code == 'INR' %}
+          {{ unit_money | replace: 'Rs.', '₹' | replace: 'Rs', '₹' }}
+        {% else %}
+          {{ unit_money }}
+        {% endif %}
+      </span> /
+      <span>
+        {{ selected_variant.unit_price_measurement.reference_value }}
+        {{ selected_variant.unit_price_measurement.reference_unit }}
+      </span>
+    </div>
+  {% endif %}
+
+  <!-- Sale/Sold out badges -->
+  <div class="m-price__badges">
+    {% if show_sale_badge and compare_at_price > price %}
+      {% liquid
+        assign save_amount = compare_at_price | minus: price
+        assign discount = ''
+
+        if sale_badge_type == 'percentage'
+          assign discount = save_amount | times: 100 | divided_by: compare_at_price | round | append: '%'
+        elsif sale_badge_type == 'fixed_amount'
+          if settings.currency_code_enabled
+            assign discount = save_amount | money_with_currency
+          else
+            assign discount = save_amount | money
+          endif
+
+          if cart.currency.iso_code == 'EUR'
+            assign discount = discount | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+          elsif cart.currency.iso_code == 'INR'
+            assign discount = discount | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+          endif
+        endif
+      %}
+
+      <div class="m-price__badge-sale">
+        <span class="m-product-tag m-product-tag--sale">
+          {% if sale_badge_type == 'text' %}
+            SALE
+          {% else %}
+            SAVE {{ discount }}
+          {% endif %}
+        </span>
+      </div>
+    {% endif %}
+
+    <div class="m-price__badge-sold-out">
+      <span class="m-product-tag m-product-tag--sold-out">
+        {{ 'products.product.sold_out' | t | default: 'Sold Out' }}
+      </span>
+    </div>
+  </div>
+</div>

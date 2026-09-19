@@ -1,0 +1,94 @@
+{% comment %}
+  Renders a single standard filter (Price or Availability)
+  Accepts:
+  - filter: {Object} The filter object
+{% endcomment %}
+
+<div class="filter-group active" data-filter-label="{{ filter.label | handle }}">
+  <div class="filter-title is-collapsible">
+    <span>{{ filter.label }}</span>
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#333" stroke-width="1.5"/></svg>
+  </div>
+  
+  <div class="filter-content">
+    {%- case filter.type -%}
+      {%- when 'boolean', 'list' -%}
+        <ul class="filter-list">
+          {%- for value in filter.values -%}
+            <li class="filter-item">
+              <label>
+                <input type="checkbox"
+                  name="{{ value.param_name }}"
+                  value="{{ value.value }}"
+                  {% if value.active %}checked{% endif %}
+                  onchange="window.location.href='{% if value.active %}{{ value.url_to_remove }}{% else %}{{ value.url_to_add }}{% endif %}'">
+                <span>{{ value.label }}</span>
+              </label>
+              <span class="filter-count">({{ value.count }})</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+      {%- when 'price_range' -%}
+        <div class="price-slider-group">
+          <div class="price-inputs">
+            <div class="price-field">
+              <span>{{ cart.currency.symbol }}</span>
+              <label for="Filter-{{ filter.label | escape }}-GTE" class="visually-hidden">Min price</label>
+              <input class="price-input"
+                name="{{ filter.min_value.param_name }}"
+                id="Filter-{{ filter.label | escape }}-GTE"
+                {%- if filter.min_value.value -%}
+                  value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                {%- endif -%}
+                type="number"
+                placeholder="0"
+                min="0"
+                max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+              >
+            </div>
+            <span class="price-separator">to</span>
+            <div class="price-field">
+              <span>{{ cart.currency.symbol }}</span>
+              <label for="Filter-{{ filter.label | escape }}-LTE" class="visually-hidden">Max price</label>
+              <input class="price-input"
+                name="{{ filter.max_value.param_name }}"
+                id="Filter-{{ filter.label | escape }}-LTE"
+                {%- if filter.max_value.value -%}
+                  value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                {%- endif -%}
+                type="number"
+                placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                min="0"
+                max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+              >
+            </div>
+          </div>
+          <button type="button" class="price-apply" aria-label="Apply" onclick="applyPriceFilter(this)">Apply</button>
+        </div>
+    {%- endcase -%}
+  </div>
+</div>
+
+<script>
+  if (typeof applyPriceFilter !== 'function') {
+    window.applyPriceFilter = function(btn) {
+      const container = btn.closest('.price-slider-group');
+      const inputs = container.querySelectorAll('input');
+      const params = new URLSearchParams(window.location.search);
+      
+      inputs.forEach(input => {
+        if (input.value) {
+          params.set(input.name, input.value);
+        } else {
+          params.delete(input.name);
+        }
+      });
+      
+      // Keep page 1
+      params.delete('page');
+      
+      window.location.href = window.location.pathname + '?' + params.toString();
+    }
+  }
+</script>

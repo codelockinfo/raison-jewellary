@@ -1,0 +1,389 @@
+{{ 'contact-form.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+
+.section-{{ section.id }} {
+  position: relative;
+}
+
+.section-{{ section.id }}::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--overlay-opacity);
+  z-index: 0;
+  display: none;
+}
+
+.section-{{ section.id }}[style*="--overlay-enabled-mobile: true"]::before {
+  display: block;
+}
+
+.section-{{ section.id }} > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section-{{ section.id }} form.contact-form-main {
+  background: var(--color-background-secondary);
+  padding: 32px;
+  border-radius: var(--form-border-radius);
+  border: none;
+}
+
+/* Border ON */
+.section-{{ section.id }}[style*="--form-border-enabled: true"]
+form.contact-form-main {
+  border: var(--form-border-width) solid var(--color-border);
+}
+
+@media (max-width: 749px) {
+  .section-{{ section.id }} form.contact-form-main {
+    padding: 20px;
+  }
+
+  .section-{{ section.id }} .contact-form-box {
+    padding: 20px;
+  }
+}
+
+.section-{{ section.id }} .field__input,
+.section-{{ section.id }} .text-area {
+  background: var(--color-form-field-bg);
+  color: var(--color-form-field-text);
+  border-color: var(--color-border);
+}
+
+.section-{{ section.id }} .label,
+.section-{{ section.id }} .field__label {
+  color: var(--color-text);
+}
+
+.section-{{ section.id }} .button {
+  background: var(--color-button);
+  color: var(--color-button-text);
+}
+
+.section-{{ section.id }} .button:hover {
+  background: var(--color-button-hover);
+  color: var(--color-button-text-hover);
+}
+
+@media (min-width: 750px) {
+  /* Desktop overlay ON */
+  .section-{{ section.id }}[style*="--overlay-enabled-desktop: true"]::before {
+    display: block;
+  }
+
+  /* Heading - Desktop */
+  .section-{{ section.id }} .contact-heading-wrapper {
+    --heading-color: {{ section.settings.heading_color }};
+  }
+
+  .section-{{ section.id }} .contact-heading-wrapper h2 {
+    font-size: {{ section.settings.heading_font_size }}px;
+    color: var(--color-heading);
+  }
+}
+{%- endstyle -%}
+
+<div
+  class="contact-form-wrapper section-{{ section.id }} color-{{ section.settings.color_scheme }}"
+  style="
+    --form-border-enabled: {{ section.settings.form_border_enable }};
+    --form-border-width: {{ section.settings.form_border_width }}px;
+    --form-border-radius: {{ section.settings.form_border_radius }}px;
+  "
+>
+
+  <div class="contact page-width page-width--narrow">
+    {% if section.settings.title != blank %}
+      <div class="contact-heading-wrapper">
+         {% render 'heading-style-banner',
+            wrapper_class: 'contact-section-header',
+            heading: section.settings.title,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            class_name: 'title title-wrapper--no-top-margin inline-richtext',
+            heading_styles: ''
+         %}
+      </div>
+    {% endif %}
+    {%- form 'contact', id: 'ContactForm', class: 'contact-form-main' -%}
+      {%- if form.posted_successfully? -%}
+        <h2 id="ContactForm-Success" class="form-status form-status-list form__message" tabindex="-1" autofocus>
+          {{ 'contact.form.post_success' | t }}
+        </h2>
+      {%- elsif form.errors -%}
+        <div class="form__message">
+          <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus>
+            {{ 'contact.form.error_heading' | t }}
+          </h2>
+        </div>
+        <ul class="form-status-list caption-large" role="list">
+          <li>
+            <a href="#ContactForm-email" class="link">
+              {{ form.errors.translated_fields.email | capitalize }}
+              {{ form.errors.messages.email }}
+            </a>
+          </li>
+        </ul>
+      {%- endif -%}
+<div class="contact__fields">
+
+  <!-- First + Last name row -->
+  <div class="name-fields">
+   <div class="field">
+  <label class="field__label" for="ContactFirstName">
+    {{ 'contact.form.first_name' | t }}
+  </label>
+  <input
+    id="ContactFirstName"
+    class="field__input"
+    type="text"
+    name="contact[first_name]"
+    placeholder="{{ 'contact.form.first_name' | t }}"
+  >
+</div>
+
+
+<div class="field">
+  <label class="field__label" for="ContactLastName">
+    {{ 'contact.form.last_name' | t }}
+  </label>
+  <input
+    id="ContactLastName"
+    class="field__input"
+    type="text"
+    name="contact[last_name]"
+    placeholder="{{ 'contact.form.last_name' | t }}"
+  >
+</div>
+
+  </div>
+
+  <!-- Email -->
+ <div class="field field--with-error">
+  <label class="field__label" for="ContactEmail">
+    {{ 'contact.form.email' | t }}
+  </label>
+  <input
+    id="ContactEmail"
+    type="email"
+    class="field__input"
+    name="contact[email]"
+    placeholder="{{ 'contact.form.email' | t }}"
+    required
+  >
+</div>
+
+
+  <!-- Phone -->
+<div class="field">
+  <label class="field__label" for="ContactPhone">
+    {{ 'contact.form.phone' | t }}
+  </label>
+  <input
+    id="ContactPhone"
+    type="tel"
+    class="field__input"
+    name="contact[phone]"
+    placeholder="{{ 'contact.form.phone' | t }}"
+  >
+</div>
+
+
+  <!-- Message -->
+<div class="field">
+  <label class="field__label" for="ContactMessage">
+    {{ 'contact.form.comment' | t }}
+  </label>
+  <textarea
+    id="ContactMessage"
+    class="text-area field__input"
+    name="contact[comment]"
+    placeholder="{{ 'contact.form.comment' | t }}"
+  ></textarea>
+</div>
+
+
+</div>
+
+      <div class="contact__button">
+        <button type="submit" class="button" aria-label="{{ 'contact.form.send' | t }}">
+          {{ 'contact.form.send' | t }}
+        </button>
+      </div>
+    {%- endform -%}
+
+{% if request.path contains 'contact' and request.query_string contains 'success' %}
+  <div id="contact-toast" class="contact-toast show toast-top-left">
+    <span class="toast-icon">✓</span>
+    <span class="toast-text">
+      {{ 'contact.form.post_success' | t }}
+    </span>
+  </div>
+{% endif %}
+
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toast = document.getElementById('contact-toast');
+    if (toast) {
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    const successMsg = document.getElementById('ContactForm-Success');
+    if (successMsg) {
+      // Clear URL parameters to prevent message showing on refresh
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('customer_posted') || url.searchParams.has('contact_posted')) {
+        url.searchParams.delete('customer_posted');
+        url.searchParams.delete('contact_posted');
+        window.history.replaceState({}, '', url.pathname + url.search);
+      }
+
+      setTimeout(() => {
+        successMsg.style.transition = 'opacity 1s ease';
+        successMsg.style.opacity = '0';
+        setTimeout(() => {
+          successMsg.style.display = 'none';
+        }, 1000);
+      }, 5000);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Contact form"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+      {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        {
+          "value": "simple",
+          "label": "design 1"
+        },
+        {
+          "value": "line-top",
+          "label": "design 2"
+        },
+        {
+          "value": "underline",
+          "label": "design 3"
+        },
+        {
+          "value": "lines",
+          "label": "design 4"
+        },
+        {
+          "value": "diamond",
+          "label": "design 5"
+        },
+        {
+          "value": "ornament",
+          "label": "design 6"
+        },
+        {
+          "value": "x",
+          "label": "design 7"
+        }
+      ],
+      "info": "Choose the decorative style for the heading"
+    },
+{
+  "type": "header",
+  "content": "Form Border Settings"
+},
+{
+  "type": "checkbox",
+  "id": "form_border_enable",
+  "label": "Enable form border",
+  "default": false
+},
+{
+  "type": "range",
+  "id": "form_border_width",
+  "label": "Form border width",
+  "min": 1,
+  "max": 10,
+  "step": 1,
+  "unit": "px",
+  "default": 1
+},
+{
+  "type": "range",
+  "id": "form_border_radius",
+  "label": "Form border radius",
+  "min": 0,
+  "max": 40,
+  "step": 2,
+  "unit": "px",
+  "default": 8
+}
+  ],
+  "presets": [
+    {
+      "name": "Contact form",
+         "category": "Store Information"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,176 @@
+{% comment %}
+  Renders a product card with main video/image and bottom overlay
+  Shows video-style placeholder until product is selected
+{% endcomment %}
+
+{% if product and product.id %}
+
+  <!-- REAL PRODUCT CARD -->
+  <div class="product-card" data-product-card data-product-id="{{ product.id }}">
+    {% liquid
+      assign has_video = false
+      assign product_video = null
+      assign product_image = product.featured_image
+
+      for media in product.media
+        if media.media_type == 'video'
+          assign has_video = true
+          assign product_video = media
+          break
+        endif
+      endfor
+    %}
+
+    <div class="product-card__media-wrapper">
+      {% render 'product-badge', product: product %}
+
+      {% if has_video and product_video %}
+        <div class="product-card__media product-card__video">
+          {{ product_video | video_tag:
+            image_size: '600x600',
+            autoplay: true,
+            loop: true,
+            controls: false,
+            muted: true,
+            playsinline: true,
+            class: 'product-card__video-element'
+          }}
+        </div>
+
+        {% if product_image %}
+          <img
+            src="{{ product_image | image_url: width: 600 }}"
+            alt="{{ product_image.alt | escape }}"
+            class="product-card__image product-card__image--background"
+            loading="lazy"
+            width="600"
+            height="{{ 600 | divided_by: product_image.aspect_ratio | round }}"
+          >
+        {% endif %}
+
+      {% elsif product_image %}
+        <img
+          src="{{ product_image | image_url: width: 600 }}"
+          srcset="
+            {{ product_image | image_url: width: 300 }} 300w,
+            {{ product_image | image_url: width: 600 }} 600w,
+            {{ product_image | image_url: width: 900 }} 900w
+          "
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          alt="{{ product_image.alt | escape }}"
+          class="product-card__image product-card__image--main"
+          loading="lazy"
+          width="600"
+          height="{{ 600 | divided_by: product_image.aspect_ratio | round }}"
+        >
+      {% endif %}
+
+      <div class="product-card__overlay">
+        <div class="product-card__overlay-content">
+          {% if product_image %}
+            <div class="product-card__thumbnail">
+              <img
+                src="{{ product_image | image_url: width: 100 }}"
+                alt="{{ product_image.alt | escape }}"
+                class="product-card__thumbnail-image"
+                loading="lazy"
+                width="100"
+                height="{{ 100 | divided_by: product_image.aspect_ratio | round }}"
+              >
+            </div>
+          {% endif %}
+
+          <div class="product-card__info">
+            <h3 class="product-card__title">{{ product.title | escape }}</h3>
+            <div class="product-card__price">
+              {% if product.compare_at_price > product.price %}
+                <span class="product-card__price--sale">
+                  {%- liquid
+                    if settings.currency_code_enabled
+                      assign money_price = product.price | money_with_currency
+                    else
+                      assign money_price = product.price | money
+                    endif
+                    
+                    if cart.currency.iso_code == 'EUR'
+                      assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                    elsif cart.currency.iso_code == 'INR'
+                      assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                    endif
+                  -%}
+                  {{ money_price }}
+                </span>
+                <span class="product-card__price--compare">
+                  {%- liquid
+                    if settings.currency_code_enabled
+                      assign money_compare = product.compare_at_price | money_with_currency
+                    else
+                      assign money_compare = product.compare_at_price | money
+                    endif
+                    
+                    if cart.currency.iso_code == 'EUR'
+                      assign money_compare = money_compare | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                    elsif cart.currency.iso_code == 'INR'
+                      assign money_compare = money_compare | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                    endif
+                  -%}
+                  {{ money_compare }}
+                </span>
+              {% else %}
+                <span>
+                  {%- liquid
+                    if settings.currency_code_enabled
+                      assign money_price = product.price | money_with_currency
+                    else
+                      assign money_price = product.price | money
+                    endif
+                    
+                    if cart.currency.iso_code == 'EUR'
+                      assign money_price = money_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+                    elsif cart.currency.iso_code == 'INR'
+                      assign money_price = money_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+                    endif
+                  -%}
+                  {{ money_price }}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+
+  <!--PLACEHOLDER (NO PRODUCT SELECTED) -->
+  <div class="product-card product-card--placeholder">
+    <div class="product-card__media-wrapper">
+
+      <div class="product-card__image product-card__image--placeholder">
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+
+        <!-- VIDEO PLAY ICON -->
+        <span class="product-card__video-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.55)"/>
+            <path d="M10 8L16 12L10 16V8Z" fill="#FEFEFE"/>
+          </svg>
+        </span>
+      </div>
+
+      <div class="product-card__overlay">
+        <div class="product-card__overlay-content">
+          <div class="product-card__info">
+            <h3 class="product-card__title">Select a product</h3>
+            <div class="product-card__price">
+              <span>$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+{% endif %}

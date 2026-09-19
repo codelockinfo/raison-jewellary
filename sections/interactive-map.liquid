@@ -1,0 +1,461 @@
+{% schema %}
+{
+  "name": "Interactive Impact Map",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Padding (Desktop)",
+      "default": "60px 20px 60px 20px",
+      "info": "Values: top right bottom left"
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Padding (Mobile)",
+      "default": "40px 10px 40px 10px",
+      "info": "Values: top right bottom left"
+    },
+    {
+      "type": "header",
+      "content": "Map Settings"
+    },
+    {
+      "type": "select",
+      "id": "country",
+      "label": "Country",
+      "options": [
+        { "value": "india", "label": "India" },
+        { "value": "usa", "label": "USA" },
+        { "value": "world", "label": "World" },
+        { "value": "canada", "label": "Canada" },
+        { "value": "uk", "label": "United Kingdom" },
+        { "value": "australia", "label": "Australia" },
+        { "value": "germany", "label": "Germany" },
+        { "value": "france", "label": "France" }
+      ],
+      "default": "india"
+    },
+    {
+      "type": "color",
+      "id": "map_base_color",
+      "label": "Map Base Color",
+      "default": "#a89f91"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Highlight Color",
+      "default": "#f4a261"
+    },
+    {
+      "type": "color",
+      "id": "pin_color",
+      "label": "Pin/Marker Color",
+      "default": "#3d2e21"
+    },
+    {
+      "type": "header",
+      "content": "Typography: Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main Heading",
+      "default": "920 Weavers | 4 States"
+    },
+        {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "header",
+      "content": "Typography: Subheading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Not Just Made In India, But Made of India"
+    },
+  ],
+  "blocks": [
+    {
+      "type": "state_highlight",
+      "name": "Highlighted State",
+      "settings": [
+        {
+          "type": "text",
+          "id": "state_id",
+          "label": "State ID (from SVG)",
+          "info": "Enter the ID from the SVG (e.g., 'in-rj' for Rajasthan, 'in-mh' for Maharashtra)."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_pin",
+          "label": "Show Pin/Icon",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "stat_item",
+      "name": "Statistic",
+      "settings": [
+        {
+          "type": "text",
+          "id": "stat_number",
+          "label": "Number/Heading",
+          "default": "80L+"
+        },
+        {
+          "type": "textarea",
+          "id": "stat_text",
+          "label": "Description",
+          "default": "Man Hours Employment"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Interactive Impact Map",
+         "category": "Store Information",
+      "blocks": [
+        { "type": "state_highlight", "settings": { "state_id": "in-rj", "show_pin": true } },
+        { "type": "stat_item", "settings": { "stat_number": "80L+", "stat_text": "Man Hours Employment" } },
+        { "type": "stat_item", "settings": { "stat_number": "150%", "stat_text": "YoY Increase in earning for weavers" } },
+        { "type": "stat_item", "settings": { "stat_number": "35%", "stat_text": "of the proceeds directly to the local weaver" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  #shopify-section-{{ section.id }} .impact-map-section {
+    padding: {{ section.settings.padding_desktop }};
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  #shopify-section-{{ section.id }} .container_width {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    position: relative;
+  }
+  
+  #shopify-section-{{ section.id }} .map-container {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  #shopify-section-{{ section.id }} .content-container {
+    width: 50%;
+    padding: 20px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Container for the SVG */
+  #shopify-section-{{ section.id }} .svg-map {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .svg-map svg {
+    width: 100%;
+    height: auto;
+    max-height: 700px; 
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .svg-map svg path {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    fill: {{ section.settings.map_base_color }} !important;
+    stroke: var(--color-background) !important;
+    stroke-width: 1px !important;
+  }
+
+  /* Hide Copyright Text */
+  #shopify-section-{{ section.id }} .svg-map svg text {
+    display: none !important;
+  }
+
+  /* Interaction: Hover effect for all states */
+  #shopify-section-{{ section.id }} .svg-map svg path:hover {
+    fill: {{ section.settings.highlight_color }} !important;
+    opacity: 0.8;
+  }
+
+  /* Highlighted States Styles */
+  {% for block in section.blocks %}
+    {% if block.type == 'state_highlight' and block.settings.state_id != blank %}
+      {% assign clean_id = block.settings.state_id | strip | downcase %}
+      #shopify-section-{{ section.id }} .svg-map svg #{{ clean_id }} {
+        fill: {{ section.settings.highlight_color }} !important;
+        stroke: var(--color-background) !important;
+        stroke-width: 2px !important;
+        opacity: 1;
+      }
+    {% endif %}
+  {% endfor %}
+
+  #shopify-section-{{ section.id }} .section-heading {
+    margin-bottom: 10px;
+    color: var(--color-heading);
+  }
+
+  #shopify-section-{{ section.id }} .section-subheading {
+    opacity: 0.8;
+    margin-bottom: 50px;
+    color: var(--color-subtext);
+  }
+
+  #shopify-section-{{ section.id }} .stat-item {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  
+  #shopify-section-{{ section.id }} .stat-number {
+    font-size: 32px;
+    line-height: 1.1;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-heading);
+  }
+  
+  #shopify-section-{{ section.id }} .stat-desc {
+    line-height: 1.5;
+    max-width: 400px;
+    margin: 0 auto;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 900px) {
+    #shopify-section-{{ section.id }} .impact-map-section {
+      padding: {{ section.settings.padding_mobile }};
+    }
+
+    #shopify-section-{{ section.id }} .map-container,
+    #shopify-section-{{ section.id }} .content-container {
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    #shopify-section-{{ section.id }} .content-container {
+      padding-top: 40px;
+    }
+
+
+    #shopify-section-{{ section.id }} .stat-number {
+      font-size: 24px;
+    }
+  }
+</style>
+
+
+
+<div class="impact-map-section color-{{ section.settings.color_scheme }}">
+  <div class="container_width">
+  <div class="map-container">
+    <div class="svg-map">
+      {% case section.settings.country %}
+        {% when 'india' %}
+          {% render 'icon-india-map' %}
+        {% when 'usa' %}
+          {% render 'icon-usa-map' %}
+        {% when 'world' %}
+          {% render 'icon-world-map' %}
+        {% when 'canada' %}
+          {% render 'icon-canada-map' %}
+        {% when 'uk' %}
+          {% render 'icon-uk-map' %}
+        {% when 'australia' %}
+          {% render 'icon-australia-map' %}
+        {% when 'germany' %}
+          {% render 'icon-germany-map' %}
+        {% when 'france' %}
+          {% render 'icon-france-map' %}
+        {% else %}
+          {% render 'icon-india-map' %}
+      {% endcase %}
+    </div>
+  </div>
+  
+  <div class="content-container">
+    {% if section.settings.heading != blank %}
+      {% render 'heading-style-banner',
+              heading: section.settings.heading,
+              heading_tag: section.settings.heading_tag,
+              heading_style: section.settings.heading_style,
+              heading_alignment: section.settings.heading_alignment,
+              wrapper_class: 'impact-map-section'
+            %}
+    {% endif %}
+    
+    {% if section.settings.subheading != blank %}
+      <div class="section-subheading">{{ section.settings.subheading }}</div>
+    {% endif %}
+    
+    <div class="stats-list">
+      {% for block in section.blocks %}
+        {% if block.type == 'stat_item' %}
+          <div class="stat-item">
+            <span class="stat-number">{{ block.settings.stat_number }}</span>
+            <div class="stat-desc">{{ block.settings.stat_text }}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  </div>
+</div>
+
+<script type="application/json" id="map-data-{{ section.id }}">
+  [
+    {% assign first = true %}
+    {% for block in section.blocks %}
+      {% if block.type == 'state_highlight' and block.settings.state_id != blank and block.settings.show_pin %}
+        {% unless first %},{% endunless %}
+        {
+          "id": "{{ block.settings.state_id | strip | downcase }}",
+          "color": "{{ section.settings.pin_color }}",
+          "show_pin": {{ block.settings.show_pin }}
+        }
+        {% assign first = false %}
+      {% endif %}
+    {% endfor %}
+  ]
+</script>
+
+<script>
+  (function() {
+    const DEBUG = true;
+
+    function placePins() {
+      const sectionId = "{{ section.id }}";
+      const container = document.querySelector('#shopify-section-' + sectionId);
+      if (!container) return;
+
+      const dataScript = container.querySelector('#map-data-' + sectionId);
+      if (!dataScript) return;
+
+      let mapData;
+      try {
+        mapData = JSON.parse(dataScript.textContent);
+      } catch (e) {
+        return;
+      }
+
+      const svg = container.querySelector('.svg-map svg');
+      if (!svg) {
+        if(DEBUG)
+        setTimeout(placePins, 500);
+        return;
+      }
+
+      if (svg.clientWidth === 0 || svg.clientHeight === 0) {
+        if(DEBUG)
+        setTimeout(placePins, 500);
+        return;
+      }
+
+      const existingPins = svg.querySelectorAll('.map-pin-group');
+      existingPins.forEach(p => p.remove());
+
+      if (mapData.length === 0) return;
+
+      mapData.forEach(item => {
+        const cleanId = item.id.toLowerCase().trim();
+        const path = svg.querySelector(`[id="${cleanId}"]`);
+        
+        if (path) {
+          try {
+            let bbox = path.getBBox();
+            let centerX, centerY;
+
+            if (bbox.width > 0 && bbox.height > 0) {
+                centerX = bbox.x + bbox.width / 2;
+                centerY = bbox.y + bbox.height / 2;
+            } else {
+                return;
+            }
+
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.setAttribute("class", "map-pin-group");
+            
+            const scale = 1.2; // Adjusted size
+            const x = centerX - (12 * scale);
+            const y = centerY - (24 * scale);
+
+            g.setAttribute("transform", `translate(${x}, ${y}) scale(${scale})`);
+            g.style.pointerEvents = 'none'; 
+            g.style.zIndex = '9999';
+
+            const pathElem = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathElem.setAttribute("d", "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z");
+            pathElem.setAttribute("fill", item.color);
+            pathElem.style.setProperty("fill", item.color, "important");
+            pathElem.setAttribute("stroke", "#FEFEFE");
+            pathElem.setAttribute("stroke-width", "1.5");
+            
+            g.appendChild(pathElem);
+            svg.appendChild(g);
+            
+          } catch(err) {
+          }
+        } else {
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', placePins);
+    } else {
+      setTimeout(placePins, 500); 
+    }
+    
+    document.addEventListener('shopify:section:select', placePins);
+    document.addEventListener('shopify:block:select', placePins);
+    document.addEventListener('shopify:block:deselect', placePins);
+
+    const section = document.querySelector('#shopify-section-{{ section.id }}');
+    if (section) {
+        new ResizeObserver(() => setTimeout(placePins, 200)).observe(section);
+    }
+  })();
+</script>

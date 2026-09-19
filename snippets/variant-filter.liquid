@@ -1,0 +1,201 @@
+{%- liquid
+  assign target_label = block.settings.variant_label | strip
+  assign rendered_labels = "" | split: ","
+-%}
+
+{%- comment -%} Determine if we should treat this as a color group based on blocks/labels {%- endcomment -%}
+{%- assign is_color_group = false -%}
+{%- assign downcase_title = block.settings.title | downcase -%}
+{%- assign downcase_label = target_label | downcase -%}
+
+{%- if downcase_title contains 'color' or downcase_title contains 'colour' or downcase_label contains 'color' or downcase_label contains 'colour' -%}
+  {%- assign is_color_group = true -%}
+{%- endif -%}
+
+{%- for filter in collection.filters -%}
+  {%- liquid
+    assign is_match = false
+    assign current_label = filter.label | strip
+    assign current_label_downcase = current_label | downcase
+    
+    if target_label == blank
+      if filter.param_name contains 'v.option'
+        assign is_match = true
+      endif
+    else
+      if current_label_downcase == downcase_label or filter.label == target_label or filter.param_name contains target_label
+        assign is_match = true
+      endif
+    endif
+  -%}
+  
+  {%- if is_match -%}
+    {%- unless rendered_labels contains current_label -%}
+      
+      {%- comment -%} Final check for color group if automatic detection missed it {%- endcomment -%}
+      {%- liquid
+         assign current_is_color = is_color_group
+         if current_label_downcase contains 'color' or current_label_downcase contains 'colour'
+           assign current_is_color = true
+         endif
+      -%}
+
+      {%- liquid
+        assign valid_value_count = 0
+        for value in filter.values
+          if value.count > 0 or value.active
+            assign valid_value_count = valid_value_count | plus: 1
+          endif
+        endfor
+      -%}
+
+      {%- if valid_value_count > 0 or request.design_mode -%}
+      <div class="filter-group {% if block.settings.expand_by_default %}active{% endif %}" data-block-id="{{ block.id }}-{{ current_label | handle }}">
+        <div class="filter-title {% if block.settings.enable_collapsible %}is-collapsible{% endif %}">
+          <span>{{ current_label }}</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#333" stroke-width="1.5"/></svg>
+        </div>
+        
+        <div class="filter-content" {% unless block.settings.expand_by_default %}style="display:none;"{% endunless %}>
+          {% if block.settings.design == 'list' %}
+            <ul class="filter-list">
+              {%- for value in filter.values -%}
+                {%- if value.count > 0 or value.active -%}
+                <li class="filter-item">
+                  <label>
+                    <input type="checkbox"
+                      name="{{ value.param_name }}"
+                      value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      onchange="window.location.href='{% if value.active %}{{ value.url_to_remove }}{% else %}{{ value.url_to_add }}{% endif %}'">
+                    
+                    {%- liquid
+                      assign show_swatch = false
+                      if current_is_color and block.settings.show_variant_color_swatch
+                         assign show_swatch = true
+                      endif
+                    -%}
+                    
+                    {%- if show_swatch -%}
+                       {%- liquid
+                         assign color_name_downcase = value.label | downcase
+                         assign custom_swatch_color = value.label | handle
+                         
+                         if settings.custom_color_mapping != blank
+                           assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                           for row in mapping_rows
+                             assign parts = row | split: ':'
+                             if parts.size == 2
+                               assign m_name = parts[0] | strip | downcase
+                               assign m_color = parts[1] | strip
+                               if m_name == color_name_downcase
+                                 assign custom_swatch_color = m_color
+                                 break
+                               endif
+                             endif
+                           endfor
+                         endif
+
+                         assign swatch_style = ''
+                         if value.swatch.image
+                            assign swatch_img = value.swatch.image | image_url: width: 50
+                            assign swatch_style = 'background-image: url(' | append: swatch_img | append: '); background-color: ' | append: value.swatch.color | append: ';'
+                         elsif value.swatch.color
+                            assign swatch_style = 'background-color: ' | append: value.swatch.color | append: ';'
+                         else
+                            assign swatch_file_name = value.label | handle | append: '.png'
+                            assign swatch_img_obj = images[swatch_file_name]
+                            if swatch_img_obj != blank
+                               assign swatch_img = swatch_img_obj | image_url: width: 40
+                               assign swatch_style = 'background-color: ' | append: custom_swatch_color | append: '; background-image: url(' | append: swatch_img | append: ');'
+                            else
+                               assign swatch_style = 'background-color: ' | append: custom_swatch_color | append: ';'
+                            endif
+                         endif
+                       -%}
+                       <span class="color-swatch-small" style="{{ swatch_style }}"></span>
+                    {%- endif -%}
+
+                    {%- if block.settings.show_variant_color_name or show_swatch == false -%}
+                      <span>{{ value.label }}</span>
+                    {%- endif -%}
+                    
+                  </label>
+                </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- else -%}
+            <div class="tag-buttons">
+              {%- for value in filter.values -%}
+                {%- if value.count > 0 or value.active -%}
+                <button type="button" 
+                  class="tag-button {% if value.active %}active{% endif %}"
+                  aria-label="{{ value.label }}"
+                  onclick="window.location.href='{% if value.active %}{{ value.url_to_remove }}{% else %}{{ value.url_to_add }}{% endif %}'">
+                  
+                  {%- liquid
+                    assign show_swatch = false
+                    if current_is_color and block.settings.show_variant_color_swatch
+                       assign show_swatch = true
+                    endif
+                  -%}
+
+                  {%- if show_swatch -%}
+                     {%- liquid
+                       assign color_name_downcase = value.label | downcase
+                       assign custom_swatch_color = value.label | handle
+                       
+                       if settings.custom_color_mapping != blank
+                         assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                         for row in mapping_rows
+                           assign parts = row | split: ':'
+                           if parts.size == 2
+                             assign m_name = parts[0] | strip | downcase
+                             assign m_color = parts[1] | strip
+                             if m_name == color_name_downcase
+                               assign custom_swatch_color = m_color
+                               break
+                             endif
+                           endif
+                         endfor
+                       endif
+
+                       assign swatch_style = ''
+                       if value.swatch.image
+                          assign swatch_img = value.swatch.image | image_url: width: 50
+                          assign swatch_style = 'background-image: url(' | append: swatch_img | append: '); background-color: ' | append: value.swatch.color | append: ';'
+                       elsif value.swatch.color
+                          assign swatch_style = 'background-color: ' | append: value.swatch.color | append: ';'
+                       else
+                          assign swatch_file_name = value.label | handle | append: '.png'
+                          assign swatch_img_obj = images[swatch_file_name]
+                          if swatch_img_obj != blank
+                             assign swatch_img = swatch_img_obj | image_url: width: 40
+                             assign swatch_style = 'background-color: ' | append: custom_swatch_color | append: '; background-image: url(' | append: swatch_img | append: ');'
+                          else
+                             assign swatch_style = 'background-color: ' | append: custom_swatch_color | append: ';'
+                          endif
+                       endif
+                     -%}
+                     <span class="color-swatch-small" style="{{ swatch_style }}"></span>
+                  {%- endif -%}
+
+                  {%- if block.settings.show_variant_color_name or show_swatch == false -%}
+                    {{ value.label }}
+                  {%- endif -%}
+                  
+                </button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- assign label_list = current_label | split: "," -%}
+      {%- assign rendered_labels = rendered_labels | concat: label_list -%}
+      {%- endif -%}
+    {%- endunless -%}
+  {%- endif -%}
+{%- endfor -%}

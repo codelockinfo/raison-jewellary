@@ -1,0 +1,106 @@
+{% comment %}
+  Compare section - displays products for comparison
+  
+  https://shopify.dev/docs/storefronts/themes/architecture/sections
+{% endcomment %}
+
+{% liquid
+  assign section_id = section.settings.custom_id | default: section.id
+  assign section_class = 'compare-section'
+%}
+
+<section
+  id="{{ section_id }}"
+  class="{{ section_class }} skeleton-container"
+  style="
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="skeleton-visible container_width" style="padding-top: 40px; padding-bottom: 40px;">
+    <div class="skeleton-title skeleton-shimmer" style="margin: 0 auto 30px auto; width: 250px;"></div>
+    <div style="display: flex; gap: 20px; overflow: hidden;">
+      <div class="skeleton-box skeleton-shimmer" style="flex: 1; height: 500px; min-width: 200px;"></div>
+      <div class="skeleton-box skeleton-shimmer" style="flex: 1; height: 500px; min-width: 200px;"></div>
+      <div class="skeleton-box skeleton-shimmer" style="flex: 1; height: 500px; min-width: 200px;"></div>
+    </div>
+  </div>
+
+  <div class="container_width">
+    {% comment %} Breadcrumb Navigation {% endcomment %}
+    <nav class="compare-breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}" class="compare-breadcrumb__link">{{ 'compare.breadcrumb.home' | t | default: 'Home' }}</a>
+      <span class="compare-breadcrumb__separator">></span>
+      <span class="compare-breadcrumb__current">{{ 'compare.title' | t | default: 'Compare Products' }}</span>
+    </nav>
+
+    {% comment %} Page Title {% endcomment %}
+    <h1 class="compare-title">{{ 'compare.title' | t | default: 'Compare Products' }}</h1>
+
+    {% comment %} Compare Container {% endcomment %}
+    <div class="compare-container" data-compare-container>
+      {% comment %} Comparison Table {% endcomment %}
+      <div class="compare-table-wrapper">
+        <table class="compare-table" data-compare-table style="display: none;">
+          <thead>
+            <tr>
+              {% comment %} Header row will be dynamically populated via JavaScript {% endcomment %}
+            </tr>
+          </thead>
+          <tbody>
+            {% comment %} Table rows will be dynamically populated via JavaScript {% endcomment %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% comment %} Empty State {% endcomment %}
+    <div class="compare-empty" data-compare-empty>
+      <h3>
+        {{ 'compare.no_products' | t | default: 'No products to compare' }}
+        <a class="compare-empty__link" href="{{ routes.all_products_collection_url }}">
+          {{ 'compare.back_to_shopping' | t | default: 'Continue Shopping' }}
+        </a>
+      </h3>
+    </div>
+  </div>
+</section>
+
+{% comment %}
+  Note: compare.css and compare.js are loaded globally in theme.liquid
+  They are available on all pages for compare functionality
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Compare Products",
+  "tag": "section",
+  "class": "compare-section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Compare Products"
+    }
+  ]
+}
+{% endschema %}
+

@@ -1,0 +1,317 @@
+{% liquid
+%}
+
+<section
+  class="image-video-section 
+    layout-{{ section.settings.layout }}
+    content-{{ section.settings.content_position }}
+    v-{{ section.settings.vertical_align }}
+    h-{{ section.settings.horizontal_align }}
+    color-{{ section.settings.color_scheme }}
+    skeleton-container"
+  style="
+    --padding-desktop: {{ section.settings.padding_desktop | default: '0px 0px 0px 0px' }};
+    --padding-mobile: {{ section.settings.padding_mobile | default: '0px 0px 0px 0px' }};
+  "
+>
+  <div class="skeleton-visible">
+    <div class="container_width">
+       <div class="image-video-wrapper" style="display: flex; gap: 20px;">
+          <div class="skeleton-box skeleton-shimmer" style="flex: 1; height: 500px; border-radius:15px;"></div>
+          <div class="skeleton-box skeleton-shimmer" style="flex: 1; height: 500px; border-radius:15px;"></div>
+       </div>
+    </div>
+  </div>
+  <div class="container_width">
+    <div class="image-video-wrapper">
+
+    {% capture content_desktop %}
+        <div class="content-inner desktop-only">
+          {% if section.settings.heading_desktop != blank %}
+            {% render 'heading-style-banner',
+            heading: section.settings.heading_desktop,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            wrapper_class: 'banner-with-video-section'
+            %}
+          {% endif %}
+          {% if section.settings.subheading_desktop != blank %}<p class="common-subheading">{{ section.settings.subheading_desktop }}</p>{% endif %}
+          {% if section.settings.text_desktop != blank %}<div class="common-text">{{ section.settings.text_desktop }}</div>{% endif %}
+          {% if section.settings.button_text_desktop != blank %}
+            <a href="{{ section.settings.button_link_desktop | default: section.settings.button_link }}" class="common-btn">{{ section.settings.button_text_desktop }}</a>
+          {% endif %}
+        </div>
+    {% endcapture %}
+
+    {% capture content_mobile %}
+        <div class="content-inner mobile-only">
+          {% if section.settings.heading_mobile != blank %}
+            {% render 'heading-style-banner',
+            heading: section.settings.heading_mobile,
+            heading_tag: section.settings.heading_tag,
+            heading_style: section.settings.heading_style,
+            heading_alignment: section.settings.heading_alignment,
+            wrapper_class: 'banner-with-video-section'
+            %}
+          {% endif %}
+          {% if section.settings.subheading_mobile != blank %}<p class="common-subheading">{{ section.settings.subheading_mobile }}</p>{% endif %}
+          {% if section.settings.text_mobile != blank %}<div class="common-text">{{ section.settings.text_mobile }}</div>{% endif %}
+          {% if section.settings.button_text_mobile != blank %}
+            <a href="{{ section.settings.button_link_mobile | default: section.settings.button_link }}" class="common-btn">{{ section.settings.button_text_mobile }}</a>
+          {% endif %}
+        </div>
+    {% endcapture %}
+
+    <!-- CENTER CONTENT -->
+    {% if section.settings.content_position == 'center' %}
+      <div class="section-center-overlay">
+        {{ content_desktop }}
+        {{ content_mobile }}
+      </div>
+    {% endif %}
+
+    <!-- IMAGE -->
+    <div class="media image">
+      {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+      {% assign fetch_priority = 'low' %}
+      {% if loading_strategy == 'eager' %}
+        {% assign fetch_priority = 'high' %}
+      {% endif %}
+      {% if section.settings.image != blank %}
+        {% render 'image',
+          image: section.settings.image,
+          loading: loading_strategy,
+          fetchpriority: fetch_priority,
+          sizes: '50vw',
+          class: 'banner-video__image'
+        %}
+      {% else %}
+        <div class="media-placeholder">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {% endif %}
+
+      {% if section.settings.content_position == 'image' %}
+        <div class="overlay-content">
+          {{ content_desktop }}
+          {{ content_mobile }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- VIDEO -->
+    <div class="media video">
+      {% if section.settings.video != blank %}
+        {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: true }}
+      {% else %}
+        <div class="media-placeholder video-placeholder">
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          <span class="play-icon">▶</span>
+        </div>
+      {% endif %}
+
+      {% if section.settings.content_position == 'video' %}
+        <div class="overlay-content">
+          {{ content_desktop }}
+          {{ content_mobile }}
+        </div>
+      {% endif %}
+    </div>
+
+    </div>
+  </div>
+</section>
+<style>
+.image-video-section {
+      padding: var(--padding-desktop);
+}
+  .image-video-section .common-heading {
+    color: var(--color-heading);
+    margin: 10px 0 10px;
+  }
+  .image-video-section .common-subheading {
+    color: var(--color-subtext);
+    margin: 0 0 15px;
+  }
+  .image-video-section .common-text p {
+    color: var(--color-text);
+    margin: 0 0 20px;
+  }
+  .image-video-section .common-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    margin: 0 0 20px;
+    background: var(--color-button);
+    color: var(--color-button-text);
+    text-decoration: none;
+    transition: opacity 0.3s;
+  }
+  .image-video-section .common-btn:hover {
+    opacity: 0.9;
+    background: var(--color-button-hover);
+    color: var(--color-button-text-hover);
+  }
+
+  /* Centering Logic for per-media overlay */
+  .image-video-section.v-top .overlay-content { align-items: flex-start; }
+  .image-video-section.v-middle .overlay-content { align-items: center; }
+  .image-video-section.v-bottom .overlay-content { align-items: flex-end; }
+  .image-video-section.h-left .overlay-content { justify-content: flex-start; text-align: left; }
+  .image-video-section.h-center .overlay-content { justify-content: center; text-align: center; }
+  .image-video-section.h-right .overlay-content { justify-content: flex-end; text-align: right; }
+
+  /* Centering Logic for section-center-overlay */
+  .image-video-section.v-top .section-center-overlay { align-items: flex-start; }
+  .image-video-section.v-middle .section-center-overlay { align-items: center; }
+  .image-video-section.v-bottom .section-center-overlay { align-items: flex-end; }
+  .image-video-section.h-left .section-center-overlay { justify-content: center; text-align: left; }
+  .image-video-section.h-center .section-center-overlay { justify-content: center; text-align: center; }
+  .image-video-section.h-right .section-center-overlay { justify-content: center; text-align: right; }
+
+  .desktop-only { display: block; }
+  .mobile-only { display: none; }
+
+  @media (max-width: 768px) {
+    .desktop-only { display: none; }
+    .mobile-only { display: block; }
+    .image-video-section {
+      padding: var(--padding-mobile);
+}
+
+    .image-video-section.content-center .section-center-overlay {
+        position: absolute;
+        inset: 0;
+        padding: 40px 20px;
+        align-items: center;
+    }
+    .image-video-section.h-left .section-center-overlay { justify-content: flex-start; text-align: left; }
+    .image-video-section.h-center .section-center-overlay { justify-content: center; text-align: center; }
+    .image-video-section.h-right .section-center-overlay { justify-content: flex-end; text-align: right; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Image + Video",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "video", "id": "video", "label": "Video" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Media Layout",
+      "default": "image-left",
+      "options": [
+        { "value": "image-left", "label": "Image Left / Video Right" },
+        { "value": "video-left", "label": "Video Left / Image Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Text Position",
+      "default": "image",
+      "options": [
+        { "value": "image", "label": "On Image" },
+        { "value": "video", "label": "On Video" },
+        { "value": "center", "label": "Center" }
+      ]
+    },
+
+    {
+      "type": "select",
+      "id": "vertical_align",
+      "label": "Vertical Align",
+      "default": "middle",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+
+    {
+      "type": "select",
+      "id": "horizontal_align",
+      "label": "Horizontal Align",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+
+    { "type": "header", "content": "Desktop Settings" },
+    { "type": "header", "content": "Heading Settings" },
+    { "type": "text", "id": "heading_desktop", "label": "Heading" },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    
+    { "type": "header", "content": "Subheading Settings" },
+    { "type": "text", "id": "subheading_desktop", "label": "Subheading" },
+
+    { "type": "header", "content": "Text Settings" },
+    { "type": "richtext", "id": "text_desktop", "label": "Text" },
+
+    { "type": "header", "content": "Button Settings" },
+    { "type": "text", "id": "button_text_desktop", "label": "Button Text" },
+    { "type": "url", "id": "button_link_desktop", "label": "Button Link" },
+
+    { "type": "header", "content": "Mobile Settings" },
+    { "type": "header", "content": "Heading Settings" },
+    { "type": "text", "id": "heading_mobile", "label": "Heading" },
+
+    { "type": "header", "content": "Subheading Settings" },
+    { "type": "text", "id": "subheading_mobile", "label": "Subheading" },
+
+    { "type": "header", "content": "Text Settings" },
+    { "type": "richtext", "id": "text_mobile", "label": "Text" },
+
+    { "type": "header", "content": "Button Settings" },
+    { "type": "text", "id": "button_text_mobile", "label": "Button Text" },
+    { "type": "url", "id": "button_link_mobile", "label": "Button Link" },
+
+    { "type": "header", "content": "Section Padding" },
+    { "type": "text", "id": "padding_desktop", "label": "Section Padding Desktop", "default": "0px 0px 0px 0px", "info": "Format: Top Right Bottom Left (e.g., 40px 20px 40px 20px)" },
+    { "type": "text", "id": "padding_mobile", "label": "Section Padding Mobile", "default": "0px 0px 0px 0px", "info": "Format: Top Right Bottom Left (e.g., 20px 10px 20px 10px)" }
+
+  ],
+    "presets": [
+    {
+      "name": "Image + Video",
+          "category": "Video"
+    }
+  ]
+}
+
+{% endschema %}

@@ -1,0 +1,26 @@
+{%- liquid
+  assign button_classes = 'header__search-link'
+  if class != blank
+    assign button_classes = button_classes | append: ' ' | append: class
+  endif
+-%}
+<button type="button" class="{{ button_classes }}" aria-label="{{ 'general.search.search' | t }}" data-search-toggle>
+<svg width="20" height="26" viewBox="0 0 24 24" fill="none">
+  <circle 
+    cx="11" 
+    cy="11" 
+    r="6.5" 
+    stroke="currentColor" 
+    stroke-width="1.2"
+  />
+  <line 
+    x1="16.5" 
+    y1="16.5" 
+    x2="20" 
+    y2="20" 
+    stroke="currentColor" 
+    stroke-width="1.2" 
+    stroke-linecap="round"
+  />
+</svg>
+</button>

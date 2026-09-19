@@ -1,0 +1,166 @@
+{%- liquid 
+  assign metafield_values = block.settings.values | split: ',' 
+  assign param_name = 'filter.p.m.' | append: block.settings.namespace | append: '.' | append: block.settings.key
+  assign filter_to_check = nil
+  for filter in collection.filters
+    if filter.param_name == param_name
+      assign filter_to_check = filter
+      break
+    endif
+  endfor
+
+  assign has_values = false
+  if filter_to_check
+    for val in metafield_values
+      assign val_stripped = val | strip
+      for f_val in filter_to_check.values
+        if f_val.value == val_stripped
+          if f_val.count > 0 or f_val.active
+            assign has_values = true
+            break
+          endif
+        endif
+      endfor
+      if has_values
+        break
+      endif
+    endfor
+  endif
+-%}
+
+{% if has_values or request.design_mode %}
+<div class="filter-group {% if block.settings.expand_by_default %}active{% endif %}" data-block-id="{{ block.id }}">
+  {% if block.settings.title != blank %}
+    <div class="filter-title {% if block.settings.enable_collapsible %}is-collapsible{% endif %}">
+      <span>{{ block.settings.title }}</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#333" stroke-width="1.5"/></svg>
+    </div>
+  {% endif %}
+  
+  <div class="filter-content" {% unless block.settings.expand_by_default %}style="display:none;"{% endunless %}>
+    {% if block.settings.design == 'list' %}
+      <ul class="filter-list">
+        {%- for val in metafield_values -%}
+          {%- assign val_stripped = val | strip -%}
+          <li class="filter-item">
+            <label>
+              {%- assign param_name = 'filter.p.m.' | append: block.settings.namespace | append: '.' | append: block.settings.key -%}
+              <input type="checkbox"
+                name="{{ param_name }}"
+                value="{{ val_stripped }}"
+                {%- liquid
+                  assign is_active = false
+                  for filter in collection.filters
+                    if filter.param_name == param_name
+                      for active_val in filter.active_values
+                        if active_val.value == val_stripped
+                          assign is_active = true
+                          break
+                        endif
+                      endfor
+                    endif
+                  endfor
+                -%}
+                {% if is_active %}checked{% endif %}
+                onchange="toggleMetafieldFilter(this)">
+              
+              {%- if block.settings.work_with_filter_colors -%}
+                 {%- liquid
+                   assign color_name_downcase = val_stripped | downcase
+                   assign custom_swatch_color = val_stripped | handle
+                   
+                   if settings.custom_color_mapping != blank
+                     assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                     for row in mapping_rows
+                       assign parts = row | split: ':'
+                       if parts.size == 2
+                         assign m_name = parts[0] | strip | downcase
+                         assign m_color = parts[1] | strip
+                         if m_name == color_name_downcase
+                           assign custom_swatch_color = m_color
+                           break
+                         endif
+                       endif
+                     endfor
+                   endif
+                   assign color_handle = val_stripped | handle
+                 -%}
+                 {%- liquid
+                   assign swatch_image = nil
+                   assign swatch_file_name = color_handle | append: '.png'
+                   if images[swatch_file_name] != blank
+                     assign swatch_image = images[swatch_file_name] | image_url: width: 40
+                   endif
+                 -%}
+                 <span class="color-swatch-small" style="background-color: {{ custom_swatch_color }};{% if swatch_image %} background-image: url({{ swatch_image }});{% endif %}"></span>
+              {%- endif -%}
+
+              <span>{{ val_stripped }}</span>
+            </label>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <div class="tag-buttons">
+        {%- for val in metafield_values -%}
+          {%- assign val_stripped = val | strip -%}
+          {%- assign param_name = 'filter.p.m.' | append: block.settings.namespace | append: '.' | append: block.settings.key -%}
+          {%- liquid
+            assign is_active = false
+            for filter in collection.filters
+              if filter.param_name == param_name
+                for active_val in filter.active_values
+                  if active_val.value == val_stripped
+                    assign is_active = true
+                    break
+                  endif
+                endfor
+              endif
+            endfor
+          -%}
+          <button type="button" 
+            class="tag-button {% if is_active %}active{% endif %}"
+            data-name="{{ param_name }}"
+            data-value="{{ val_stripped }}"
+            aria-label="{{ val_stripped }}"
+            onclick="toggleMetafieldFilter(this)">
+            
+            {%- if block.settings.work_with_filter_colors -%}
+               {%- liquid
+                 assign color_name_downcase = val_stripped | downcase
+                 assign custom_swatch_color = val_stripped | handle
+                 
+                 if settings.custom_color_mapping != blank
+                   assign mapping_rows = settings.custom_color_mapping | newline_to_br | split: '<br />'
+                   for row in mapping_rows
+                     assign parts = row | split: ':'
+                     if parts.size == 2
+                       assign m_name = parts[0] | strip | downcase
+                       assign m_color = parts[1] | strip
+                       if m_name == color_name_downcase
+                         assign custom_swatch_color = m_color
+                         break
+                       endif
+                     endif
+                   endfor
+                 endif
+                 assign color_handle = val_stripped | handle
+               -%}
+               {%- liquid
+                 assign swatch_image = nil
+                 assign swatch_file_name = color_handle | append: '.png'
+                 if images[swatch_file_name] != blank
+                   assign swatch_image = images[swatch_file_name] | image_url: width: 40
+                 endif
+               -%}
+               <span class="color-swatch-small" style="background-color: {{ custom_swatch_color }};{% if swatch_image %} background-image: url({{ swatch_image }});{% endif %}"></span>
+            {%- endif -%}
+            
+            {{ val_stripped }}
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+{% endif %}

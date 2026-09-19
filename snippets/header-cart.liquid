@@ -1,0 +1,7 @@
+{%- if settings.show_cart_icon -%}
+  {%- assign cart_type = settings.cart_type | default: 'drawer' -%}
+  <a href="{{ routes.cart_url }}" {% if cart_type == 'drawer' and template != 'cart' %}data-cart-drawer-open{% endif %} class="header__cart-link {{ class }}">
+    <sup class="header__cart-count" style="{% if cart.item_count == 0 %}display: none;{% endif %}">{{ cart.item_count }}</sup>
+    {% render 'icon-cart' %}
+  </a>
+{%- endif -%}

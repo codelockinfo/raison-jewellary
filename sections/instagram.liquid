@@ -1,0 +1,519 @@
+{% comment %}
+  Instagram Gallery Section
+  Options: Auto Slider OR Grid
+  Now supports Video (File & External) and Links
+{% endcomment %}
+
+{% comment %} Swiper CSS is loaded globally in theme.liquid {% endcomment %}
+
+<section class="instagram-gallery-section color-{{ section.settings.color_scheme }} skeleton-container" id="insta-{{ section.id }}"
+  style="
+    --heading-align: {{ section.settings.heading_alignment }};
+    --grid-cols-desktop: {{ section.settings.grid_desktop_columns }};
+    --grid-cols-mobile: {{ section.settings.grid_mobile_columns }};
+    --padding-desktop: {{ section.settings.padding_desktop }};
+    --padding-mobile: {{ section.settings.padding_mobile }};
+    --media-ratio: {% if section.settings.media_ratio == 'square' %}1/1{% else %}3/5{% endif %};
+  "
+>
+  {% style %}
+    .instagram-gallery-media-wrap {
+      aspect-ratio: var(--media-ratio);
+      position: relative;
+      background: #eee;
+      overflow: hidden;
+      border-radius: var(--block-radius, 12px);
+    }
+    .insta-media {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .instagram-gallery-item:hover .insta-media {
+      transform: scale(1.05);
+    }
+    .instagram-gallery-media-wrap video.insta-media {
+      object-fit: cover;
+    }
+    .insta-placeholder-wrap svg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .insta-placeholder-wrap {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    /* Navigation Arrows */
+    .instagram-gallery-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background-color: #FEFEFE;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      color: #000;
+    }
+    
+    .instagram-gallery-arrow:hover {
+      background-color: #000;
+      color: #FEFEFE;
+    }
+    
+    .instagram-gallery-arrow--prev {
+      left: 15px;
+    }
+    
+    .instagram-gallery-arrow--next {
+      right: 15px;
+    }
+    
+    .instagram-gallery-arrow svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    @media (min-width: 1025px) {
+      {% if section.settings.arrow_visibility == 'hover' %}
+        .instagram-gallery-arrow {
+          opacity: 0;
+          visibility: hidden;
+        }
+        .instagram-gallery-wrapper:hover .instagram-gallery-arrow {
+          opacity: 1;
+          visibility: visible;
+        }
+      {% elsif section.settings.arrow_visibility == 'hide' %}
+        .instagram-gallery-arrow {
+          display: none !important;
+        }
+      {% endif %}
+    }
+    
+    @media (max-width: 768px) {
+      {% if section.settings.show_arrows_mobile == false %}
+        .instagram-gallery-arrow {
+          display: none !important;
+        }
+      {% endif %}
+      .instagram-gallery-arrow {
+        width: 35px;
+        height: 35px;
+      }
+      .instagram-gallery-arrow svg {
+        width: 20px;
+        height: 20px;
+      }
+      .instagram-gallery-arrow--next {
+        right: 5px;
+      }
+      .instagram-gallery-arrow--prev {
+        left: 5px;
+      }
+    }
+  {% endstyle %}
+  <div class="skeleton-visible">
+    <div class="instagram-gallery-container container_width">
+       <div class="instagram-gallery-heading">
+          <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 40px; width: 300px; margin: 0 auto 10px;"></div>
+          <div class="skeleton-box skeleton-shimmer skeleton-text short" style="margin: 0 auto 30px;"></div>
+       </div>
+       <div style="display: grid; grid-template-columns: repeat({{ section.settings.grid_desktop_columns }}, 1fr); gap: 15px;">
+          {% for i in (1..section.settings.grid_desktop_columns) %}
+             <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: var(--media-ratio); border-radius: 12px;"></div>
+          {% endfor %}
+       </div>
+    </div>
+  </div>
+  <div class="instagram-gallery-container container_width">
+
+    {% if section.settings.heading != blank %}
+      <div class="instagram-gallery-heading">
+        {% render 'heading-style-banner',
+          heading: section.settings.heading,
+          heading_tag: section.settings.heading_tag,
+          heading_style: section.settings.heading_style,
+          heading_alignment: section.settings.heading_alignment,
+          wrapper_class: 'instagram-gallery'
+        %}
+        {% if section.settings.subheading != blank %}
+          <span class="instagram-gallery-subtitle">{{ section.settings.subheading }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="instagram-gallery-wrapper {% if section.settings.layout == 'slider' %}swiper instagram-gallery-slider{% else %}instagram-gallery-grid{% endif %}">
+      <div class="{% if section.settings.layout == 'slider' %}swiper-wrapper{% else %}instagram-gallery-grid-inner{% endif %}">
+        
+        {% if section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            <div class="{% if section.settings.layout == 'slider' %}swiper-slide{% endif %} instagram-gallery-item" {{ block.shopify_attributes }}>
+              {% if block.settings.link != blank %}
+                <a href="{{ block.settings.link }}" target="_blank" class="instagram-gallery-link">
+              {% endif %}
+              
+              <div class="instagram-gallery-media-wrap">
+                {% if block.settings.media_type == 'video' %}
+                  {% if block.settings.video != blank %}
+                    {{ block.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, class: 'insta-media' }}
+                    <div class="insta-video-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  {% elsif block.settings.video_url_external != blank %}
+                    <video autoplay muted loop playsinline class="insta-media">
+                      {% # theme-check-disable RemoteAsset %}
+                      <source src="{{ block.settings.video_url_external | escape }}" type="video/mp4">
+                      {% # theme-check-enable RemoteAsset %}
+                    </video>
+                    <div class="insta-video-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  {% elsif block.settings.image != blank %}
+                  {% assign loading_strategy = section.settings.lazy_load | default: 'lazy' %}
+                  {% assign fetch_priority = 'low' %}
+                  {% if loading_strategy == 'eager' %}
+                    {% assign fetch_priority = 'high' %}
+                  {% endif %}
+                  {{ block.settings.image | image_url: width: 600, height: 600, crop: 'center' | image_tag: loading: loading_strategy, fetchpriority: fetch_priority, class: 'insta-media', alt: 'Instagram media', width: 600, height: 600 }}
+                  {% else %}
+                     {% if block.settings.image != blank %}
+                       {{ block.settings.image | image_url: width: 600 | image_tag: class: 'insta-media', loading: 'lazy', width: 600, height: 600 }}
+                     {% else %}
+                       <div class="insta-placeholder-wrap">
+                         {{ 'image' | placeholder_svg_tag: 'insta-media placeholder-svg' }}
+                       </div>
+                     {% endif %}
+                  {% endif %}
+                {% else %}
+                  {% if block.settings.image != blank %}
+                    {{ block.settings.image | image_url: width: 600 | image_tag: class: 'insta-media', loading: 'lazy', width: 600, height: 600 }}
+                  {% else %}
+                    <div class="insta-placeholder-wrap">
+                      {{ 'image' | placeholder_svg_tag: 'insta-media placeholder-svg' }}
+                    </div>
+                  {% endif %}
+                {% endif %}
+                
+                <div class="insta-overlay">
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </div>
+              </div>
+
+              {% if block.settings.link != blank %}
+                </a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          {% comment %} FALLBACK FOR EMPTY SECTION {% endcomment %}
+          {% for i in (1..5) %}
+            <div class="{% if section.settings.layout == 'slider' %}swiper-slide{% endif %} instagram-gallery-item">
+              <div class="instagram-gallery-media-wrap">
+                <div class="insta-placeholder-wrap">
+                   {{ 'image' | placeholder_svg_tag: 'insta-media placeholder-svg' }}
+                </div>
+                <div class="insta-overlay">
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      {% if section.settings.layout == 'slider' %}
+        <div class="instagram-gallery-arrow instagram-gallery-arrow--prev">
+          {% render 'icon-slider-nav', direction: 'prev' %}
+        </div>
+        <div class="instagram-gallery-arrow instagram-gallery-arrow--next">
+          {% render 'icon-slider-nav', direction: 'next' %}
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+<script>
+(function() {
+  function initInstaGallery() {
+    const slider = document.querySelector('#insta-{{ section.id }} .instagram-gallery-slider');
+    if (slider) {
+      new Swiper(slider, {
+  slidesPerView: {{ section.settings.slider_mobile_view }},
+  spaceBetween: 10,
+  loop: true,
+  autoplay: {
+    delay: 3000,
+    disableOnInteraction: false
+  },
+  navigation: {
+    nextEl: '#insta-{{ section.id }} .instagram-gallery-arrow--next',
+    prevEl: '#insta-{{ section.id }} .instagram-gallery-arrow--prev',
+  },
+  breakpoints: {
+    768: {
+      slidesPerView: {{ section.settings.slider_mobile_view }},
+      spaceBetween: 15
+    },
+    1024: {
+      slidesPerView: {{ section.settings.slider_desktop_view }},
+      spaceBetween: 15
+    }
+  }
+});
+
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initInstaGallery);
+  document.addEventListener('shopify:section:load', function(e) {
+    if (e.target.id === 'shopify-section-{{ section.id }}') {
+      initInstaGallery();
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Insta feed",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Desktop Padding (Top Right Bottom Left)",
+      "default": "60px 20px 60px 20px",
+      "info": "Example: 60px 20px 60px 20px"
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Mobile Padding (Top Right Bottom Left)",
+      "default": "40px 15px 40px 15px",
+      "info": "Example: 40px 15px 40px 15px"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "#Beauty Vibes"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Sub Heading",
+      "default": "FOLLOW US"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout Type",
+      "default": "slider",
+      "options": [
+        { "value": "slider", "label": "Auto Slider" },
+        { "value": "grid", "label": "Grid" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        { "value": "simple", "label": "design 1" },
+        { "value": "line-top", "label": "design 2" },
+        { "value": "underline", "label": "design 3" },
+        { "value": "lines", "label": "design 4" },
+        { "value": "diamond", "label": "design 5" },
+        { "value": "ornament", "label": "design 6" },
+        { "value": "x", "label": "design 7" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "slider_desktop_view",
+      "label": "Slider Desktop Slides Per View",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "slider_mobile_view",
+      "label": "Slider Mobile Slides Per View",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "arrow_visibility",
+      "label": "Arrow Visibility",
+      "options": [
+        { "value": "always", "label": "Always Visible" },
+        { "value": "hover", "label": "Visible on Hover" },
+        { "value": "hide", "label": "Hide" }
+      ],
+      "default": "always"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_mobile",
+      "label": "Arrow Visibility (Mobile)",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Grid Settings"
+    },
+    {
+      "type": "range",
+      "id": "grid_desktop_columns",
+      "label": "Grid Desktop Columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_mobile_columns",
+      "label": "Grid Mobile Columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Media Settings"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Media Aspect Ratio",
+      "default": "square",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Media Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media Type",
+          "default": "video",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Video" }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video (Upload)"
+        },
+        {
+          "type": "text",
+          "id": "video_url_external",
+          "label": "Video URL (MP4 Link)",
+          "info": "Paste a direct link to an MP4 file here."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Media Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Insta feed",
+      "category": "Image",
+      "blocks": [
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,180 @@
+{%- unless template == 'index' or template == 'cart' or template == 'list-collections' or template == '404' -%}
+<nav class="breadcrumb" role="navigation" aria-label="breadcrumbs">
+  <div class="breadcrumb__container">
+  <a href="{{ routes.root_url }}" title="{{ 'general.breadcrumbs.home_link_title' | t }}">{{ 'general.breadcrumbs.home' | t | default: "Home" }}</a>
+
+  {%- if template contains 'page' -%}
+    <span aria-hidden="true" class="breadcrumb__separator">/</span>
+    <span>{{ page.title }}</span>
+
+  {%- elsif template contains 'product' -%}
+    {%- assign product_collection = collection | default: product.collections.first -%}
+    {%- if product_collection -%}
+      <span aria-hidden="true" class="breadcrumb__separator">/</span>
+      {{ product_collection.title | link_to: product_collection.url }}
+    {%- endif -%}
+
+    <span aria-hidden="true" class="breadcrumb__separator">/</span>
+    <span>{{ product.title }}</span>
+
+  {%- elsif template contains 'collection' and collection.handle -%}
+    <span aria-hidden="true" class="breadcrumb__separator">/</span>
+    {%- if current_tags -%}
+      {% capture url %}/collections/{{ collection.handle }}{% endcapture %}
+      {{ collection.title | link_to: url }}
+      <span aria-hidden="true" class="breadcrumb__separator">/</span>
+      <span>{{ current_tags | join: " + " }}</span>
+    {%- else -%}
+      <span>{{ collection.title }}</span>
+    {%- endif -%}
+
+  {%- elsif template == 'blog' -%}
+    <span aria-hidden="true" class="breadcrumb__separator">/</span>
+    {%- if current_tags -%}
+      {{ blog.title | link_to: blog.url }}
+      <span aria-hidden="true" class="breadcrumb__separator">/</span>
+      <span>{{ current_tags | join: " + " }}</span>
+    {%- else -%}
+    <span>{{ blog.title }}</span>
+    {%- endif -%}
+
+  {%- elsif template == 'article' -%}
+    <span aria-hidden="true" class="breadcrumb__separator">/</span>
+    {{ blog.title | link_to: blog.url }}
+    <span aria-hidden="true" class="breadcrumb__separator">/</span>
+    <span>{{ article.title }}</span>
+  {%- else -%}
+   <span aria-hidden="true" class="breadcrumb__separator">/</span>
+   <span>{{ page_title }}</span>
+  {%- endif -%}
+  </div>
+</nav>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "home",
+      "item": "{{ shop.url }}"
+    }
+    {%- if template contains 'page' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ page.title }}",
+        "item": "{{ shop.url }}{{ page.url }}"
+      }
+    {%- elsif template contains 'product' -%}
+      {%- assign product_collection = collection | default: product.collections.first -%}
+      {%- if product_collection -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ product_collection.title }}",
+          "item": "{{ shop.url }}{{ product_collection.url }}"
+        }
+        ,{
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ product.title }}",
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- else -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ product.title }}",
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- endif -%}
+
+    {%- elsif template contains 'collection' and collection.handle -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ collection.title }}",
+        "item": "{{ shop.url }}{{ collection.url }}"
+      }
+    {%- elsif template == 'blog' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ blog.title }}",
+        "item": "{{ shop.url }}{{ blog.url }}"
+      }
+    {%- elsif template == 'article' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ blog.title }}",
+        "item": "{{ shop.url }}{{ blog.url }}"
+      }
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ article.title }}",
+        "item": "{{ shop.url }}{{ article.url }}"
+      }
+    {%- endif -%}
+  ]
+}
+</script>
+{%- endunless -%}
+
+<style>
+  .breadcrumb {
+    padding: 10px 0;
+    color: black;
+  }
+   .breadcrumb__container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: left;
+    gap: 0.5rem;
+   }
+
+   .breadcrumb__container span {
+    font-weight: 500;
+    line-height: 1.6;
+   }
+   .breadcrumb__container a {
+    font-weight: 600;
+    font-size: 14px;
+   }
+  .breadcrumb a {
+    color: gray !important;
+    font-size:16px !important;
+    font-weight:400 !important;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .breadcrumb a:hover {
+    color: rgb(var(black));
+    text-decoration: underline;
+  }
+  .breadcrumb__separator {
+    margin: 0 0.2rem;
+    opacity: 0.6;
+  }
+
+    @media screen and (max-width: 750px) {
+      .breadcrumb {
+        padding: 0px 0;
+        color: black;
+      }
+      .breadcrumb__container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: left;
+        gap: 4px;
+      }
+     
+      .breadcrumb__container a {
+        font-weight: 600;
+      }
+    }
+</style>

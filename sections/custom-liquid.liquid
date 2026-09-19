@@ -1,0 +1,92 @@
+<style>
+  .section-{{ section.id }}-padding {
+    padding: {{ section.settings.padding_desktop }};
+  }
+  @media (max-width: 768px) {
+    .section-{{ section.id }}-padding {
+      padding: {{ section.settings.padding_mobile }};
+    }
+  }
+</style>
+<div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding" style="background: {{ section.settings.bg_gradient | default: section.settings.bg_color }};">
+  <div class="section-custom-liquid container_width">
+    <div style="color: {{ section.settings.text_color }};">
+      {{ section.settings.custom_liquid }}
+    </div>
+  </div>
+</div>
+
+{% comment %} Removed old style block in favor of inline styles for container width {% endcomment %}
+
+{% schema %}
+{
+  "name": "Custom Liquid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Liquid code",
+      "info": "Add app snippets or other code to create advanced customizations."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FEFEFE"
+    },
+    {
+      "type": "color_background",
+      "id": "bg_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Section Padding (Desktop)",
+      "default": "60px 0px 60px 0px",
+      "info": "Values: top right bottom left (e.g., 60px 20px 60px 20px)"
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Section Padding (Mobile)",
+      "default": "40px 0px 40px 0px",
+      "info": "Values: top right bottom left (e.g., 40px 15px 40px 15px)"
+    },
+    {
+      "type": "checkbox",
+      "id": "make_section_narrow",
+      "default": true,
+      "label": "Make section narrow"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Liquid",
+      "category": "layout",
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,497 @@
+{{ 'custom-style.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  .dynamic-swiper .swiper-pagination-bullet {
+    background: var(--color-pagination-bullet) !important;
+    opacity: 0.5 !important;
+    width: 10px;
+    height: 10px;
+  }
+  .dynamic-swiper .swiper-pagination-bullet-active {
+    background: var(--color-pagination-bullet-active) !important;
+    opacity: 1 !important;
+    transform: scale(1.2);
+  } 
+
+/* 🔒 Force hide arrows on mobile & desktop when only one slide */
+.dynamic-swiper .swiper.swiper--single-slide .swiper-button-next,
+.dynamic-swiper .swiper.swiper--single-slide .swiper-button-prev {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.heading-style-banner.swiper-slide__heading-wrapper {
+  width: 100%;
+}
+  @media screen and (max-width: 768px) { 
+    .dynamic-swiper .slide-content {
+      padding: 20px;
+    } 
+    .dynamic-swiper .slide-content.mobile-alignment-center-center .slide-inner {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .dynamic-swiper .slide-content.mobile-alignment-align-center-top .swiper-slide__heading,
+    .dynamic-swiper .slide-content.mobile-alignment-align-center-center .swiper-slide__heading,
+    .dynamic-swiper .slide-content.mobile-alignment-align-center-bottom .swiper-slide__heading{
+      text-align: center;
+    }
+
+    .dynamic-swiper .slide-content.mobile-alignment-align-right-top .swiper-slide__heading,
+    .dynamic-swiper .slide-content.mobile-alignment-align-right-center .swiper-slide__heading,
+    .dynamic-swiper .slide-content.mobile-alignment-align-right-bottom .swiper-slide__heading{
+      text-align: right;
+    }
+
+    .dynamic-swiper .slide-content.mobile-alignment-center-center .common-subheading {
+      text-align: center;
+    }
+
+       /* Cancel hover logic completely */
+  .dynamic-swiper[data-button-visibility="hover"] .swiper-button-next,
+  .dynamic-swiper[data-button-visibility="hover"] .swiper-button-prev {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  }
+{% endstyle %}
+
+<div class="dynamic-swiper color-{{ section.settings.color_scheme }} skeleton-container" 
+     data-section-id="{{ section.id }}"
+     data-show-pagination="{{ section.settings.show_pagination }}"
+     data-show-navigation="{{ section.settings.show_navigation }}"
+     data-button-visibility="{{ section.settings.button_visibility }}"
+     data-arrow-style="{{ section.settings.arrow_style }}"
+     data-show-arrows-mobile="{{ section.settings.show_arrows_mobile }}"
+     style="
+       --heading-color: var(--color-heading);
+       --subheading-color: var(--color-subtext);      
+       --button-bg-color: var(--color-button);
+       --button-text-color: var(--color-button-text);
+       --button-border-color: var(--color-button);
+       --image-height: {{ section.settings.image_height }}px;
+       --image-height-mobile: {{ section.settings.image_height_mobile }}px;
+       --button-padding-v: {{ section.settings.button_padding_vertical }}px;
+       --button-padding-h: {{ section.settings.button_padding_horizontal }}px;
+     "
+>
+  <div class="skeleton-visible">
+    <div style="width: 100%; height: var(--image-height); position: relative; overflow: hidden; background: #eee;">
+       <div class="skeleton-box skeleton-shimmer" style="width: 100%; height: 100%;"></div>
+       <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; max-width: 600px;">
+          <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 60px; width: 400px; margin: 0 auto 20px;"></div>
+          <div class="skeleton-box skeleton-shimmer skeleton-text medium" style="margin: 0 auto 30px;"></div>
+          <div class="skeleton-box skeleton-shimmer" style="width: 150px; height: 50px; border-radius: 5px; margin: 0 auto;"></div>
+       </div>
+    </div>
+  </div>
+  <div class="swiper mySwiper-{{ section.id }}">
+    <div class="swiper-wrapper">
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          <div class="swiper-slide">
+            {% liquid
+              assign loading_attr = 'lazy'
+              assign fetch_priority = 'low'
+              if section.settings.lazy_load == 'eager' and forloop.first
+                assign loading_attr = 'eager'
+                assign fetch_priority = 'high'
+              endif
+            %}
+            {% if block.settings.image %}
+              {% if block.settings.mobile_image %}
+                <img 
+                  class="desktop-image" 
+                  src="{{ block.settings.image | image_url: width: 2000 }}" 
+                  alt="{{ block.settings.heading | escape }}"
+                  loading="{{ loading_attr }}"
+                  fetchpriority="{{ fetch_priority }}"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                >
+                <img 
+                  class="mobile-image" 
+                  src="{{ block.settings.mobile_image | image_url: width: 1000 }}" 
+                  alt="{{ block.settings.heading | escape }}"
+                  loading="{{ loading_attr }}"
+                  fetchpriority="{{ fetch_priority }}"
+                  width="{{ block.settings.mobile_image.width }}"
+                  height="{{ block.settings.mobile_image.height }}"
+                >
+              {% else %}
+                <img 
+                  class="swiper-slide-image" 
+                  src="{{ block.settings.image | image_url: width: 2000 }}" 
+                  alt="{{ block.settings.heading | escape }}"
+                  loading="{{ loading_attr }}"
+                  fetchpriority="{{ fetch_priority }}"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                >
+              {% endif %}
+            {% else %}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+
+            <div class="slide-content {{ block.settings.alignment }} mobile-alignment-{{ block.settings.alignment_mobile }}">
+              <div class="slide-inner">
+                {% if block.settings.text_above_heading != blank %}
+                  <span class="text-above-heading">{{ block.settings.text_above_heading }}</span>
+                {% endif %}
+                {% assign align_val = block.settings.alignment %}
+                {% if align_val contains 'left' %}
+                  {% assign text_align = 'left' %}
+                {% elsif align_val contains 'right' %}
+                  {% assign text_align = 'left' %}
+                {% else %}
+                  {% assign text_align = 'center' %}
+                {% endif %}
+
+                {% render 'heading-style-banner',
+                  heading: block.settings.heading,
+                  heading_tag: section.settings.heading_tag,
+                  heading_style: section.settings.heading_style,
+                  heading_alignment: text_align,
+                  wrapper_class: 'swiper-slide',
+                  heading_styles: 'color: var(--heading-color); margin: 0;'
+                %}
+                <p class="common-subheading">{{ block.settings.subheading }}</p>
+                {% if block.settings.button_text != blank %}
+                  <a href="{{ block.settings.button_link }}" class="common-btn">
+                    {{ block.settings.button_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..2) %}
+          <div class="swiper-slide">
+            {{ 'lifestyle-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+            <div class="slide-content align-center-center">
+              <div class="slide-inner">
+                <span class="text-above-heading">New Collection 2024</span>
+                <h2>Dynamic Swiper Slide {{ i }}</h2>
+                <p>Welcome to our store. We provide the best quality products for you.</p>
+                <a href="#">Shop Now</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    {% if section.settings.show_pagination %}
+      <div class="swiper-pagination swiper-pagination-{{ section.id }}"></div>
+    {% endif %}
+
+      <div class="swiper-button-next swiper-button-next-{{ section.id }}">{% render 'icon-slider-nav', direction: 'next' %}</div>
+      <div class="swiper-button-prev swiper-button-prev-{{ section.id }}">{% render 'icon-slider-nav', direction: 'prev' %}</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var sectionId = '{{ section.id }}';
+  
+  function initSwiper() {
+    var container = document.querySelector('[data-section-id="' + sectionId + '"]');
+    if (!container) return;
+    
+    const swiperElement = container.querySelector('.mySwiper-' + sectionId);
+    if (!swiperElement) return;
+    
+    // Check if Swiper is already initialized
+    if (swiperElement.swiper) {
+      swiperElement.swiper.destroy(true, true);
+    }
+
+    const slides = swiperElement.querySelectorAll('.swiper-slide');
+    const slideCount = slides.length;
+
+    // Add class if only one slide
+if (slideCount <= 1) {
+  swiperElement.classList.add('swiper--single-slide');
+} else {
+  swiperElement.classList.remove('swiper--single-slide');
+}
+
+    
+    const swiperConfig = {
+      loop: slideCount > 1,
+      spaceBetween: 0,
+      slidesPerView: 1,
+      watchOverflow: true
+    };
+    
+    var showPagination = container.getAttribute('data-show-pagination') === 'true';
+    var showNavigation = container.getAttribute('data-show-navigation') === 'true';
+    
+    if (showPagination  && slideCount > 1) {
+      const paginationEl = container.querySelector('.swiper-pagination-' + sectionId);
+      if (paginationEl) {
+        swiperConfig.pagination = {
+          el: paginationEl,
+          clickable: true,
+          type: 'bullets'
+        };
+      }
+    }
+    
+      const nextEl = container.querySelector('.swiper-button-next-' + sectionId);
+      const prevEl = container.querySelector('.swiper-button-prev-' + sectionId);
+      if (showNavigation && slideCount > 1) {
+        swiperConfig.navigation = {
+          nextEl: nextEl,
+          prevEl: prevEl
+        };
+      }
+    
+    if (typeof Swiper !== 'undefined') {
+      new Swiper(swiperElement, swiperConfig);
+    } else {
+      setTimeout(initSwiper, 100);
+    }
+  }
+  
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSwiper);
+  } else {
+    setTimeout(initSwiper, 100);
+  }
+  
+  // Re-initialize when theme editor updates
+  if (typeof document.addEventListener !== 'undefined') {
+    document.addEventListener('shopify:section:load', function(event) {
+      if (event.detail.sectionId === sectionId) {
+        setTimeout(initSwiper, 100);
+      }
+    });
+  }
+})();
+</script>
+
+
+
+{% schema %}
+{
+  "name": "Dynamic Swiper Slider",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "lazy_load",
+      "label": "Image Loading",
+      "options": [
+        { "value": "lazy", "label": "Lazy" },
+        { "value": "eager", "label": "Eager" }
+      ],
+      "default": "lazy"
+    },
+    {
+       "type": "select",
+       "id": "heading_style",
+       "label": "Heading Style",
+       "default": "simple",
+       "options": [
+        { "value": "simple", "label": "Design 1" },
+        { "value": "line-top", "label": "Design 2" },
+        { "value": "underline", "label": "Design 3" },
+        { "value": "lines", "label": "Design 4" },
+        { "value": "diamond", "label": "Design 5" },
+        { "value": "ornament", "label": "Design 6" },
+        { "value": "x", "label": "Design 7" }
+       ]
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings (Desktop)"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Button Padding (Top/Bottom)",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Button Padding (Left/Right)",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Image Height (Desktop)",
+      "min": 200,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "label": "Image Height (Mobile)",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pagination",
+      "label": "Show Pagination",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show Prev/Next Buttons",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "button_visibility",
+      "label": "Button Visibility",
+      "options": [
+        { "value": "static", "label": "Always Visible" },
+        { "value": "hover", "label": "Show on Hover" }
+      ],
+      "default": "static",
+      "info": "Choose whether navigation buttons are always visible or only appear on hover"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_mobile",
+      "label": "Show Arrows on Mobile",
+      "default": true,
+      "info": "Toggle to show or hide navigation arrows on mobile devices"
+    },
+    {
+      "type": "header",
+      "content": "Arrow Style Settings"
+    },
+    {
+      "type": "select",
+      "id": "arrow_style",
+      "label": "Arrow Button Style",
+      "options": [
+        { "value": "style1", "label": "Style 1" },
+        { "value": "style2", "label": "Style 2" },
+        { "value": "style3", "label": "Style 3" }
+      ],
+      "default": "style2",
+      "info": "Choose the shape style for navigation arrow buttons"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Slide Image (Desktop)" },
+        { "type": "image_picker", "id": "mobile_image", "label": "Slide Image (Mobile - Optional)" },
+        { "type": "text", "id": "text_above_heading", "label": "Text Above Heading" },
+        { "type": "text", "id": "heading", "label": "Heading" },
+        { "type": "text", "id": "subheading", "label": "Subheading" },
+        { "type": "text", "id": "button_text", "label": "Button Text" },
+        { "type": "url", "id": "button_link", "label": "Button Link" },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Content Alignment (Desktop)",
+          "options": [
+            { "value": "align-left-top", "label": "Left Top" },
+            { "value": "align-left-center", "label": "Left Center" },
+            { "value": "align-left-bottom", "label": "Left Bottom" },
+            { "value": "align-center-top", "label": "Center Top" },
+            { "value": "align-center-center", "label": "Center Middle" },
+            { "value": "align-center-bottom", "label": "Center Bottom" },
+            { "value": "align-right-top", "label": "Right Top" },
+            { "value": "align-right-center", "label": "Right Center" },
+            { "value": "align-right-bottom", "label": "Right Bottom" }
+          ],
+          "default": "align-center-center"
+        },
+        {
+          "type": "select",
+          "id": "alignment_mobile",
+          "label": "Content Alignment (Mobile)",
+          "options": [
+            { "value": "align-left-top", "label": "Left Top" },
+            { "value": "align-left-center", "label": "Left Center" },
+            { "value": "align-left-bottom", "label": "Left Bottom" },
+            { "value": "align-center-top", "label": "Center Top" },
+            { "value": "align-center-center", "label": "Center Middle" },
+            { "value": "align-center-bottom", "label": "Center Bottom" },
+            { "value": "align-right-top", "label": "Right Top" },
+            { "value": "align-right-center", "label": "Right Center" },
+            { "value": "align-right-bottom", "label": "Right Bottom" }
+          ],
+          "default": "align-center-center"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Dynamic Swiper Slider",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "heading": "Luxury Skin Care",
+            "subheading": "Discover our new range of natural skin care products.",
+            "button_text": "Shop Now"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "heading": "Natural Beauty",
+            "subheading": "Feel the power of nature with our organic beauty line.",
+            "button_text": "Explore"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

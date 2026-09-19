@@ -1,0 +1,160 @@
+{% liquid
+  assign desktop_banner = collection.metafields.custom.desktop_banner.value
+%}
+
+{% if desktop_banner != blank %}
+  <section
+    class="collection-metafield-banner section-{{ section.id }} color-{{ section.settings.color_scheme }}"
+    style="
+      --desktop-height: {{ section.settings.desktop_height }}px;
+      --mobile-height: {{ section.settings.mobile_height }}px;
+      --overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    "
+  >
+    <picture>
+
+      <img
+        src="{{ desktop_banner | image_url: width: 2000 }}"
+        alt="{{ collection.title | escape }}"
+        width="{{ desktop_banner.width }}"
+        height="{{ desktop_banner.height }}"
+        loading="eager"
+      >
+    </picture>
+
+    {% if section.settings.show_title %}
+      <div class="collection-metafield-banner__content">
+        <h1>{{ collection.title }}</h1>
+
+        {% if section.settings.show_description and collection.description != blank %}
+          <div class="collection-metafield-banner__description">
+            {{ collection.description }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endif %}
+
+<style>
+  .collection-metafield-banner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+
+  .collection-metafield-banner picture,
+  .collection-metafield-banner img {
+    display: block;
+    width: 100%;
+  }
+
+  .collection-metafield-banner img {
+    height: var(--desktop-height);
+    object-fit: cover;
+  }
+
+  .collection-metafield-banner__content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, var(--overlay-opacity));
+  }
+
+  .collection-metafield-banner__content h1 {
+    margin: 0;
+    font-size: 42px;
+    line-height: 1.2;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .collection-metafield-banner__description {
+    margin-top: 12px;
+    max-width: 700px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-metafield-banner {
+      margin-bottom: 20px;
+    }
+
+    .collection-metafield-banner img {
+      height: var(--mobile-height);
+    }
+
+    .collection-metafield-banner__content h1 {
+      font-size: 28px !important;
+    }
+
+    .collection-metafield-banner__description {
+      font-size: 14px !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Collection banner",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show collection title on banner",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop banner height",
+      "min": 200,
+      "max": 700,
+      "step": 10,
+      "default": 360
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Mobile banner height",
+      "min": 180,
+      "max": 600,
+      "step": 10,
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 25
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection banner"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,371 @@
+{% comment %}
+  Recently Viewed Products Section
+  Tracks viewed products in localStorage and displays them in a slider.
+{% endcomment %}
+
+<div 
+  class="recently-viewed-section newsec custom-category-section color-{{ section.settings.color_scheme }}" 
+  id="recently-viewed-{{ section.id }}"
+  style="display: none;"
+>
+  <div class="collection-with-slider-main-new">
+    <div class="container_width">
+      <div class="collection-img-main-box-new">
+        <div class="collection-slider-box-new">
+          <div class="collection-slider-header">
+            <h2 class="collection-slider-heading">
+              {{ section.settings.heading }}
+            </h2>
+          </div>
+          <div class="swiper collectionSwiper-custome arrow-shape-{{ section.settings.arrow_shape }}" id="recently-swiper-{{ section.id }}">
+            <div class="swiper-wrapper" id="recently-viewed-wrapper-{{ section.id }}">
+              {% comment %} Products will be loaded here via JS {% endcomment %}
+            </div>
+            <div class="swiper-button-prev collection-swiper-button-prev">{% render 'icon-slider-nav', direction: 'prev' %}</div>
+            <div class="swiper-button-next collection-swiper-button-next">{% render 'icon-slider-nav', direction: 'next' %}</div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.recently-viewed-section {
+  padding: {{ section.settings.section_padding_desktop }} !important;
+}
+
+.recently-viewed-section .swiper-slide.product-grid {
+  display: block !important;
+  background: transparent;
+}
+/* Same Height Cards */
+.recently-viewed-section .swiper-wrapper{
+  align-items: stretch;
+}
+
+.recently-viewed-section .swiper-slide{
+  height: auto !important;
+  display: flex !important;
+}
+
+.recently-viewed-section .swiper-slide > *{
+  width: 100%;
+  height: 100%;
+}
+
+.recently-viewed-section .product-card,
+.recently-viewed-section .product-card-vertical,
+.recently-viewed-section .product-card-horizontal{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.recently-viewed-section .product-card__content,
+.recently-viewed-section .product-content{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.recently-viewed-section .product-price-custome{
+  margin-top: auto;
+}
+
+.recently-viewed-section .product-title-custome a {
+   font-size: 16px !important;
+}
+
+.recently-viewed-section .custom-category-section .collection-swiper-button-prev,
+.recently-viewed-section .custom-category-section .collection-swiper-button-next {
+  width: 40px ;
+  height: 40px;
+  background-color: #FEFEFE;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.arrow-shape-round .collection-swiper-button-prev,
+.arrow-shape-round .collection-swiper-button-next {
+  border-radius: 50% !important;
+}
+
+.arrow-shape-square-rounded .collection-swiper-button-prev,
+.arrow-shape-square-rounded .collection-swiper-button-next {
+  border-radius: 8px !important;
+}
+
+.arrow-shape-square .collection-swiper-button-prev,
+.arrow-shape-square .collection-swiper-button-next {
+  border-radius: 0 !important;
+}
+
+.recently-viewed-section .swiper-button-lock {
+  display: none !important;
+}
+
+@media (max-width: 990px) {
+  .collection-with-slider-main-new .container_width {
+    padding: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .recently-viewed-section {
+    padding: {{ section.settings.section_padding_mobile }} !important;
+  }
+  .recently-viewed-section .collection-swiper-button-prev,
+  .recently-viewed-section .collection-swiper-button-next {
+    display: none;
+  }
+}
+
+</style>
+
+<script>
+(function() {
+  const LOCAL_STORAGE_KEY = 'recently_viewed_products';
+  const MAX_PRODUCTS = 12;
+
+  function setRecentlyViewed() {
+    {% if product %}
+      let products = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
+      const currentHandle = '{{ product.handle }}';
+      
+      // Remove current product if it exists
+      products = products.filter(p => p !== currentHandle);
+      
+      // Add to beginning
+      products.unshift(currentHandle);
+      
+      // Limit to MAX_PRODUCTS
+      if (products.length > MAX_PRODUCTS) {
+        products.length = MAX_PRODUCTS;
+      }
+      
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(products));
+    {% endif %}
+  }
+
+  async function renderRecentlyViewed() {
+    const sectionContainer = document.getElementById('recently-viewed-{{ section.id }}');
+    const wrapper = document.getElementById('recently-viewed-wrapper-{{ section.id }}');
+    if (!sectionContainer || !wrapper) return;
+
+    const products = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
+    const currentHandle = '{{ product.handle }}';
+    
+    // Filter out current product
+    const filteredProducts = products.filter(p => p !== currentHandle);
+
+    if (filteredProducts.length === 0) {
+      sectionContainer.style.display = 'none';
+      return;
+    }
+
+    sectionContainer.style.display = 'block';
+
+    // Fetch products HTML with settings passed as query terms
+    const query = filteredProducts.map(h => `handle:\"${h}\"`).join(' OR ');
+    const configStr = 'settings:style={{ section.settings.product_card_style }}|wishlist={{ section.settings.show_wishlist }}|qv={{ section.settings.show_quick_view }}|compare={{ section.settings.show_compare }}|atc={{ section.settings.show_add_to_cart }}|badge={{ section.settings.show_badge }}|rating={{ section.settings.show_rating }}|colors={{ section.settings.show_colors }}';
+
+    const params = new URLSearchParams({
+      view: 'recently-viewed',
+      type: 'product',
+      q: `${query} OR handle:\"${configStr}\"`
+    });
+
+    const url = `${window.Shopify.routes.root}search?${params.toString()}`;
+
+    try {
+      const response = await fetch(url);
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const slides = doc.querySelectorAll('.swiper-slide');
+
+      if (slides.length > 0) {
+        let finalHtml = '';
+        const slidesMap = {};
+        slides.forEach(slide => {
+          const handle = slide.dataset.handle;
+          if (handle) slidesMap[handle] = slide.outerHTML;
+        });
+
+        // Maintain order from localStorage
+        filteredProducts.forEach(handle => {
+          if (slidesMap[handle]) {
+            finalHtml += slidesMap[handle];
+          }
+        });
+
+        wrapper.innerHTML = finalHtml;
+        
+        // Initialize Swiper
+        initRecentlySwiper();
+        
+        // Fix currency symbols for India
+        if (window.__ACTIVE_CURRENCY__ && window.__ACTIVE_CURRENCY__.iso === 'INR') {
+           document.querySelectorAll('#recently-viewed-{{ section.id }} .product-price, #recently-viewed-{{ section.id }} .product-price-custome').forEach(el => {
+              if (el.textContent.includes('R')) {
+                  el.innerHTML = el.innerHTML.replace(/Rs\.|Rs|R/g, '₹');
+              }
+           });
+        }
+      } else {
+        sectionContainer.style.display = 'none';
+      }
+    } catch (e) {
+      sectionContainer.style.display = 'none';
+    }
+  }
+
+  function initRecentlySwiper() {
+    const swiperId = '#recently-swiper-{{ section.id }}';
+    const swiperEl = document.querySelector(swiperId);
+    if (swiperEl) {
+      if (swiperEl.swiper) swiperEl.swiper.destroy(true, true);
+      
+      new Swiper(swiperId, {
+        slidesPerView: 2,
+        spaceBetween: 16,
+        watchOverflow: true,
+        navigation: {
+          nextEl: swiperId + ' .collection-swiper-button-next',
+          prevEl: swiperId + ' .collection-swiper-button-prev',
+        },
+        
+        breakpoints: {
+          768: { slidesPerView: 3 },
+          1024: { slidesPerView: 4 }
+        }
+      });
+    }
+  }
+
+  // Set recently viewed for current product
+  setRecentlyViewed();
+
+  // Run rendering
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderRecentlyViewed);
+  } else {
+    renderRecentlyViewed();
+  }
+
+  // Theme editor support
+  document.addEventListener('shopify:section:load', (e) => {
+    if (e.detail.sectionId === '{{ section.id }}') renderRecentlyViewed();
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Recently Viewed Slider",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Recently Viewed Products"
+    },
+    {
+      "type": "header",
+      "content": "Product Card Settings"
+    },
+    {
+      "type": "select",
+      "id": "product_card_style",
+      "label": "Product Card Style",
+      "options": [
+        { "value": "vertical", "label": "Vertical Hover" },
+        { "value": "horizontal", "label": "Horizontal Hover" },
+        { "value": "static", "label": "Static (Always Visible)" }
+      ],
+      "default": "vertical"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "default": true,
+      "label": "Show Wishlist Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_view",
+      "default": true,
+      "label": "Show Quick View Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare",
+      "default": true,
+      "label": "Show Compare Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_to_cart",
+      "default": true,
+      "label": "Show Add to Cart Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "default": true,
+      "label": "Show Product Rating"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_colors",
+      "default": true,
+      "label": "Show Color Swatches"
+    },
+    {
+      "type": "select",
+      "id": "arrow_shape",
+      "label": "Arrow Shape",
+      "options": [
+        { "value": "round", "label": "Round (Circle)" },
+        { "value": "square-rounded", "label": "Square Rounded" },
+        { "value": "square", "label": "Square" }
+      ],
+      "default": "round"
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_desktop",
+      "label": "Desktop Padding",
+      "default": "40px 0px 40px 0px",
+      "info": "Example: 40px 0px 40px 0px"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_mobile",
+      "label": "Mobile Padding",
+      "default": "30px 20px 30px 20px",
+      "info": "Example: 30px 20px 30px 20px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recently Viewed Slider"
+    }
+  ]
+}
+{% endschema %}

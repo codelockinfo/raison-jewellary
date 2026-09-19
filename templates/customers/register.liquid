@@ -1,0 +1,148 @@
+<div class="customer-register-page">
+  <div class="container--narrow">
+    <div class="register-form-container">
+      <header class="section-header">
+        <h1 class="section-header__title">Create Account</h1>
+        <p class="section-header__sub">Please fill in the information below to register.</p>
+      </header>
+
+      {% form 'create_customer' %}
+        {{ form.errors | default_errors }}
+
+        <div class="field">
+          <label for="FirstName">First Name</label>
+          <input type="text" name="customer[first_name]" id="FirstName" placeholder="First Name" autocomplete="given-name" required>
+        </div>
+
+        <div class="field">
+          <label for="LastName">Last Name</label>
+          <input type="text" name="customer[last_name]" id="LastName" placeholder="Last Name" autocomplete="family-name" required>
+        </div>
+
+        <div class="field">
+          <label for="Email">Email</label>
+          <input type="email" name="customer[email]" id="Email" placeholder="Email" autocomplete="email" required>
+        </div>
+
+        <div class="field">
+          <label for="CreatePassword">Password</label>
+          <input type="password" name="customer[password]" id="CreatePassword" placeholder="Password" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-btn full-width" aria-label="Register">Register</button>
+        </div>
+
+        <div class="login-link">
+          <span>Already have an account?</span>
+          <a href="{{ routes.account_login_url }}">Log in</a>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+<style>
+.customer-register-page {
+  padding: 80px 0;
+  background: #fdfdfd;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+}
+.container--narrow {
+  max-width: 450px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 20px;
+}
+.register-form-container {
+  background: #FEFEFE;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.section-header__title {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #111;
+}
+.section-header__sub {
+  color: #666;
+  font-size: 0.95rem;
+}
+.field {
+  margin-bottom: 15px;
+}
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #111;
+  text-align: left;
+}
+.field input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+.field input:focus {
+  border-color: #000;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+}
+.form-actions {
+  margin-bottom: 25px;
+}
+.primary-btn {
+  background: #000;
+  color: #FEFEFE;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  width: 100%;
+  font-size: 1rem;
+}
+.primary-btn:hover {
+  opacity: 0.9;
+}
+.login-link {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+.login-link a {
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 5px;
+}
+.login-link a:hover {
+  text-decoration: underline;
+}
+.errors {
+  background: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  list-style: none;
+  border: 1px solid #ffcdd2;
+}
+</style>

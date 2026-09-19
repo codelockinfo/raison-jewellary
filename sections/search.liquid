@@ -1,0 +1,430 @@
+{{ 'search.css' | asset_url | stylesheet_tag }}
+
+{% comment %}
+  Search with Filters + Load More + Progress (SAFE)
+{% endcomment %}
+
+<div class="container_search skeleton-container"
+  {% if search.results_count > 0 %}
+    data-total="{{ search.results_count }}"
+    data-per-page="12"
+  {% endif %}
+>
+  <div class="skeleton-visible">
+    <div style="text-align: center; margin-bottom: 40px;">
+       <div class="skeleton-box skeleton-shimmer skeleton-title" style="height: 50px; width: 300px; margin: 0 auto 20px;"></div>
+       <div class="skeleton-box skeleton-shimmer" style="height: 60px; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 30px;"></div>
+    </div>
+    <div style="display: flex; gap: 30px;">
+       <div style="width: 250px; flex-shrink: 0;">
+          {% for i in (1..5) %}
+            <div class="skeleton-box skeleton-shimmer skeleton-text" style="height: 30px; margin-bottom: 15px;"></div>
+          {% endfor %}
+       </div>
+       <div style="flex: 1;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+             {% for i in (1..6) %}
+               <div>
+                  <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: 1/1; border-radius: 8px; margin-bottom: 15px;"></div>
+                  <div class="skeleton-box skeleton-shimmer skeleton-text medium"></div>
+                  <div class="skeleton-box skeleton-shimmer skeleton-text short"></div>
+               </div>
+             {% endfor %}
+          </div>
+       </div>
+    </div>
+  </div>
+
+  {% if search.performed %}
+    {% if search.results_count == 0 %}
+      <p class="search-info">
+        {{ 'search.no_results_html' | t: terms: search.terms }}
+      </p>
+    {% else %}
+      <p class="search-info">
+        {{ 'search.results_for_html' | t: terms: search.terms, count: search.results_count }}
+      </p>
+    {% endif %}
+  {% endif %}
+
+  <h1 class="search-title">{{ 'search.title' | t }}</h1>
+
+  <!-- SEARCH BOX -->
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-box-container">
+    <div class="search-box">
+      <label for="searchInput" class="visually-hidden">Search results</label>
+      <input
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'search.placeholder' | t }}"
+        class="search-input"
+        id="searchInput">
+
+      <button type="button" class="clear-search" aria-label="Clear Search" id="clearSearch">
+        <svg width="12" height="12" viewBox="0 0 12 12">
+          <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <button type="submit" class="search-btn" aria-label="Search">
+        <svg width="26" height="26" viewBox="0 0 24 24">
+          <use href="#icon-search"></use>
+        </svg>
+      </button>
+    </div>
+  </form>
+
+  {% if search.performed %}
+
+  <!-- Mobile Sort Dropdown -->
+  <div class="mobile-sort-dropdown">
+    <div class="mobile-sort-header">Sort by</div>
+    <ul class="mobile-sort-options">
+      {% for option in search.sort_options %}
+        <li class="mobile-sort-option {% if option.value == search.sort_by %}active{% endif %}" 
+            onclick="updateSortBy('{{ option.value }}')">
+          {{ option.name }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="{% if search.results_count == 0 %}search-layout--empty{% else %}search-layout{% endif %}">
+
+    <!-- FILTER SIDEBAR -->
+    <aside class="search-sidebar">
+      <div class="sidebar-header-mobile">
+        <h3>Filter & Sort</h3>
+        <button class="close-sidebar" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      {% render 'collection-sidebar', results: search %}
+    </aside>
+
+    <!-- MAIN -->
+    <div class="search-main">
+      
+      <!-- Toolbar (Matches Collection Page) -->
+      <div class="collection-toolbar">
+         <div class="results-count">
+          {{ search.results_count }} results found for "{{ search.terms }}"
+        </div>
+
+        <!-- Mobile Filter and Sort Buttons -->
+        <div class="mobile-toolbar-buttons">
+          <button class="mobile-filter-btn" aria-label="Filter" onclick="toggleSidebar()">
+            Filter
+            <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 4.5 6 7.5 9 4.5"></polyline>
+            </svg>
+          </button>
+          
+          <button class="mobile-sort-btn" aria-label="Sort by" onclick="toggleSortDropdown()">
+            Sort by
+            <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 4.5 6 7.5 9 4.5"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div class="toolbar-options">
+          <div class="toolbar-select-wrapper">
+             <label for="SortBy">Sort by</label>
+             <select name="sort_by" id="SortBy" class="toolbar-select" aria-describedby="a11y-refresh-page-message">
+              {%- for option in search.sort_options -%}
+                <option value="{{ option.value | escape }}"{% if option.value == search.sort_by %} selected="selected"{% endif %}>{{ option.name | escape }}</option>
+              {%- endfor -%}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {%- liquid
+        assign has_active_filters = false
+        for filter in search.filters
+          if filter.active_values.size > 0
+            assign has_active_filters = true
+            break
+          endif
+          if filter.min_value.value != nil or filter.max_value.value != nil
+            assign has_active_filters = true
+            break
+          endif
+        endfor
+      -%}
+
+      {%- if has_active_filters -%}
+        <div class="active-filters">
+          <span class="active-filters-label">Active Filters:</span>
+          {%- for filter in search.filters -%}
+            {%- for value in filter.active_values -%}
+              <a href="{{ value.url_to_remove }}" class="active-filter-tag">
+                {{ value.label | escape }}
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
+              </a>
+            {%- endfor -%}
+            {% if filter.type == "price_range" %}
+              {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                <a href="{{ filter.url_to_remove }}" class="active-filter-tag">
+                  {%- assign min_value = filter.min_value.value | default: 0 -%}
+                  {%- assign max_value = filter.max_value.value | default: filter.range_max -%}
+                  {{ min_value | money }} - {{ max_value | money }}
+                  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
+                </a>
+              {%- endif -%}
+            {% endif %}
+          {%- endfor -%}
+          <a href="{{ routes.search_url }}?q={{ search.terms | escape }}&sort_by={{ search.sort_by }}" class="clear-all-filters">Clear All</a>
+        </div>
+      {%- endif -%}
+
+      {% if search.results_count > 0 %}
+        {% paginate search.results by 12 %}
+
+        <div class="search-results" id="searchResults">
+          {% for result in search.results %}
+            {% if result.object_type == 'product' %}
+              <div class="search-result">
+                {% render 'product-card-vertical',
+                  product: result,
+                  settings: section.settings,
+                  show_video: true %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- PROGRESS -->
+        {% if search.results_count > 12 %}
+        <div class="search-progress">
+          <span id="progressText">
+            You've viewed {{ search.results.size }} of {{ search.results_count }} results
+          </span>
+
+          <div class="progress-bar">
+            <span class="progress-fill" id="progressFill" style="width: {{ search.results.size | times: 100.0 | divided_by: search.results_count }}%;"></span>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if paginate.next %}
+          <div class="load-more-wrapper">
+            <button
+              class="load-more-btn"
+              id="loadMoreBtn"
+              aria-label="Load more products"
+              data-next-url="{{ paginate.next.url }}">
+              Load more products
+            </button>
+          </div>
+        {% endif %}
+
+        {% endpaginate %}
+      {% endif %}
+
+      <!-- EMPTY STATE -->
+      {% if search.performed and search.results_count == 0 %}
+        <div class="no-products-found">
+          <h3>No products found</h3>
+          <p>Try adjusting your search or filters.</p>
+        </div>
+
+        <div class="no-products-actions">
+          <a href="{{ routes.search_url }}" class="back-btn">
+            Clear filters
+          </a>
+          <a href="{{ routes.search_url }}" class="back-btn outline">
+            Reset search
+          </a>
+        </div>
+      {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+/* SEARCH CLEAR */
+const input = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearSearch');
+const searchBox = input?.closest('.search-box');
+const form = input?.closest('form');
+
+function toggleValueClass() {
+  if (!searchBox) return;
+  searchBox.classList.toggle('has-value', input.value.trim() !== '');
+}
+
+toggleValueClass();
+input?.addEventListener('input', toggleValueClass);
+
+clearBtn?.addEventListener('click', () => {
+  input.value = '';
+  toggleValueClass();
+  form.submit();
+});
+
+/* LOAD MORE + PROGRESS */
+(() => {
+  const container = document.querySelector('.container_search');
+  const results = document.getElementById('searchResults');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const progressText = document.getElementById('progressText');
+  const progressFill = document.getElementById('progressFill');
+
+  if (!container || !results || !loadMoreBtn || !progressFill) return;
+
+  const total = parseInt(container.dataset.total, 10);
+  let loaded = results.children.length;
+
+  updateProgress();
+
+  loadMoreBtn.addEventListener('click', async () => {
+    loadMoreBtn.classList.add('loading');
+
+    const response = await fetch(loadMoreBtn.dataset.nextUrl);
+    const html = await response.text();
+
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    const newItems = temp.querySelectorAll('.search-result');
+    newItems.forEach(el => results.appendChild(el));
+
+    loaded += newItems.length;
+    updateProgress();
+
+    const newBtn = temp.querySelector('#loadMoreBtn');
+    if (newBtn) {
+      loadMoreBtn.dataset.nextUrl = newBtn.dataset.nextUrl;
+      loadMoreBtn.classList.remove('loading');
+    } else {
+      loadMoreBtn.remove();
+    }
+  });
+
+  function updateProgress() {
+    const percent = Math.min((loaded / total) * 100, 100);
+    progressFill.style.width = percent + '%';
+    progressText.textContent = `You've viewed ${loaded} of ${total} results`;
+  }
+})();
+
+/* MOBILE SIDEBAR TOGGLE */
+const filterBtn = document.querySelector('.filter-toggle-btn');
+const closeSidebarBtn = document.querySelector('.close-sidebar');
+const sidebar = document.querySelector('.search-sidebar');
+const overlay = document.createElement('div');
+overlay.className = 'sidebar-overlay';
+document.body.appendChild(overlay);
+
+function toggleSidebar() {
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+  document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+}
+
+if (filterBtn) filterBtn.addEventListener('click', toggleSidebar);
+if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+overlay.addEventListener('click', toggleSidebar);
+
+/* SORT BY EVENT */
+/* SORT BY EVENT */
+const sortSelect = document.getElementById('SortBy');
+if (sortSelect) {
+  sortSelect.addEventListener('change', function() {
+    updateSortBy(this.value);
+  });
+}
+
+// Mobile Sort Dropdown Logic
+const sortDropdown = document.querySelector('.mobile-sort-dropdown');
+// Overlay is already created by sidebar code
+const sortOverlay = document.createElement('div');
+sortOverlay.className = 'sort-overlay'; // Separate overlay for sort if needed, or reuse
+// Reuse existing overlay logic for simplicity if possible, or create new.
+// For now, let's stick to the sidebar overlay for consistency or make a shared one.
+// Actually collection page uses "filter-drawer-overlay".
+
+function toggleSortDropdown() {
+  const dropdown = document.querySelector('.mobile-sort-dropdown');
+  const overlay = document.querySelector('.sidebar-overlay'); // Reusing sidebar overlay
+  dropdown.classList.toggle('active');
+  overlay.classList.toggle('active');
+  document.body.style.overflow = dropdown.classList.contains('active') ? 'hidden' : '';
+}
+
+function closeSortDropdown() {
+  const dropdown = document.querySelector('.mobile-sort-dropdown');
+  const overlay = document.querySelector('.sidebar-overlay');
+  dropdown.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Update Sort By URL
+function updateSortBy(value) {
+  const url = new URL(window.location);
+  url.searchParams.set('sort_by', value);
+  window.location.href = url.toString();
+}
+
+// Close sort if overlay clicked (adding to existing overlay listener)
+if (overlay) {
+    overlay.addEventListener('click', () => {
+        closeSortDropdown();
+        // toggleSidebar is also attached, might conflict? 
+        // toggleSidebar toggles 'active'. If we just remove 'active' it's fine.
+    });
+}
+
+</script>
+
+
+{% schema %}
+{
+  "name": "Search",
+  "settings": [
+     {
+      "type": "text",
+      "id": "filters_title",
+      "label": "Filters title",
+      "default": "Filters"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_view",
+      "label": "Show quick view",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare",
+      "label": "Show compare",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_to_cart",
+      "label": "Show add to cart",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_colors",
+      "label": "Show Color Swatches",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
+

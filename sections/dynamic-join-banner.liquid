@@ -1,0 +1,471 @@
+<section class="join-banner-section section-{{ section.id }}">
+  <div class="join-banner-container container_width">
+    <div class="join-banner-box">
+
+      <div class="join-banner-left">
+        {% if section.settings.left_image != blank %}
+          <img
+            src="{{ section.settings.left_image | image_url: width: 500 }}"
+            alt="{{ section.settings.heading | escape }}"
+            class="join-banner-image"
+            loading="lazy"
+          >
+        {% endif %}
+
+        <div class="join-banner-content">
+          {% if section.settings.heading != blank %}
+            <h2>{{ section.settings.heading }}</h2>
+          {% endif %}
+
+          {% if section.settings.description != blank %}
+            <p>{{ section.settings.description }}</p>
+          {% endif %}
+
+          {% if section.settings.button_text != blank %}
+            <a href="{{ section.settings.button_link | default: '#' }}" class="join-banner-btn">
+              {{ section.settings.button_text }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="join-banner-divider"></div>
+
+      <div class="join-banner-features">
+        {% for block in section.blocks %}
+          <div class="join-banner-feature" {{ block.shopify_attributes }}>
+            {% if block.settings.icon != blank %}
+              <img
+                src="{{ block.settings.icon | image_url: width: 90 }}"
+                alt="{{ block.settings.title | escape }}"
+                class="join-feature-icon"
+                loading="lazy"
+              >
+            {% else %}
+              <div class="join-feature-default-icon">
+                {{ forloop.index }}
+              </div>
+            {% endif %}
+
+            {% if block.settings.title != blank %}
+              <span>{{ block.settings.title }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+.section-{{ section.id }} {
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+.section-{{ section.id }} .join-banner-box {
+  display: flex;
+  align-items: center;
+  background: {{ section.settings.background_color }};
+  border-radius: {{ section.settings.border_radius }}px;
+  padding: 18px 26px;
+  overflow: hidden;
+  color: {{ section.settings.text_color }};
+}
+
+.section-{{ section.id }} .join-banner-left {
+  width: 42%;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.section-{{ section.id }} .join-banner-image {
+  width: 160px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.section-{{ section.id }} .join-banner-content h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: {{ section.settings.heading_color }};
+  text-transform: uppercase;
+}
+
+.section-{{ section.id }} .join-banner-content p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: {{ section.settings.text_color }};
+}
+
+.section-{{ section.id }} .join-banner-btn {
+  display: inline-block;
+  padding: 8px 18px;
+  background: {{ section.settings.button_bg }};
+  color: {{ section.settings.button_text_color }};
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--btn-border-radius);
+  text-transform: uppercase;
+}
+
+.section-{{ section.id }} .join-banner-divider {
+  width: 1px;
+  height: 90px;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 0 30px;
+}
+
+.section-{{ section.id }} .join-banner-features {
+  width: 58%;
+  display: grid;
+  grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.section-{{ section.id }} .join-banner-feature {
+  text-align: center;
+  color: {{ section.settings.text_color }};
+}
+
+.section-{{ section.id }} .join-feature-icon {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  margin: 0 auto 8px;
+  display: block;
+}
+
+.section-{{ section.id }} .join-feature-default-icon {
+  width: 42px;
+  height: 42px;
+  border: 1px solid {{ section.settings.icon_color }};
+  color: {{ section.settings.icon_color }};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.section-{{ section.id }} .join-banner-feature span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+@media screen and (max-width: 989px) {
+  .section-{{ section.id }} .join-banner-box {
+    padding: 16px;
+  }
+
+  .section-{{ section.id }} .join-banner-left {
+    width: 45%;
+    gap: 14px;
+  }
+
+  .section-{{ section.id }} .join-banner-image {
+    width: 125px;
+    height: 120px;
+  }
+
+  .section-{{ section.id }} .join-banner-features {
+    width: 55%;
+    gap: 12px;
+  }
+
+  .section-{{ section.id }} .join-banner-content h2 {
+    font-size: 17px;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .section-{{ section.id }} {
+    padding-top: {{ section.settings.mobile_padding_top }}px;
+    padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+  }
+
+  .section-{{ section.id }} .join-banner-container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .section-{{ section.id }} .join-banner-box {
+    flex-direction: column;
+    padding: 16px;
+    border-radius: {{ section.settings.mobile_border_radius }}px;
+    gap: 18px;
+  }
+
+  .section-{{ section.id }} .join-banner-left {
+    width: 100%;
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .section-{{ section.id }} .join-banner-image {
+    width: 115px;
+    height: 90px;
+    border-radius: 12px;
+  }
+
+  .section-{{ section.id }} .join-banner-content h2 {
+    font-size: 16px;
+  }
+
+  .section-{{ section.id }} .join-banner-content p {
+    font-size: 12px;
+  }
+
+  .section-{{ section.id }} .join-banner-btn {
+    padding: 7px 14px;
+    font-size: 11px;
+  }
+
+  .section-{{ section.id }} .join-banner-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+  }
+
+  .section-{{ section.id }} .join-banner-features {
+    width: 100%;
+    grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr);
+    gap: 16px 10px;
+  }
+
+  .section-{{ section.id }} .join-feature-icon,
+  .section-{{ section.id }} .join-feature-default-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .section-{{ section.id }} .join-banner-feature span {
+    font-size: 11px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Dynamic Join Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Left image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Earn With Riseon"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Join our Affiliate Program and become financially independent."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Join Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#4b0014"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#F6D3AB"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FEFEFE"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button background",
+      "default": "#c9963d"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#FEFEFE"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Default icon color",
+      "default": "#F6D3AB"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "label": "Desktop icon columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "label": "Mobile icon columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Desktop border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "mobile_border_radius",
+      "label": "Mobile border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Desktop padding top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Desktop padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Mobile padding top",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Mobile padding bottom",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Icon item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Text",
+          "default": "Join For Free"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Dynamic Join Banner",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Join For Free"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Share & Refer"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Earn Commission"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Get Paid Monthly"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,845 @@
+{% liquid
+  assign section_id = section.settings.custom_id | default: section.id
+  assign section_class = 'product-showcase-section'
+  assign layout_mode = section.settings.layout_mode | default: 'grid'
+%}
+
+<section
+  id="{{ section_id }}"
+  class="{{ section_class }} layout-{{ layout_mode }} color-{{ section.settings.color_scheme }}"
+
+  style="
+ 
+    --section-padding-desktop: {{ section.settings.padding_desktop }};
+    --section-padding-mobile: {{ section.settings.padding_mobile }};
+    {% liquid
+      case section.settings.heading_tag
+        when 'h1'
+          assign h_px = settings.h1_font_size | default: 42
+        when 'h2'
+          assign h_px = settings.h2_font_size | default: 38
+        when 'h3'
+          assign h_px = settings.type_header_base_size | default: 32
+        when 'h4'
+          assign h_px = settings.h4_font_size | default: 28
+        when 'h5'
+          assign h_px = settings.h5_font_size | default: 24
+        when 'h6'
+          assign h_px = settings.h6_font_size | default: 20
+        else
+          assign h_px = settings.h2_font_size | default: 38
+      endcase
+    %}
+    --heading-size: {{ h_px }}px;
+  "
+>
+  <div class="product-showcase-section__container">
+    <!-- SKELETON LOADER -->
+    <div class="skeleton-visible">
+       {% liquid
+         assign count = section.settings.slides_to_show_desktop | default: 4
+         if layout_mode == 'grid'
+           assign count = section.settings.products_per_row | default: 4
+         endif
+       %}
+       {% render 'skeleton-loader', type: 'product-showcase', count: count, gap: section.settings.column_gap %}
+    </div>
+
+    <div class="skeleton-container container_width">
+      {% if section.settings.section_heading != blank or section.settings.sub_heading != blank %}
+        <div class="section-heading-wrapper">
+          {% if section.settings.section_heading != blank %}
+            {% render 'heading-style-banner',
+              heading: section.settings.section_heading,
+              heading_tag: section.settings.heading_tag,
+              heading_style: section.settings.heading_style,
+              heading_alignment: section.settings.heading_alignment,
+              wrapper_class: 'product-showcase-section'
+            %}
+          {% endif %}
+
+          {% if section.settings.sub_heading != blank %}
+            <p class="section-sub-heading text-align-{{ section.settings.sub_heading_alignment }}">
+              {{ section.settings.sub_heading }}
+            </p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if layout_mode == 'slider' %}
+        {% comment %} Slider Layout {% endcomment %}
+        <div 
+          class="product-slider-wrapper"
+          data-slider-id="{{ section_id }}"
+          data-slides-desktop="{{ section.settings.slides_to_show_desktop }}"
+          data-slides-tablet="{{ section.settings.slides_to_show_tablet }}"
+          data-slides-mobile="{{ section.settings.slides_to_show_mobile }}"
+          data-show-navigation="{{ section.settings.show_slider_arrows }}"
+          data-show-pagination="{{ section.settings.show_pagination }}"
+          data-pagination-style="{{ section.settings.pagination_style | default: 'dots' }}"
+          data-show-arrows="{{ section.settings.show_slider_arrows }}"
+          data-arrows-desktop="{{ section.settings.show_slider_arrows }}"
+          data-arrows-mobile="{{ section.settings.show_arrows_mobile }}"
+          data-button-visibility="{{ section.settings.button_visibility | default: 'static' }}"
+          data-arrow-style="{{ section.settings.arrow_style | default: 'style2' }}"
+          data-show-arrows-mobile="{{ section.settings.show_arrows_mobile | default: true }}"
+          style="
+            --slides-desktop: {{ section.settings.slides_to_show_desktop }};
+            --slides-tablet: {{ section.settings.slides_to_show_tablet }};
+            --slides-mobile: {{ section.settings.slides_to_show_mobile }};
+            --column-gap: {{ section.settings.column_gap }}px;
+          "
+        >
+          <div class="product-slider-container">
+            <div class="product-slider-track">
+              {% for block in section.blocks %}
+                {% assign product = block.settings.product %}
+                <div class="product-slide" {{ block.shopify_attributes }}>
+                  {% render 'product-showcase-card', product: product %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          
+            <button class="slider-arrow slider-arrow-prev" aria-label="Previous slide">
+              {% render 'icon-slider-nav', direction: 'prev' %}
+            </button>
+            <button class="slider-arrow slider-arrow-next" aria-label="Next slide">
+              {% render 'icon-slider-nav', direction: 'next' %}
+            </button>
+
+          {% if section.settings.show_pagination %}
+            <div class="slider-pagination slider-pagination--{{ section.settings.pagination_style | default: 'dots' }}"></div>
+          {% endif %}
+        </div>
+
+      {% else %}
+        {% comment %} Grid Layout - Desktop Grid, Mobile Slider (if enabled) {% endcomment %}
+        <div 
+          class="product-grid-wrapper"
+          style="
+            --column-gap: {{ section.settings.column_gap }}px;
+            --products-per-row: {{ section.settings.products_per_row }};
+            --products-to-show-desktop: {{ section.settings.products_to_show_desktop }};
+            --products-to-show-mobile: {{ section.settings.products_to_show_mobile }};
+          "
+        >
+            <div 
+              class="product-slider-wrapper product-grid-mobile-slider-wrapper"
+              data-slider-id="{{ section_id }}-mobile"
+              data-slides-mobile="1"
+              data-products-to-show-mobile="1"
+              data-show-navigation="{{ section.settings.show_slider_arrows }}"
+              data-show-pagination="{{ section.settings.show_pagination }}"
+              data-pagination-style="{{ section.settings.pagination_style | default: 'dots' }}"
+              data-show-arrows="{{ section.settings.show_slider_arrows }}"
+              data-button-visibility="{{ section.settings.button_visibility | default: 'static' }}"
+              data-arrow-style="{{ section.settings.arrow_style | default: 'style2' }}"
+              data-show-arrows-mobile="{{ section.settings.show_arrows_mobile | default: true }}"
+              style="
+                --products-to-show-mobile: 1;
+                --column-gap: {{ section.settings.column_gap }}px;
+              "
+            >
+              <div class="product-slider-container">
+                <div class="product-grid product-grid-mobile-slider">
+                  {% for block in section.blocks limit: section.settings.products_to_show_desktop %}
+                    {% assign product = block.settings.product %}
+                    <div class="product-grid-item" {{ block.shopify_attributes }}>
+                      {% render 'product-showcase-card', product: product %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+                <button class="slider-arrow slider-arrow-prev mobile-only" aria-label="Previous slide">
+                  {% render 'icon-slider-nav', direction: 'prev' %}
+                </button>
+                <button class="slider-arrow slider-arrow-next mobile-only" aria-label="Next slide">
+                  {% render 'icon-slider-nav', direction: 'next' %}
+                </button>
+              {% if section.settings.show_pagination %}
+                <div class="slider-pagination slider-pagination--{{ section.settings.pagination_style | default: 'dots' }} mobile-only"></div>
+              {% endif %}
+            </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ================= PRODUCT POPUPS (ONLY REAL PRODUCTS) ================= -->
+  {% for block in section.blocks %}
+    {% if block.settings.product != blank %}
+      {% render 'product-popup', product: block.settings.product %}
+    {% endif %}
+  {% endfor %}
+</section>
+
+{{ 'product-showcase-card.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-showcase-card.js' | asset_url }}" defer></script>
+{{ 'product-popup.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+
+
+/* Section Padding */
+.product-showcase-section#{{ section_id }} {
+  padding: var(--section-padding-desktop, 60px);
+}
+
+@media (max-width: 768px) {
+  .product-showcase-section#{{ section_id }} {
+    padding: var(--section-padding-mobile, 40px);
+  }
+}
+
+/* Container Width Options */
+.product-showcase-section#{{ section_id }} .product-showcase-section__container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+{% comment %} Removed old max-width classes in favor of dynamic styles {% endcomment %}
+
+/* Heading Styles */
+.product-showcase-section#{{ section_id }} .section-heading-wrapper {
+  margin-bottom: 18px;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading {
+  color: var(--color-heading);
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-weight: 700;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading--left {
+  text-align: left;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading--center {
+  text-align: center;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading--right {
+  text-align: right;
+}
+
+/* Style 1: Line Top (Lines on sides) */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-container--left {
+  justify-content: flex-start;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-container--right {
+  justify-content: flex-end;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-container .product-showcase-section__heading {
+  text-align: center;
+  margin: 0;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-line-left,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-line-right {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 1px;
+  background: var(--color-heading, #000);
+  opacity: 2.3;
+}
+
+/* Style 2: Underline */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-underline {
+  width: 100%; 
+  max-width: 250px !important;
+  height: 2px;
+  background: var(--color-heading, #000);
+  margin-top: -10px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 1.3;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper--underline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper--underline .product-showcase-section__heading {
+  padding-bottom: 15px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Style 3: Lines on sides (SVG) */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-lines {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -3px;
+  width: 100%;
+}
+
+/* Alignment for decorative elements */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--left ~ .product-showcase-section__heading-lines,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--left ~ .product-showcase-section__heading-diamond,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--left ~ .product-showcase-section__heading-ornament,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--left ~ .product-showcase-section__heading-x {
+  justify-content: flex-start;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--right ~ .product-showcase-section__heading-lines,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--right ~ .product-showcase-section__heading-diamond,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--right ~ .product-showcase-section__heading-ornament,
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-wrapper .product-showcase-section__heading--right ~ .product-showcase-section__heading-x {
+  justify-content: flex-end;
+}
+
+/* Style 4: Diamond */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-diamond {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 3px;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-diamond span {
+  width: 49px;
+  height: 1px;
+  background: var(--color-heading, #000);
+  opacity: 2.3;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-diamond svg {
+  width: 12px;
+  height: 14px;
+  color: var(--color-heading, #000);
+  opacity: 1.6;
+}
+
+/* Style 5: Ornament */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  margin-top: 0px;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-ornament span {
+  width: 50px;
+  height: 1px;
+  background: var(--color-heading, #000);
+  opacity: 1.3;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-ornament svg {
+  width: 24px;
+  height: 16px;
+  color: var(--color-heading, #000);
+  opacity: 2.6;
+}
+
+/* Style 6: X symbol */
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 1px;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-x span {
+  width: 60px;
+  height: 1px;
+  background: var(--color-heading, #000);
+  opacity: 2.3;
+}
+
+.product-showcase-section#{{ section_id }} .product-showcase-section__heading-x svg {
+  width: 12px;
+  height: 14px;
+  color: var(--color-heading, #000);
+  opacity: 2.6;
+}
+
+.product-showcase-section#{{ section_id }} .section-sub-heading {
+  color: var(--color-subtext);
+  margin: 0.5rem 0 0 0;
+}
+
+@media (max-width: 768px) {
+  .product-showcase-section#{{ section_id }} .section-sub-heading {
+    font-size: var(--sub-heading-font-size-mobile);
+  }
+}
+
+/* Pagination Styles */
+.product-showcase-section#{{ section_id }} .slider-pagination {
+  position: relative;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Style 1: Dots */
+.product-showcase-section#{{ section_id }} .slider-pagination--dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  --swiper-pagination-color: var(--color-pagination-bullet-active);
+  --swiper-theme-color: var(--color-pagination-bullet-active);
+}
+
+.product-showcase-section#{{ section_id }} .slider-pagination--dots .slider-pagination-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-pagination-bullet);
+  opacity: 0.3;
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.product-showcase-section#{{ section_id }} .slider-pagination--dots .slider-pagination-dot.active {
+  background: var(--color-pagination-bullet-active);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Style 2: Progress Bar */
+.product-showcase-section#{{ section_id }} .slider-pagination--progressbar {
+  display: block !important;
+  flex-direction: unset;
+  justify-content: unset;
+  align-items: unset;
+  gap: 0;
+  height: 4px;
+  background: var(--color-pagination-bullet);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  --swiper-pagination-color: var(--color-pagination-bullet-active);
+  --swiper-theme-color: var(--color-pagination-bullet-active);
+}
+
+.product-showcase-section#{{ section_id }} .slider-pagination--progressbar .slider-pagination-progress {
+  height: 100%;
+  background: var(--color-pagination-bullet-active);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+/* Style 3: Numbers (Fraction) */
+.product-showcase-section#{{ section_id }} .slider-pagination--fraction {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-pagination-bullet-active);
+  gap: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .product-showcase-section#{{ section_id }} .slider-pagination--fraction {
+    font-size: 14px;
+  }
+}
+
+.product-showcase-section#{{ section_id }} .slider-pagination--fraction .slider-pagination-fraction {
+  display: inline-block;
+}
+
+.product-showcase-section#{{ section_id }} .product-slider-wrapper .slider-arrow {
+  background-color: var(--color-arrow-bg);
+  border: 2px solid var(--color-arrow-bg);
+}
+
+.product-showcase-section#{{ section_id }} .product-slider-wrapper .slider-arrow svg {
+  color: var(--color-arrow);
+}
+
+/* Arrow Style 1: Square */
+.product-showcase-section#{{ section_id }} .product-slider-wrapper[data-arrow-style="style1"] .slider-arrow {
+  border-radius: 0 !important;
+}
+
+/* Arrow Style 2: Square with border radius 33% */
+.product-showcase-section#{{ section_id }} .product-slider-wrapper[data-arrow-style="style2"] .slider-arrow {
+  border-radius: 33% !important;
+}
+
+/* Arrow Style 3: Round */
+.product-showcase-section#{{ section_id }} .product-slider-wrapper[data-arrow-style="style3"] .slider-arrow {
+  border-radius: 50% !important;
+}
+
+/* Hover effects */
+.product-showcase-section#{{ section_id }} .product-slider-wrapper .slider-arrow:hover {
+  background-color: var(--color-arrow-hover-bg);
+  border-color: var(--color-arrow-hover-bg);
+}
+
+.product-showcase-section#{{ section_id }} .product-slider-wrapper .slider-arrow:hover svg {
+  color: var(--color-arrow-hover);
+}
+
+/* Show buttons on hover only */
+{% if section.settings.button_visibility == 'hover' %}
+.product-showcase-section#{{ section_id }} .product-slider-wrapper[data-button-visibility="hover"] .slider-arrow {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+.product-showcase-section#{{ section_id }} .product-slider-wrapper[data-button-visibility="hover"]:hover .slider-arrow {
+  opacity: 1;
+  visibility: visible;
+}
+{% endif %}
+
+/* Hide arrows on mobile */
+{% if section.settings.show_arrows_mobile == false %}
+@media (max-width: 768px) {
+  .product-showcase-section#{{ section_id }} .product-slider-wrapper .slider-arrow.mobile-only {
+    display: none !important;
+  }
+}
+{% endif %}
+
+/* DESKTOP ARROWS */
+@media (min-width: 769px) {
+  .product-slider-wrapper[data-arrows-desktop="false"] .slider-arrow {
+    display: none !important;
+  }
+}
+
+/* MOBILE ARROWS */
+@media (max-width: 768px) {
+  .product-slider-wrapper[data-arrows-mobile="false"] .slider-arrow {
+    display: none !important;
+  }
+
+.product-showcase-section#{{ section_id }} .product-slider-wrapper[data-button-visibility="hover"] .slider-arrow {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+}
+
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Product Showcase",
+  "tag": "section",
+  "class": "product-showcase-section",
+  "max_blocks": 50,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Heading Settings"
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Heading Text",
+      "default": "Featured Products"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_style",
+      "label": "Heading Style",
+      "default": "simple",
+      "options": [
+        {
+          "value": "simple",
+          "label": "design 1"
+        },
+        {
+          "value": "line-top",
+          "label": "design 2"
+        },
+        {
+          "value": "underline",
+          "label": "design 3"
+        },
+        {
+          "value": "lines",
+          "label": "design 4"
+        },
+        {
+          "value": "diamond",
+          "label": "design 5"
+        },
+        {
+          "value": "ornament",
+          "label": "design 6"
+        },
+        {
+          "value": "x",
+          "label": "design 7"
+        }
+      ],
+      "info": "Choose the decorative style for the heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Level (Size)",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "header",
+      "content": "Sub Heading Settings"
+    },
+    {
+      "type": "textarea",
+      "id": "sub_heading",
+      "label": "Sub Heading Text"
+    },
+    {
+      "type": "select",
+      "id": "sub_heading_alignment",
+      "label": "Sub Heading Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "text",
+      "id": "padding_desktop",
+      "label": "Padding (Desktop)",
+      "default": "60px",
+      "info": "Enter padding value(s). Single value (e.g., '40px') applies to all sides. Two values (e.g., '20px 40px') apply first to top/bottom, second to left/right."
+    },
+    {
+      "type": "text",
+      "id": "padding_mobile",
+      "label": "Padding (Mobile)",
+      "default": "40px",
+      "info": "Enter padding value(s). Single value (e.g., '40px') applies to all sides. Two values (e.g., '20px 40px') apply first to top/bottom, second to left/right."
+    },
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "select",
+      "id": "layout_mode",
+      "label": "Layout Mode",
+      "default": "grid",
+      "options": [
+        { "value": "slider", "label": "Slider" },
+        { "value": "grid", "label": "Grid" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Slider Settings",
+      "info": "These settings apply when Layout Mode is set to Slider"
+    },
+    {
+      "type": "range",
+      "id": "slides_to_show_desktop",
+      "label": "Slides to Show (Desktop)",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "slides_to_show_tablet",
+      "label": "Slides to Show (Tablet)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "slides_to_show_mobile",
+      "label": "Slides to Show (Mobile)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pagination",
+      "label": "Show Pagination",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "pagination_style",
+      "label": "Pagination Style",
+      "default": "dots",
+      "options": [
+        {
+          "value": "dots",
+          "label": "Style 1 (Dots)"
+        },
+        {
+          "value": "progressbar",
+          "label": "Style 2 (Progress Bar)"
+        },
+        {
+          "value": "fraction",
+          "label": "Style 3 (Numbers)"
+        }
+      ],
+      "info": "Choose the pagination style for the slider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_slider_arrows",
+      "label": "Show Slider Arrows",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "button_visibility",
+      "label": "Button Visibility",
+      "options": [
+        { "value": "static", "label": "Always Visible" },
+        { "value": "hover", "label": "Show on Hover" }
+      ],
+      "default": "static",
+      "info": "Choose whether navigation buttons are always visible or only appear on hover"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_mobile",
+      "label": "Show Arrows on Mobile",
+      "default": true,
+      "info": "Toggle to show or hide navigation arrows on mobile devices"
+    },
+    {
+      "type": "header",
+      "content": "Arrow Style Settings"
+    },
+    {
+      "type": "select",
+      "id": "arrow_style",
+      "label": "Arrow Button Style",
+      "options": [
+        { "value": "style1", "label": "Style 1" },
+        { "value": "style2", "label": "Style 2" },
+        { "value": "style3", "label": "Style 3" }
+      ],
+      "default": "style2",
+      "info": "Choose the shape style for navigation arrow buttons"
+    },
+    {
+      "type": "header",
+      "content": "Grid Settings",
+      "info": "These settings apply when Layout Mode is set to Grid"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column Gap",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "label": "Products per Row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_to_show_desktop",
+      "label": "Products to Show (Desktop)",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 8
+    },
+
+
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+  {
+    "name": "Product Showcase",
+    "category": "Product",
+    "blocks": [
+      { "type": "product" },
+      { "type": "product" },
+      { "type": "product" },
+      { "type": "product" }
+    ]
+  }
+]
+
+}
+{% endschema %}

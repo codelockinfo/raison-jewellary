@@ -1,0 +1,2270 @@
+{% liquid
+  assign free_shipping_threshold = 50000 | default: 50000
+  assign cart_total = cart.total_price
+  assign remaining_amount = free_shipping_threshold | minus: cart_total
+  assign progress_percentage = cart_total | times: 100 | divided_by: free_shipping_threshold
+  if progress_percentage > 100
+    assign progress_percentage = 100
+  endif
+  assign has_free_shipping = false
+  if cart_total >= free_shipping_threshold
+    assign has_free_shipping = true
+  endif
+  assign show_vendor = settings.show_cart_vendor
+  assign show_cart_note = settings.cart_notes_enable
+  assign cart_type = settings.cart_type | default: 'drawer'
+  assign show_discount_code = settings.discount_code_enable
+  assign show_shipping_calculator = settings.cart_estimate_shipping
+  assign show_trust_badge = false
+  if settings.cart_drawer_trust_badge != blank
+    assign show_trust_badge = true
+  endif
+  assign show_accelerated_checkout = settings.cart_drawer_show_accelerated_button
+  assign show_delivery_days = settings.show_delivery_days
+  assign show_delivery_time = settings.delivery_time_enable
+%}
+<div class="cart-drawer" data-cart-drawer data-cart-type="{{ cart_type }}" data-cart-discount-code="{%- for app in cart.discount_applications -%}{{ app.title | escape }}{% break %}{%- endfor -%}" data-cart-total-discount="{{ cart.total_discount }}" style="display: none;">
+  <div class="cart-drawer__overlay" data-cart-drawer-close></div>
+  <div class="cart-drawer__content">
+    <div class="cart-drawer__header">
+      <div class="cart-drawer__title">Shopping Cart (<span data-cart-count>{{ cart.item_count }}</span>)</div>
+      <button class="cart-drawer__close" aria-label="Close cart" data-cart-drawer-close>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="cart-drawer__shipping-progress" data-shipping-progress {% if cart.item_count == 0 %}style="display: none;"{% endif %}>
+      <div class="shipping-progress-bar">
+        <div class="shipping-progress-bar__fill" style="width: {{ progress_percentage }}%"></div>
+        <div class="shipping-progress-bar__icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 10"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+      </div>
+      {% if has_free_shipping %}
+        <p class="shipping-progress__message shipping-progress__message--success">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M13.3333 4L6 11.3333L2.66667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Congratulations! You've got free shipping!
+        </p>
+      {% else %}
+        <p class="shipping-progress__message">
+          Add 
+          {%- liquid
+            if settings.currency_code_enabled
+              assign money_remaining = remaining_amount | money_with_currency
+            else
+              assign money_remaining = remaining_amount | money
+            endif
+          -%}
+          {% if cart.currency.iso_code == 'EUR' %}
+            {{ money_remaining | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ',' }}
+          {% elsif cart.currency.iso_code == 'INR' %}
+            {{ money_remaining | replace: 'Rs.', '₹' | replace: 'Rs', '₹' }}
+          {% else %}
+            {{ money_remaining }}
+          {% endif %}
+          more to get free shipping!
+        </p>
+      {% endif %}
+      {% unless has_free_shipping %}
+        <p class="shipping-progress__warning">
+          You're out of time! Checkout now to avoid losing your order!
+        </p>
+      {% endunless %}
+    </div>
+    
+    <div class="cart-drawer__countdown" {% if cart.item_count == 0 %}style="display: none;"{% endif %}>
+      <span class="countdown-icon">🔥</span>
+      <span class="countdown-text" style= "color:#000;">Products are limited, checkout within <span id="cart-countdown-timer">00 m 00 s</span></span>
+    </div>
+    <div class="m-cartitems" style="flex: 1; overflow-y: auto;">
+     <div class="cart-drawer__items" data-cart-items>
+      {% if cart.item_count > 0 %}
+        {% for item in cart.items %}
+          <div class="cart-item" data-cart-item data-item-key="{{ item.key }}">
+            <div class="cart-item__image">
+              {% if item.image %}
+                {% render 'image', 
+                  image: item.image, 
+                  url: item.url,
+                  width: 120,
+                  height: 120,
+                  class: 'cart-item__img'
+                %}
+              {% else %}
+                <a href="{{ item.url }}">
+                  {{ 'product-2.svg' | asset_url | image_tag: alt: item.title, class: 'cart-item__img', width: 120, height: 120 }}
+                </a>
+              {% endif %}
+            </div>
+            <div class="cart-item__details">
+              <h3 class="cart-item__title">
+                <a href="{{ item.url }}">{{ item.product.title }}</a>
+              </h3>
+              {% if show_vendor and item.product.vendor != blank %}
+                <p class="cart-item__vendor">{{ item.product.vendor }}</p>
+              {% endif %}
+              {% if item.variant.title != 'Default Title' %}
+                <p class="cart-item__variant">{{ item.variant.title }}</p>
+              {% endif %}
+              <div class="cart-item__price">
+                {% if item.original_price != item.final_price %}
+                  <span class="cart-item__price--original">
+                    {%- liquid
+                      if settings.currency_code_enabled
+                        assign money_original_price = item.original_price | money_with_currency
+                      else
+                        assign money_original_price = item.original_price | money
+                      endif
+                    -%}
+                    {% if cart.currency.iso_code == 'EUR' %}
+                      {{ money_original_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ',' }}
+                    {% elsif cart.currency.iso_code == 'INR' %}
+                      {{ money_original_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹' }}
+                    {% else %}
+                      {{ money_original_price }}
+                    {% endif %}
+                  </span>
+                {% endif %}
+                  <span class="cart-item__price--current">
+                    {%- liquid
+                      if settings.currency_code_enabled
+                        assign money_final_price = item.final_price | money_with_currency
+                      else
+                        assign money_final_price = item.final_price | money
+                      endif
+                    -%}
+                    {% if cart.currency.iso_code == 'EUR' %}
+                      {{ money_final_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ',' }}
+                    {% elsif cart.currency.iso_code == 'INR' %}
+                      {{ money_final_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹' }}
+                    {% else %}
+                      {{ money_final_price }}
+                    {% endif %}
+                  </span>
+              </div>
+              <div class="cart-item__quantity">
+                {% render 'quantity-input', 
+                  value: item.quantity, 
+                  item_key: item.key,
+                  container_class: 'cart-item__quantity-selector',
+                  data_attributes: 'data-quantity-input',
+                  minus_attributes: 'data-quantity-decrease',
+                  plus_attributes: 'data-quantity-increase'
+                %}
+              </div>
+            </div>
+            <button 
+              type="button" 
+              class="cart-item__remove" 
+              aria-label="Remove {{ item.title | escape }}"
+              data-remove-item
+              data-item-key="{{ item.key }}"
+            >
+              <svg xmlns="https://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" fill="none">
+<path d="M1.25 4.5H2.75M2.75 4.5H14.75M2.75 4.5L2.75 15C2.75 15.3978 2.90804 15.7794 3.18934 16.0607C3.47064 16.342 3.85218 16.5 4.25 16.5H11.75C12.1478 16.5 12.5294 16.342 12.8107 16.0607C13.092 15.7794 13.25 15.3978 13.25 15V4.5M5 4.5V3C5 2.60218 5.15804 2.22064 5.43934 1.93934C5.72064 1.65804 6.10218 1.5 6.5 1.5H9.5C9.89782 1.5 10.2794 1.65804 10.5607 1.93934C10.842 2.22064 11 2.60218 11 3V4.5M6.5 8.25V12.75M9.5 8.25V12.75" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+            </button>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="cart-drawer__empty">
+          <p>Your cart is empty</p>
+          <a href="{{ routes.all_products_collection_url }}" class="cart-drawer__continue-shopping">Continue Shopping</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+    <div class="cart-drawer__recommendations" {% if cart.item_count == 0 %}style="display: none;"{% endif %}>
+      <div class="cart-drawer__recommendations-title">Frequently bought together</div>
+      <div class="swiper cart-drawer__recommendations-slider" data-recommendations-slider>
+        <div class="swiper-wrapper">
+          {% comment %} Get recommended products - exclude cart items {% endcomment %}
+          {% assign cart_product_ids = '' %}
+          {% for item in cart.items %}
+            {% assign cart_product_ids = cart_product_ids | append: item.product.id | append: ',' %}
+          {% endfor %}
+          
+          {% assign recommendations_count = 0 %}
+          {% for product in collections.all.products limit: 20 %}
+            {% unless cart_product_ids contains product.id or product.available == false %}
+              {% if recommendations_count < 5 %}
+                <div class="swiper-slide">
+                  <div class="recommendation-item">
+                    <div class="recommendation-item__image">
+                      {% if product.featured_image %}
+                        {% render 'image', 
+                          image: product.featured_image, 
+                          url: product.url,
+                          width: 60,
+                          height: 60,
+                          class: 'recommendation-item__img'
+                        %}
+                      {% else %}
+                        <a href="{{ product.url }}">
+                          <div class="recommendation-item__placeholder">
+                            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                          </div>
+                        </a>
+                      {% endif %}
+                    </div>
+                    <div class="recommendation-item__content">
+                      <div class="recommendation-item__info">
+                          <div class="recommendation-item__title">
+                            <a href="{{ product.url }}">{{ product.title }}</a>
+                          </div>
+                      </div>
+                      <div class="recommendation-item__actions">
+                          <p class="recommendation-item__price">
+                            {%- liquid
+                              if settings.currency_code_enabled
+                                assign money_product_price = product.price | money_with_currency
+                              else
+                                assign money_product_price = product.price | money
+                              endif
+                            -%}
+                            {% if cart.currency.iso_code == 'EUR' %}
+                              {{ money_product_price | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ',' }}
+                            {% elsif cart.currency.iso_code == 'INR' %}
+                              {{ money_product_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹' }}
+                            {% else %}
+                              {{ money_product_price }}
+                            {% endif %}
+                          </p>
+                          {% assign first_variant = product.selected_or_first_available_variant %}
+                          {% if first_variant %}
+                            <button 
+                              type="button" 
+                              class="recommendation-item__add-btn" 
+                              aria-label="Add {{ product.title | escape }} to cart"
+                              data-add-recommendation
+                              data-product-id="{{ product.id }}"
+                              data-variant-id="{{ first_variant.id }}"
+                            >
+                              ADD
+                            </button>
+                          {% else %}
+                            <button class="recommendation-item__add-btn recommendation-item__add-btn--disabled" disabled aria-label="Sold out">
+                              SOLD
+                            </button>
+                          {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% assign recommendations_count = recommendations_count | plus: 1 %}
+              {% endif %}
+            {% endunless %}
+          {% endfor %}
+          
+          {% if recommendations_count == 0 %}
+            <div class="swiper-slide">
+              <div class="recommendation-item">
+               <p style="padding: 10px; width: 100%; text-align: center; color: #666;">No recommendations available</p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="cart-drawer__recommendations-dots" data-recommendations-dots></div>
+    </div>
+   <div class="cart-drawer__footer" {% if cart.item_count == 0 %}style="display: none;"{% endif %}>
+        <div class="cart-drawer__addons-row">
+          {% if show_cart_note %}
+            <button type="button" class="cart-drawer__addon-btn" data-toggle-addon="note" aria-label="Add Note" data-label="Add Note">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+          {% endif %}
+          
+          {% if show_shipping_calculator %}
+            <button type="button" class="cart-drawer__addon-btn" data-toggle-addon="shipping" aria-label="Estimate Shipping" data-label="Estimate Shipping">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </button>
+          {% endif %}
+
+          {% if show_discount_code %}
+            <button type="button" class="cart-drawer__addon-btn" data-toggle-addon="coupon" aria-label="Add Coupon" data-label="Add Coupon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-1.414 1.414L15 7.828l1.414-1.414L15 5zM9 19l-1.414-1.414L9 16.172l1.414 1.414L9 19zM21 11V5h-6m0 0l-5 5m5-5H5v14h14v-9m0 0l-5 5"/></svg>
+            </button>
+          {% endif %}
+        </div>
+
+        {% if show_cart_note %}
+          <div class="cart-drawer__note cart-drawer__addon-content" data-addon-content="note" style="display: none;">
+            <div class="cart-drawer__note-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <label for="cart-note" class="cart-drawer__note-title">Tell us how we can make this order just right</label>
+            </div>
+            <textarea 
+              id="cart-note" 
+              name="note" 
+              class="cart-drawer__note-input" 
+              placeholder="Please add any order or delivery instructions we should take note of"
+              data-cart-note
+            >{{ cart.note }}</textarea>
+            <div class="cart-drawer__note-actions">
+                <button type="button" class="cart-drawer__note-btn cart-drawer__note-btn--cancel" aria-label="Cancel" data-note-cancel>CANCEL</button>
+                <button type="button" class="cart-drawer__note-btn cart-drawer__note-btn--save" aria-label="Save" data-note-save>SAVE</button>
+            </div>
+          </div>
+        {% endif %}
+
+        {% if show_shipping_calculator %}
+          <div class="cart-drawer__shipping-estimator cart-drawer__addon-content" data-addon-content="shipping" style="display: none;">
+            <div class="cart-drawer__shipping-content">
+              <div class="cart-drawer__note-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <h3 class="cart-drawer__note-title">Estimate shipping rates</h3>
+              </div>
+              
+              <div class="cart-drawer__shipping-field">
+                <label for="drawer_address_country" class="cart-drawer__field-label">Country</label>
+                <select id="drawer_address_country" name="address[country]" class="cart-drawer__field-input" data-default="{{ settings.default_country_estimate_shipping }}">{{ country_option_tags }}</select>
+              </div>
+
+              <div id="drawer_address_province_container" class="cart-drawer__shipping-field" style="display:none;">
+                <label for="drawer_address_province" class="cart-drawer__field-label">Province</label>
+                <select id="drawer_address_province" name="address[province]" class="cart-drawer__field-input" data-default=""></select>
+              </div>
+
+                <label for="drawer_address_zip" class="cart-drawer__field-label">Postal/Zip Code</label>
+                <input type="text" id="drawer_address_zip" name="address[zip]" class="cart-drawer__field-input" placeholder="Postal/Zip Code">
+
+              <div class="cart-drawer__note-actions">
+                  <button type="button" class="cart-drawer__note-btn cart-drawer__note-btn--cancel" aria-label="Cancel" data-shipping-cancel>CANCEL</button>
+                  <button type="button" class="cart-drawer__note-btn cart-drawer__note-btn--save" aria-label="Calculate" data-calculate-shipping>CALCULATE</button>
+              </div>
+              
+              {% if show_delivery_days %}
+                <div class="cart-drawer__delivery-info">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  <span>Estimated delivery: 3-5 business days</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if show_discount_code %}
+          <div class="cart-drawer__discount cart-drawer__addon-content" data-addon-content="coupon" style="display: none;">
+             {% render 'cart-discount-form', label: 'Add Coupon', show_label: true %}
+          </div>
+        {% endif %}
+
+        {% if show_delivery_time %}
+          <div class="cart-drawer__delivery-time-info">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>Standard delivery time: 9:00 AM - 6:00 PM</span>
+          </div>
+        {% endif %}
+
+        <div class="cart-drawer__subtotal">
+          <span class="cart-drawer__subtotal-label">Subtotal</span>
+          <div class="cart-drawer__subtotal-wrapper" style="display: flex; flex-direction: column; align-items: flex-end;">
+            <div data-discount-wrapper style="display: none; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span style="font-size: 13px; color: #888; text-decoration: line-through;" data-cart-original-total></span>
+              <span style="font-size: 12px; background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 4px; font-weight: 500;" data-cart-discount-amount></span>
+            </div>
+            {%- liquid
+              assign is_manual_active = false
+              if cart.discount_applications.size > 0
+                assign is_manual_active = true
+              endif
+
+              assign displayed_total = cart.total_price
+              if is_manual_active == false and cart.total_discount > 0
+                assign displayed_total = cart.total_price | plus: cart.total_discount
+              endif
+            -%}
+            <span class="cart-drawer__subtotal-amount" data-cart-total>
+              {%- liquid
+                if settings.currency_code_enabled
+                  assign money_displayed_total = displayed_total | money_with_currency
+                else
+                  assign money_displayed_total = displayed_total | money
+                endif
+              -%}
+              {% if cart.currency.iso_code == 'EUR' %}
+                {{ money_displayed_total | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ',' }}
+              {% elsif cart.currency.iso_code == 'INR' %}
+                {{ money_displayed_total | replace: 'Rs.', '₹' | replace: 'Rs', '₹' }}
+              {% else %}
+                {{ money_displayed_total }}
+              {% endif %}
+            </span>
+          </div>
+        </div>
+
+        {% if show_trust_badge %}
+          <div class="cart-drawer__trust-badge">
+            <img src="{{ settings.cart_drawer_trust_badge | image_url: width: 400 }}" alt="Trust Badge" loading="lazy" width="{{ settings.cart_drawer_trust_badge.width }}" height="{{ settings.cart_drawer_trust_badge.height }}">
+          </div>
+        {% endif %}
+
+        {% liquid
+          if settings.agree_text != blank and settings.show_agree_on_cart
+            render 'agree-terms-checkbox'
+          endif
+        %}
+
+        <div class="cart-drawer__buttons">
+          <a href="{{ routes.cart_url }}" class="cart-drawer__btn cart-drawer__btn--secondary">View Cart</a>
+          <div class="cart-drawer__checkout-wrapper" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <a href="/checkout" class="cart-drawer__btn cart-drawer__btn--primary" data-checkout-btn>Checkout</a>
+            {% if show_accelerated_checkout and additional_checkout_buttons %}
+              <div class="cart-drawer__additional-buttons">
+                {{ content_for_additional_checkout_buttons }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<style>
+  .cart-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    z-index: 10005;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .cart-drawer.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .cart-drawer__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+  .cart-drawer__content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 420px;
+    height: 100%;
+    height: 100dvh;
+    background: #FEFEFE;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .cart-drawer.active .cart-drawer__content {
+    transform: translateX(0);
+  }
+  .m-cartitems{
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .cart-drawer__header {
+    display: flex;
+    margin:10px 15px 5px 15px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  .cart-drawer__title {
+    text-align:center;
+    margin: 0;
+    font-weight: 600;
+    font-size:20px;
+    color: #000;
+  }
+  .cart-drawer__close {
+    background: none;
+    border: none !important;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cart-drawer__shipping-progress {
+    padding: 8px 30px 8px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  .shipping-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .shipping-progress-bar__fill {
+    height: 100%;
+    background: {{ settings.free_shipping_accent_color | default: '#4caf50' }};
+    transition: width 0.3s ease;
+    border-radius: 4px;
+  }
+  .shipping-progress-bar__icon {
+    position: absolute;
+    top: 50%;
+    padding:4px;
+    right: -12px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: #FEFEFE;
+    border: 1px solid {{ settings.free_shipping_accent_color | default: '#4caf50' }};
+    border-radius: 50%;
+    color: {{ settings.free_shipping_accent_color | default: '#4caf50' }};
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .shipping-progress__message {
+    color: #666;
+    font-size:14px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .shipping-progress__message--success {
+    color: {{ settings.free_shipping_accent_color | default: '#4caf50' }};
+    font-weight: 600;
+    font-size:14px !important;
+  }
+  .shipping-progress__warning {
+    color: #f44336;
+    margin: 0.5rem 0 0;
+    font-size:14px;
+    font-weight: 500;
+  }
+  .cart-drawer__items {
+    flex: 1;
+    padding:10px 15px;
+  }
+  .cart-item {
+    display: flex;
+    gap: 1rem;
+    padding: 10px 0px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cart-item:last-child {
+    border-bottom: none;
+  }
+  .cart-item__image {
+    flex-shrink: 0;
+    width: 80px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .cart-item__image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .cart-item__image img,
+  .cart-item__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+  }
+  .cart-item__details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .cart-item__title {
+    margin: 0;
+    font-weight: 500;
+    font-size:14px;
+  }
+  .cart-item__title a {
+    color: #000;
+    text-decoration: none;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .cart-item__vendor {
+    display: none;
+    margin: 0;
+    color: #888;
+    font-size:14px !important;
+    font-weight: 400;
+  }
+  .cart-item__variant {
+    margin: 0;
+    color: #666;
+    font-size:14px !important;
+  }
+  .cart-item__price {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size:14px;
+  }
+  .cart-item__price--original {
+    text-decoration: line-through;
+    color: #999;
+  }
+  .cart-item__price--current {
+    font-weight: 600;
+    color: #000;
+  }
+  .cart-item__quantity {
+    display: flex;
+
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .cart-item__quantity-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e0e0e0;
+    background: #FEFEFE;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    transition: background 0.2s ease;
+  }
+  .cart-item__quantity-btn:hover {
+    background: #f5f5f5;
+  }
+  .cart-item__quantity-input {
+    width: 50px;
+    height: 32px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .cart-item__remove {
+    align-self: flex-start;
+    background: none;
+    border: none !important;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #666;
+    transition: color 0.2s ease;
+    margin-top: 0;
+  }
+  .cart-item__remove:hover {
+    color: #f44336;
+  }
+  .cart-drawer__empty {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .cart-drawer__empty p{
+    font-size:14px;
+    font-weight: 500;
+    color:#000;
+  }
+  .cart-drawer__continue-shopping {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #000;
+    color: #FEFEFE;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size:14px;
+  }
+  .cart-drawer__recommendations {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #FEFEFE;
+  }
+  .cart-drawer__recommendations-title {
+    margin: 0 0 10px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+  }
+  .cart-drawer__recommendations-slider {
+    margin-bottom: 0px;
+  }
+  .cart-drawer__recommendations-slider .swiper-wrapper {
+    display: flex;
+    align-items: stretch;
+  }
+  .cart-drawer__recommendations-slider .swiper-slide {
+    width: 100%;
+    flex-shrink: 0;
+    height: auto;
+    display: flex;
+    box-sizing: border-box;
+  }
+  .recommendation-item {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    width: 100%;
+    align-items: center;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+  }
+
+  .recommendation-item__image {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #e9ecef;
+    flex-shrink: 0;
+  }
+  .recommendation-item__image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .recommendation-item__image img,
+  .recommendation-item__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .recommendation-item__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+  }
+  .recommendation-item__content {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .recommendation-item__info {
+    flex: 1;
+    min-width: 0;
+  }
+  .recommendation-item__title {
+    font-weight: 400;
+    font-size: 14px !important;
+    color: #333;
+    margin: 0;
+    line-height: 1.3;
+    flex: 1;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  .recommendation-item__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .recommendation-item__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+    min-width: max-content;
+  }
+  .recommendation-item__price {
+    font-weight: 700;
+    color: #000;
+    font-size: 14px !important;
+    margin: 0;
+  }
+  .recommendation-item__add-btn {
+    background: #4E032A;
+    color: #FEFEFE;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 20px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    line-height: 1.2;
+    min-width: 60px;
+    text-align: center;
+  }
+  .recommendation-item__add-btn:hover {
+    background: #470b29;
+  }
+  .recommendation-item__add-btn:disabled,
+  .recommendation-item__add-btn--disabled {
+    background: #4E032A;
+    cursor: not-allowed;
+  }
+  .cart-drawer__recommendations-dots {
+    margin-top:15px;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .cart-drawer__recommendations-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e4cfda;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+  }
+  .cart-drawer__recommendations-dots .dot:hover {
+    transform: scale(1.2);
+  }
+  .cart-drawer__recommendations-dots .swiper-pagination-bullet-active,
+  .cart-drawer__recommendations-dots .dot.swiper-pagination-bullet-active {
+    background: #4E032A;
+    width: 10px;
+    height: 10px;
+  }
+  .cart-drawer__footer {
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  .cart-drawer__note {
+    margin-bottom: 1rem;
+  }
+  .cart-drawer__note-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #000;
+  }
+  .cart-drawer__note-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: #000;
+    line-height: 1.3;
+  }
+  .cart-drawer__note-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .recommendation-item {
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 12px !important;
+      padding: 12px !important;
+    }
+    .cart-drawer__title{
+      font-size:18px;
+    }
+    .recommendation-item__image {
+      width: 60px !important;
+      height: 60px !important;
+      min-width: 60px !important;
+    }
+    .recommendation-item__content {
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+    .recommendation-item__info {
+      text-align: left !important;
+    }
+    .recommendation-item__actions {
+      align-items: flex-end !important;
+      flex-direction: column !important;
+    }
+    .recommendation-item__title {
+      font-size: 14px !important;
+      white-space: nowrap !important;
+    }
+    .recommendation-item__add-btn {
+      padding: 6px 16px !important;
+      font-size: 11px !important;
+      height: auto !important;
+      min-height: 0 !important;
+      border-radius: 4px !important;
+    }
+  }
+  .cart-drawer__note-btn {
+    padding: 12px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: none;
+    letter-spacing: 0.05em;
+  }
+  .cart-drawer__note-btn--cancel {
+    color: #000;
+    border: 1px solid #4E032A;
+    background:transparent;
+  }
+
+  .cart-drawer__note-btn--save {
+    background: #4E032A;
+    color: #FEFEFE;
+  }
+  .cart-drawer__note-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #000;
+  }
+  .cart-drawer__note-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+    color: #000;
+    background: #FEFEFE;
+    font-size:14px;
+    line-height: 20px;
+  }
+  .cart-drawer__note-input:focus {
+    outline: none;
+    border-color: #000;
+  }
+  .cart-drawer__note-input::placeholder {
+    color: #999;
+  }
+  .cart-drawer__subtotal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size:14px;
+    font-weight: 600;
+    padding: 5px 15px;
+    color: #000;
+  }
+  .cart-drawer__terms {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+  .cart-drawer__terms-checkbox {
+    cursor: pointer;
+  }
+  .cart-drawer__buttons {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0px 15px 10px 15px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .cart-drawer__btn {
+    flex: 1;
+    padding: 7px;
+    text-align: center;
+    font-size:16px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .cart-drawer__btn--secondary {
+    background: #FEFEFE;
+    color: #000;
+    border: 1px solid #4E032A;
+  }
+  .cart-drawer__btn--secondary:hover {
+    background: #f5f5f5;
+  }
+  .cart-drawer__btn--primary {
+    background: #4E032A;
+    color: #FEFEFE;
+    border: 1px solid #4E032A;
+  }
+  .cart-drawer__btn--primary:hover {
+    background: #470b29;
+  }
+  .cart-drawer__btn--primary:disabled,
+  .cart-drawer__btn--primary[disabled="true"],
+  .cart-drawer__btn--primary[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .cart-drawer__field-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+  }
+  .cart-drawer__field-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #eee;
+    background: #f9f9f9;
+    font-size: 0.9rem;
+    color: #333;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+  .cart-drawer__field-input:focus {
+    outline: none;
+    border-color: #000;
+    background: #FEFEFE;
+  }
+  select.cart-drawer__field-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='https://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 5 3 3 3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+  }
+  .cart-drawer__countdown {
+    padding: 12px 15px;
+    background: #FEFEFE;
+    border-top: 1px dashed #eee;
+    border-bottom: 1px dashed #eee;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+  }
+  #cart-countdown-timer {
+    color: #e44343;
+    font-weight: 700;
+  }
+  .cart-drawer__addons-row {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .cart-drawer__addon-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: #FEFEFE;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: 1px solid #e0e0e0 !important;
+    border-radius: 0 !important;
+    cursor: pointer;
+    color: #333;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .cart-drawer .quantity-input{
+  height: 32px !important;
+  }
+  .cart-drawer__addon-btn::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    background: #000;
+    color: #FEFEFE;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 100;
+    line-height: 1;
+  }
+  .cart-drawer__addon-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  .cart-drawer__addon-btn::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    border: 5px solid transparent;
+    border-top-color: #000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .cart-drawer__addon-btn:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-5px);
+  }
+  .cart-drawer__addon-btn:last-child {
+    border-right: none !important;
+  }
+  .cart-drawer__addon-btn.active {
+    background: #f9f9f9;
+    color: #000;
+  }
+  .cart-drawer__addon-content {
+    padding: 6px 24px;
+    background: #FEFEFE;
+    border-top: 1px solid #eee;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 148px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .cart-drawer__addon-content.is-open {
+    opacity: 1;
+  }
+  .cart-drawer__discount {
+    margin-bottom: 0;
+  }
+  .cart-drawer__discount-form {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .cart-drawer__discount-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  .cart-drawer__discount-btn {
+    padding: 0.5rem 1rem;
+    background: #000;
+    color: #FEFEFE;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .cart-drawer__discount-remove-btn {
+    padding: 0.5rem 1rem;
+    background: #FEFEFE;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .cart-drawer__discount-remove-btn:hover {
+    background: #f5f5f5;
+  }
+  .cart-drawer__trust-badge {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .cart-drawer__trust-badge img {
+    max-width: 100%;
+    height: auto;
+  }
+  .cart-drawer__shipping-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .cart-drawer__shipping-content select,
+  .cart-drawer__shipping-content input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  .cart-drawer__note-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #000;
+  }
+  .cart-drawer__additional-buttons {
+    margin-top: 4px;
+  }
+  .cart-drawer__additional-buttons [data-shopify-buttoncontainer] {
+    justify-content: center !important;
+  }
+  .cart-drawer__delivery-info,
+  .cart-drawer__delivery-time-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 8px;
+    padding: 4px 0;
+  }
+  .cart-drawer__delivery-time-info {
+    margin-bottom: 12px;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+  }
+  @media (max-width: 768px) {
+    .cart-drawer__content {
+      max-width: 100%;
+    }
+    .cart-item__title {
+      font-size:16px;
+    }
+    .recommendation-item {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .recommendation-item__content {
+      padding: 0;
+    }
+    .shipping-progress__message--success {
+      font-size: 12px !important;
+    }
+  }
+  @media (max-width: 425px) {
+    .recommendation-item__title {
+      max-width: 150px;
+    }
+  }
+</style>
+<script>
+  (function() {
+    class CartDrawer {
+      constructor() {
+        this.drawer = document.querySelector('[data-cart-drawer]');
+        this.closeBtns = document.querySelectorAll('[data-cart-drawer-close]');
+        this.quantityInputs = document.querySelectorAll('[data-quantity-input]');
+        this.quantityDecreaseBtns = document.querySelectorAll('[data-quantity-decrease]');
+        this.quantityIncreaseBtns = document.querySelectorAll('[data-quantity-increase]');
+        this.removeBtns = document.querySelectorAll('[data-remove-item]');
+        this.recommendationsSwiper = null;
+        this.appliedDiscountCode = null; // Only set when user explicitly applies a code
+
+        if (!this.drawer) {
+          return;
+        }
+        
+        // Only access drawer elements after confirming drawer exists
+        this.checkoutBtn = this.drawer.querySelector('[data-checkout-btn]');
+        this.termsCheckbox = this.drawer.querySelector('[data-terms-checkbox]');
+        this.cartNoteInput = this.drawer.querySelector('[data-cart-note]');
+        
+        this.init();
+      }
+
+      init() {
+        this.checkCartState();
+        if (typeof Shopify !== 'undefined' && Shopify.CountryProvinceSelector && document.getElementById('drawer_address_country')) {
+          new Shopify.CountryProvinceSelector('drawer_address_country', 'drawer_address_province', {
+            hideElement: 'drawer_address_province_container'
+          });
+        }
+        this.cartType = this.getCartType();
+        document.addEventListener('click', (e) => {
+          const openBtn = e.target.closest('[data-cart-drawer-open]');
+          if (openBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.cartType === 'drawer' && this.drawer) {
+              this.open();
+            } else {
+              window.location.href = '{{ routes.cart_url }}';
+            }
+          }
+        });
+        // Global delegated interactions for Drawer and Cart Page
+        document.addEventListener('click', async (e) => {
+          // 1. Close button
+          if (e.target.closest('[data-cart-drawer-close]')) {
+            this.close();
+            return;
+          }
+
+          // 2. Quantity decrease
+          const decreaseBtn = e.target.closest('[data-quantity-decrease]');
+          if (decreaseBtn) {
+            const itemKey = decreaseBtn.dataset.itemKey;
+            this.updateQuantity(itemKey, -1);
+            return;
+          }
+
+          // 3. Quantity increase
+          const increaseBtn = e.target.closest('[data-quantity-increase]');
+          if (increaseBtn) {
+            const itemKey = increaseBtn.dataset.itemKey;
+            this.updateQuantity(itemKey, 1);
+            return;
+          }
+
+          // 4. Remove item
+          const removeBtn = e.target.closest('[data-remove-item]');
+          if (removeBtn) {
+            const itemKey = removeBtn.dataset.itemKey;
+            this.removeItem(itemKey);
+            return;
+          }
+
+          // 5. Toggle Addons (Note/Shipping/Coupon)
+          const toggleBtn = e.target.closest('[data-toggle-addon]');
+          if (toggleBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const target = toggleBtn.dataset.toggleAddon;
+            const content = this.drawer.querySelector(`[data-addon-content="${target}"]`);
+            if (content) {
+              const isActive = toggleBtn.classList.contains('active');
+              
+              // Hide others
+              this.hideAllAddons();
+              
+              // Show this one
+              if (!isActive) {
+                content.style.display = 'block';
+                setTimeout(() => content.classList.add('is-open'), 10);
+                toggleBtn.classList.add('active');
+              }
+            }
+            return;
+          }
+
+          // 6. Recommendation Add to Cart
+          const recBtn = e.target.closest('[data-add-recommendation]');
+          if (recBtn) {
+            e.preventDefault();
+            const variantId = recBtn.dataset.variantId;
+            if (!variantId) return;
+            const originalText = recBtn.textContent;
+            recBtn.textContent = 'Adding...';
+            recBtn.style.pointerEvents = 'none';
+            recBtn.style.opacity = '0.6';
+            try {
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+              });
+              if (response.ok) {
+                await this.refreshCart();
+                document.dispatchEvent(new CustomEvent('cart:updated'));
+                recBtn.textContent = 'Added!';
+                recBtn.style.color = '#4caf50';
+                setTimeout(() => {
+                  recBtn.textContent = originalText;
+                  recBtn.style.color = '';
+                  recBtn.style.pointerEvents = '';
+                  recBtn.style.opacity = '';
+                }, 2000);
+              }
+            } catch (err) {
+              recBtn.textContent = originalText;
+              recBtn.style.pointerEvents = '';
+            }
+            return;
+          }
+
+          // 7. Apply Discount
+          const discBtn = e.target.closest('[data-apply-coupon]');
+          if (discBtn) {
+            const container = discBtn.closest('[data-discount-form-container]') || document;
+            const input = container.querySelector('[data-discount-input]');
+            const code = input ? input.value.trim() : '';
+            if (!code) return;
+            
+            const originalText = discBtn.textContent;
+            discBtn.textContent = 'Checking...';
+            discBtn.disabled = true;
+
+            const messageEl = container.querySelector('[data-discount-message]');
+            if (messageEl) messageEl.innerHTML = ''; // Clear previous messages
+
+            try {
+              // Step 1: Apply the discount code via Shopify's discount endpoint
+              await fetch(`/discount/${encodeURIComponent(code)}`);
+
+              // Step 2: Wait for Shopify to register the discount
+              await new Promise(resolve => setTimeout(resolve, 800));
+
+              // Step 3: Refresh cart to check current state
+              const cartRes = await fetch('/cart.js', { cache: 'no-store' });
+              const cartAfter = await cartRes.json();
+
+              // Step 4: Check if discount is reflected in cart.js
+              const hasApp = cartAfter.discount_applications && cartAfter.discount_applications.some(app =>
+                (app.title && app.title.toLowerCase() === code.toLowerCase()) ||
+                (app.code && app.code.toLowerCase() === code.toLowerCase())
+              );
+              const hasCartDiscount = cartAfter.total_discount > 0;
+              const hasItemDiscount = cartAfter.items && cartAfter.items.some(item =>
+                item.discounts && item.discounts.some(d => d.title && d.title.toLowerCase() === code.toLowerCase())
+              );
+
+              if (hasApp || hasCartDiscount || hasItemDiscount) {
+                // Step 5: SUCCESSFUL DISCOUNT
+                this.appliedDiscountCode = code;
+                localStorage.setItem('cart_applied_discount', code);
+                localStorage.removeItem('cart_discount_cleared');
+                localStorage.removeItem('cart_discount_clearing');
+
+                await fetch('/cart/update.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ attributes: { 'user_applied_coupon': code } })
+                });
+
+                // Update checkout button URL with discount code
+                const checkoutBtns = document.querySelectorAll('[data-checkout-btn], button[name="checkout"]');
+                checkoutBtns.forEach(checkoutBtn => {
+                  if (checkoutBtn.hasAttribute('href')) {
+                    const url = new URL(checkoutBtn.getAttribute('href'), window.location.origin);
+                    url.searchParams.set('discount', code);
+                    checkoutBtn.setAttribute('href', url.pathname + url.search);
+                  }
+                });
+
+                // Show apply/remove button states
+                discBtn.style.display = 'none';
+                const removeBtn = container.querySelector('[data-remove-coupon]');
+                if (removeBtn) removeBtn.style.display = 'block';
+
+                messageEl.innerHTML = `<span style="color: #4caf50; font-size: 13px; font-weight: 500; margin-top: 8px; display: block;">✓ Discount code "${code}" applied successfully!</span>`;
+                this.updateCartUI(cartAfter);
+                document.dispatchEvent(new CustomEvent('cart:updated'));
+              } else {
+                // Step 6: INVALID OR NON-APPLICABLE DISCOUNT
+                // Reset the cookie Shopify just set so it doesn't break future checkout logic
+                await fetch('/discount/CLEAR'); 
+                
+                this.appliedDiscountCode = null;
+                localStorage.removeItem('cart_applied_discount');
+
+                discBtn.textContent = originalText;
+                discBtn.disabled = false;
+                
+                messageEl.innerHTML = `<span style="color: #f44336; font-size: 13px; font-weight: 500; margin-top: 8px; display: block;">✕ Invalid or non-applicable discount code.</span>`;
+                
+                // Update UI to ensure no discount remnants are shown
+                this.updateCartUI(cartAfter);
+              }
+            } catch (err) {
+              discBtn.textContent = originalText;
+              discBtn.disabled = false;
+              if (messageEl) messageEl.innerHTML = `<span style="color: #f44336; font-size: 13px; font-weight: 500; margin-top: 8px; display: block;">Error applying discount. Try again.</span>`;
+            }
+
+            return;
+          }
+
+          // 7b. Remove Discount
+          const removeDiscBtn = e.target.closest('[data-remove-coupon]');
+          if (removeDiscBtn) {
+             const container = removeDiscBtn.closest('[data-discount-form-container]') || document;
+             removeDiscBtn.textContent = 'Removing...';
+             removeDiscBtn.disabled = true;
+
+             try {
+                // Clear Shopify session using multiple methods for reliability
+                // Hit both invalid and standard clear endpoints to force a session update
+                await fetch('/discount/NONE?t=' + Date.now(), { cache: 'no-store' }); 
+                await fetch('/discount/CLEAR?t=' + Date.now(), { cache: 'no-store' }); 
+                await fetch('/discount/1?t=' + Date.now(), { cache: 'no-store' }); 
+                await fetch('/discount/ ?t=' + Date.now(), { cache: 'no-store' }); 
+                await fetch('/checkout?discount=&t=' + Date.now(), { cache: 'no-store' }); 
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await fetch('/cart.js', { cache: 'no-store' }); // Wake up cart session
+                
+                // Clear UI state and flag as intentionally cleared to block staleness in Liquid
+                this.appliedDiscountCode = null;
+                localStorage.removeItem('cart_applied_discount');
+                localStorage.setItem('cart_discount_cleared', 'true');
+                localStorage.setItem('cart_discount_clearing', 'true');
+
+                // Update cart attributes for server-side persistence
+                await fetch('/cart/update.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ attributes: { 'user_applied_coupon': '', 'user_applied_discount': '' } })
+                });
+                
+                // Keep the clearing flag active for several seconds to allow checkout/reloads to finish
+                setTimeout(() => {
+                  localStorage.removeItem('cart_discount_clearing');
+                }, 5000);
+                
+                const discInput = container.querySelector('[data-discount-input]');
+                if (discInput) discInput.value = '';
+                
+                const discBtn = container.querySelector('[data-apply-coupon]');
+                if (discBtn) {
+                   discBtn.style.display = 'block';
+                   discBtn.textContent = 'Apply';
+                   discBtn.disabled = false;
+                }
+                removeDiscBtn.style.display = 'none';
+                removeDiscBtn.textContent = 'Remove';
+                removeDiscBtn.disabled = false;
+
+                const messageEl = container.querySelector('[data-discount-message]');
+                if (messageEl) messageEl.innerHTML = '';
+
+                // Update checkout link
+                const checkoutBtns = document.querySelectorAll('[data-checkout-btn], button[name="checkout"]');
+                checkoutBtns.forEach(checkoutBtn => {
+                  if (checkoutBtn.hasAttribute('href')) {
+                    const url = new URL(checkoutBtn.getAttribute('href'), window.location.origin);
+                    url.searchParams.delete('discount');
+                    checkoutBtn.setAttribute('href', url.pathname + url.search);
+                  }
+                });
+
+                // Refresh numbers
+                const cart = await this.refreshCart();
+                if (cart) this.updateCartUI(cart);
+                document.dispatchEvent(new CustomEvent('cart:updated'));
+             } catch (err) {
+                removeDiscBtn.textContent = 'Remove';
+                removeDiscBtn.disabled = false;
+             }
+             return;
+          }
+
+          // 8. Note Save/Cancel
+          const saveNoteBtn = e.target.closest('[data-note-save]');
+          if (saveNoteBtn) {
+            const container = saveNoteBtn.closest('.cart-drawer__note, .addon-content-pane, document');
+            const noteInput = container ? container.querySelector('[data-cart-note]') : document.querySelector('[data-cart-note]');
+            if (noteInput) {
+              this.saveCartNote(noteInput.value, saveNoteBtn);
+            }
+            return;
+          }
+
+          const cancelNoteBtn = e.target.closest('[data-note-cancel]');
+          if (cancelNoteBtn) {
+            const container = cancelNoteBtn.closest('.cart-drawer__note, .addon-content-pane, document');
+            const noteInput = container ? container.querySelector('[data-cart-note]') : document.querySelector('[data-cart-note]');
+            if (noteInput) {
+               noteInput.value = '';
+               this.saveCartNote('');
+            }
+            return;
+          }
+
+          const cancelShippingBtn = e.target.closest('[data-shipping-cancel]');
+          if (cancelShippingBtn) {
+            const pane = cancelShippingBtn.closest('[data-addon-content="shipping"]');
+            if (pane) {
+              pane.querySelectorAll('input, select').forEach(el => {
+                if (el.tagName === 'SELECT') {
+                  el.selectedIndex = 0;
+                  el.dispatchEvent(new Event('change', { bubbles: true }));
+                } else {
+                  el.value = '';
+                }
+              });
+            }
+            return;
+          }
+        });
+
+        // Quantity input changes (delegated)
+        document.addEventListener('input', (e) => {
+           const discInput = e.target.closest('[data-discount-input]');
+           if (discInput) {
+             const container = discInput.closest('[data-discount-form-container]') || document;
+             const messageEl = container.querySelector('[data-discount-message]');
+             if (messageEl) messageEl.innerHTML = '';
+           }
+        });
+
+        document.addEventListener('change', (e) => {
+           const input = e.target.closest('[data-quantity-input]');
+           if (input) {
+             const itemKey = input.dataset.itemKey;
+             const quantity = parseInt(input.value) || 1;
+             this.updateQuantity(itemKey, 0, quantity);
+           }
+        });
+
+        this.additionalCheckoutButtons = this.drawer.querySelector('.cart-drawer__additional-buttons');
+
+        // Terms & Conditions enforcement
+        document.addEventListener('click', (e) => {
+          const checkoutBtn = e.target.closest('[data-checkout-btn], button[name="checkout"], .cart-drawer__additional-buttons');
+          if (checkoutBtn && checkoutBtn.closest('.cart-drawer')) {
+            const checkbox = document.querySelector('.cart-drawer [data-terms-checkbox]');
+            if (checkbox && !checkbox.checked) {
+              checkbox.reportValidity();
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+            }
+          }
+        }, true);
+
+        // Ensure buttons are initially enabled
+        const checkoutBtns = document.querySelectorAll('.cart-drawer [data-checkout-btn], .cart-drawer button[name="checkout"]');
+        const additionalBtns = document.querySelectorAll('.cart-drawer__additional-buttons');
+        checkoutBtns.forEach(btn => btn.removeAttribute('disabled'));
+        additionalBtns.forEach(btnWrap => btnWrap.style.display = 'block');
+
+        if (this.cartNoteInput) {
+           this.lastSavedNote = this.cartNoteInput.value;
+        }
+
+        // Restore discount UI state from localStorage
+        let storedDiscount = localStorage.getItem('cart_applied_discount');
+        const drawerEl = document.querySelector('.cart-drawer');
+        const liquidDiscountCode = drawerEl ? drawerEl.getAttribute('data-cart-discount-code') : '';
+        const initialTotalDiscount = drawerEl ? parseInt(drawerEl.getAttribute('data-cart-total-discount')) || 0 : 0;
+        const isClearing = localStorage.getItem('cart_discount_clearing');
+        const hasBeenCleared = localStorage.getItem('cart_discount_cleared');
+
+        if (liquidDiscountCode) {
+          storedDiscount = liquidDiscountCode;
+          this.appliedDiscountCode = storedDiscount;
+          localStorage.setItem('cart_applied_discount', storedDiscount);
+          localStorage.removeItem('cart_discount_cleared');
+          localStorage.removeItem('cart_discount_clearing');
+        } else {
+          // If Liquid says there is NO discount code active... 
+          // And there's no money being discounted...
+          if (initialTotalDiscount === 0 && !isClearing) {
+            // Then the discount has been removed (probably at checkout)
+            storedDiscount = null;
+            this.appliedDiscountCode = null;
+            localStorage.removeItem('cart_applied_discount');
+          }
+        }
+
+        if (storedDiscount && !isClearing) {
+          // A discount was manually applied — restore UI to "applied" state
+          this.appliedDiscountCode = storedDiscount;
+          const discInputs = document.querySelectorAll('[data-discount-input]');
+          const discBtns = document.querySelectorAll('[data-apply-coupon]');
+          const removeBtns = document.querySelectorAll('[data-remove-coupon]');
+          
+          discInputs.forEach(input => input.value = storedDiscount);
+          discBtns.forEach(btn => btn.style.display = 'none');
+          removeBtns.forEach(btn => btn.style.display = 'block');
+          
+          if (initialTotalDiscount === 0) {
+            document.querySelectorAll('[data-discounts-container]').forEach(c => c.style.display = 'none');
+          }
+          localStorage.removeItem('cart_discount_clearing');
+        } else {
+          // No discount active — reset UI to default "Apply" state
+          if (!isClearing) {
+            this.appliedDiscountCode = null;
+            localStorage.removeItem('cart_applied_discount');
+            document.querySelectorAll('[data-discount-input]').forEach(input => input.value = '');
+          }
+          document.querySelectorAll('[data-apply-coupon]').forEach(btn => btn.style.display = 'block');
+          document.querySelectorAll('[data-remove-coupon]').forEach(btn => btn.style.display = 'none');
+          document.querySelectorAll('[data-discounts-container]').forEach(c => {
+             c.style.display = 'none';
+             c.innerHTML = '';
+          });
+        }
+
+        // Handle Enter key for discount input in drawer
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && e.target.closest('[data-discount-input]')) {
+            e.preventDefault();
+            const container = e.target.closest('[data-discount-form-container]');
+            const applyBtn = container ? container.querySelector('[data-apply-coupon]') : null;
+            if (applyBtn && applyBtn.style.display !== 'none') {
+              applyBtn.click();
+            }
+          }
+        });
+
+        document.addEventListener('cart:updated', async (e) => {
+          // Always refresh UI when cart:updated is dispatched, regardless of drawer state
+          const cart = await this.refreshCart();
+          if (cart) {
+            this.updateCartUI(cart);
+          }
+        });
+        document.addEventListener('cart:refresh', async () => {
+          const cart = await this.refreshCart();
+          if (cart) this.updateCartUI(cart);
+        });
+        document.addEventListener('cart:open', () => {
+          if (this.cartType === 'drawer' && this.drawer) {
+            this.open();
+          }
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.drawer?.classList.contains('active')) {
+            this.close();
+          }
+        });
+
+      }
+      open() {
+        if (this.drawer) {
+          this.drawer.style.display = 'block';
+          // Force a reflow
+          this.drawer.offsetHeight;
+          this.drawer.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          this.initCountdown();
+          
+          // Ensure no hidden discount is applied at checkout if not active in cart
+          if (!this.appliedDiscountCode) {
+            fetch('/discount/ ');
+          }
+
+          this.refreshCart().then(() => {
+            setTimeout(() => this.initRecommendationsSlider(), 200);
+          }).catch(() => {
+            setTimeout(() => this.initRecommendationsSlider(), 200);
+          });
+        }
+      }
+      initRecommendationsSlider() {
+        const sliderEl = document.querySelector('[data-recommendations-slider]');
+        if (!sliderEl) return;
+        if (this.recommendationsSwiper) {
+          this.recommendationsSwiper.destroy(true, true);
+          this.recommendationsSwiper = null;
+        }
+        if (typeof Swiper !== 'undefined') {
+          const slides = sliderEl.querySelectorAll('.swiper-slide');
+          if (slides.length > 0) {
+            this.recommendationsSwiper = new Swiper(sliderEl, {
+              slidesPerView: 1,
+              spaceBetween: 16,
+              loop: false,
+              pagination: {
+                el: '[data-recommendations-dots]',
+                clickable: true,
+                bulletClass: 'dot',
+                bulletActiveClass: 'swiper-pagination-bullet-active',
+                renderBullet: function (index, className) {
+                  return '<span class="' + className + '"></span>';
+                }
+              },
+              breakpoints: {
+                320: {
+                  slidesPerView: 1,
+                  spaceBetween: 12
+                },
+                480: {
+                  slidesPerView: 1,
+                  spaceBetween: 16
+                }
+              }
+            });
+          }
+        }
+      }
+      close() {
+        if (this.drawer) {
+          this.drawer.classList.remove('active');
+          document.body.style.overflow = '';
+          setTimeout(() => {
+            if (!this.drawer.classList.contains('active')) {
+              this.drawer.style.display = 'none';
+            }
+          }, 300); // Wait for transition
+        }
+      }
+      async updateQuantity(itemKey, change, newQuantity = null) {
+        const item = document.querySelector(`[data-cart-item][data-item-key="${itemKey}"]`);
+        if (!item) return;
+        const input = item.querySelector('[data-quantity-input]');
+        let quantity = parseInt(input.value) || 1;
+        if (newQuantity !== null) {
+          quantity = Math.max(1, newQuantity);
+        } else {
+          quantity = Math.max(1, quantity + change);
+        }
+        try {
+          const response = await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: itemKey, quantity: quantity })
+          });
+          if (response.ok) {
+            await this.refreshCart();
+            document.dispatchEvent(new CustomEvent('cart:updated'));
+          }
+        } catch (error) {
+        }
+      }
+      async removeItem(itemKey) {
+        try {
+          const response = await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: itemKey, quantity: 0 })
+          });
+          if (response.ok) {
+            await this.refreshCart();
+            document.dispatchEvent(new CustomEvent('cart:updated'));
+          }
+        } catch (error) {
+        }
+      }
+      async refreshCart() {
+        if (!this.drawer) return null;
+        try {
+          const cartRes = await fetch('/cart.js', { cache: 'no-store' });
+          if (!cartRes.ok) return null;
+          const cart = await cartRes.json();
+          this.updateCartUI(cart);
+          return cart;
+        } catch (error) {
+          return null;
+        }
+      }
+      checkCartState() {
+        const cartCount = parseInt(document.querySelector('[data-cart-count]')?.textContent || '0');
+        const recommendationsSection = document.querySelector('.cart-drawer__recommendations');
+        const footerSection = document.querySelector('.cart-drawer__footer');
+        const countdownSection = document.querySelector('.cart-drawer__countdown');
+        const shippingSection = document.querySelector('[data-shipping-progress]');
+        if (cartCount === 0) {
+          if (recommendationsSection) recommendationsSection.style.display = 'none';
+          if (footerSection) footerSection.style.display = 'none';
+          if (countdownSection) countdownSection.style.display = 'none';
+          if (shippingSection) shippingSection.style.display = 'none';
+        } else {
+          if (recommendationsSection) recommendationsSection.style.display = 'block';
+          if (footerSection) footerSection.style.display = 'block';
+          if (countdownSection) countdownSection.style.display = 'flex';
+          if (shippingSection) shippingSection.style.display = 'block';
+        }
+      }
+      async updateCartUI(cart) {
+        // Sync state from localStorage for cross-component consistency
+        const storedDiscount = localStorage.getItem('cart_applied_discount');
+        this.appliedDiscountCode = storedDiscount || null;
+        
+        const discInputs = document.querySelectorAll('[data-discount-input]');
+        discInputs.forEach(input => {
+          input.value = this.appliedDiscountCode || '';
+        });
+
+        const countEl = document.querySelector('[data-cart-count]');
+        if (countEl) {
+          countEl.textContent = cart.item_count;
+        }
+        const headerCounts = document.querySelectorAll('.header__cart-count');
+        headerCounts.forEach(el => {
+          if (cart.item_count > 0) {
+            el.textContent = cart.item_count;
+            el.style.display = 'flex';
+          } else {
+            el.style.display = 'none';
+          }
+        });
+        const totalEls = document.querySelectorAll('[data-cart-total]');
+        const subtotalEls = document.querySelectorAll('[data-cart-subtotal]');
+        const originalTotalEls = document.querySelectorAll('[data-cart-original-total]');
+        const discountAmountEls = document.querySelectorAll('[data-cart-discount-amount]');
+        const discountWrappers = document.querySelectorAll('[data-discount-wrapper]');
+
+        const hasDiscountApps = cart.discount_applications && cart.discount_applications.length > 0;
+        // showDiscount: true when user has manually applied a code (regardless of cart.js discount visibility)
+        const showDiscount = !!this.appliedDiscountCode;
+        // showDiscountAmount: true only when cart.js actually reflects the discount
+        const showDiscountAmount = showDiscount && (cart.total_discount > 0 || hasDiscountApps);
+
+        totalEls.forEach(totalEl => {
+          if (totalEl) {
+            if (!showDiscount && cart.total_discount > 0) {
+              // If no manual code applied but Shopify has auto-discount, show original price
+              const originalPrice = parseInt(cart.total_price) + parseInt(cart.total_discount);
+              totalEl.innerHTML = this.formatMoney(originalPrice);
+            } else {
+              totalEl.innerHTML = this.formatMoney(cart.total_price);
+            }
+          }
+        });
+
+        subtotalEls.forEach(subtotalEl => {
+          if (subtotalEl) {
+            const totalDiscounts = (cart.discount_applications || []).reduce((sum, app) => sum + (app.total_allocated_amount || 0), 0) || cart.total_discount;
+            const originalSubtotal = parseInt(cart.total_price) + parseInt(totalDiscounts);
+            subtotalEl.innerHTML = this.formatMoney(originalSubtotal);
+          }
+        });
+
+        // Update generic discount containers (mostly used in cart page)
+        const discountContainers = document.querySelectorAll('[data-discounts-container]');
+        discountContainers.forEach(container => {
+          container.innerHTML = ''; // Clear previous
+          if (hasDiscountApps) {
+            cart.discount_applications.forEach(app => {
+              const row = document.createElement('div');
+              row.className = 'summary-total-row discount-row';
+              row.style.cssText = 'color: #2e7d32; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; width: 100%;';
+              if (container.closest('.cart-main-column')) {
+                 row.style.cssText = 'color: #2e7d32; display: flex;'; // Fallback for Design 1 layout specifics if needed
+              }
+              row.innerHTML = `
+                <span class="cart-total-label" style="margin-bottom:0;">Discount (${this.escapeHtml(app.title)}):</span>
+                <span class="value" style="text-align:right;">-${this.formatMoney(app.total_allocated_amount)}</span>
+              `;
+              container.appendChild(row);
+            });
+            container.style.display = 'block';
+          } else {
+            container.style.display = 'none';
+          }
+        });
+
+        // Only show discount amount row if cart.js reflects the discount amount
+        discountWrappers.forEach((discountWrapper, index) => {
+          const originalTotalEl = originalTotalEls[index] || originalTotalEls[0];
+          const discountAmountEl = discountAmountEls[index] || discountAmountEls[0];
+          
+          if (originalTotalEl && discountAmountEl && discountWrapper) {
+            if (showDiscountAmount) {
+              const originalPrice = parseInt(cart.total_price) + parseInt(cart.total_discount);
+              originalTotalEl.innerHTML = this.formatMoney(originalPrice);
+              discountAmountEl.innerHTML = `-${this.formatMoney(cart.total_discount)}`;
+              discountWrapper.style.display = 'flex';
+            } else {
+              discountWrapper.style.display = 'none';
+            }
+          }
+        });
+
+        // Update checkout button URL — always include discount code when applied
+        const checkoutBtns = document.querySelectorAll('[data-checkout-btn], button[name="checkout"]');
+        checkoutBtns.forEach(checkoutBtn => {
+          try {
+            if (checkoutBtn.hasAttribute('href') || checkoutBtn.tagName === 'A') {
+              const url = new URL(checkoutBtn.getAttribute('href'), window.location.origin);
+              if (this.appliedDiscountCode) {
+                url.searchParams.set('discount', this.appliedDiscountCode);
+              } else {
+                url.searchParams.delete('discount');
+              }
+              checkoutBtn.setAttribute('href', url.pathname + url.search);
+            }
+          } catch (e) {
+          }
+        });
+
+        // Toggle all discount buttons globally
+        const discBtns = document.querySelectorAll('[data-apply-coupon]');
+        const removeBtns = document.querySelectorAll('[data-remove-coupon]');
+        
+        if (showDiscount) {
+           discBtns.forEach(btn => btn.style.display = 'none');
+           removeBtns.forEach(btn => btn.style.display = 'block');
+        } else {
+           discBtns.forEach(btn => btn.style.display = 'block');
+           removeBtns.forEach(btn => btn.style.display = 'none');
+           // Only clear localStorage if NO discount is applied AND cart has no discount
+           if (!this.appliedDiscountCode && cart.total_discount === 0 && !hasDiscountApps) {
+              localStorage.removeItem('cart_applied_discount');
+           }
+        }
+
+        if (this.cartNoteInput && cart.note !== undefined) {
+           this.cartNoteInput.value = cart.note || '';
+           this.lastSavedNote = cart.note || '';
+        }
+        this.updateShippingProgress(cart.total_price);
+        const itemsContainer = document.querySelector('[data-cart-items]');
+        if (!itemsContainer) return;
+        const recommendationsSection = document.querySelector('.cart-drawer__recommendations');
+        const footerSection = document.querySelector('.cart-drawer__footer');
+        const countdownSection = document.querySelector('.cart-drawer__countdown');
+        const shippingSection = document.querySelector('[data-shipping-progress]');
+        if (cart.item_count === 0) {
+          if (recommendationsSection) recommendationsSection.style.display = 'none';
+          if (footerSection) footerSection.style.display = 'none';
+          if (countdownSection) countdownSection.style.display = 'none';
+          if (shippingSection) shippingSection.style.display = 'none';
+        } else {
+          if (recommendationsSection) recommendationsSection.style.display = 'block';
+          if (footerSection) footerSection.style.display = 'block';
+          if (countdownSection) countdownSection.style.display = 'flex';
+          if (shippingSection) shippingSection.style.display = 'block';
+          // Start countdown if not already running
+          if (!this.countdownInterval) {
+            this.initCountdown();
+          }
+        }
+
+        if (cart.item_count === 0) {
+          itemsContainer.innerHTML = `
+            <div class="cart-drawer__empty">
+              <p>Your cart is empty</p>
+              <a href="${window.Shopify?.routes?.collections_url || '/collections/all'}" class="cart-drawer__continue-shopping">Continue Shopping</a>
+            </div>
+          `;
+        } else {
+          let itemsHTML = '';
+          cart.items.forEach(item => {
+            let imageUrl = '';
+            if (item.image) {
+              if (item.image.includes('?')) {
+                imageUrl = item.image.split('?')[0] + '?width=120&height=120';
+              } else if (item.image.includes('_')) {
+                imageUrl = item.image.replace(/_\d+x\d+/i, '_120x120');
+              } else {
+                imageUrl = item.image + '?width=120&height=120';
+              }
+            }
+            const originalPrice = item.original_price !== item.final_price ? `<span class="cart-item__price--original">${this.formatMoney(item.original_price)}</span>` : '';
+            itemsHTML += `
+              <div class="cart-item" data-cart-item data-item-key="${item.key}">
+                <div class="cart-item__image">
+                  ${imageUrl ? `<a href="${item.url}"><img src="${imageUrl}" alt="${this.escapeHtml(item.product_title)}" loading="lazy" width="120" height="120" class="cart-item__img"></a>` : `<a href="${item.url}"><div class="cart-item__placeholder" style="width:100px;height:100px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#999;font-size:12px;">No Image</div></a>`}
+                </div>
+                <div class="cart-item__details">
+                  <div class="cart-item__title">
+                    <a href="${item.url}">${this.escapeHtml(item.product_title)}</a>
+                  </div>
+                  ${item.vendor ? `<p class="cart-item__vendor">${this.escapeHtml(item.vendor)}</p>` : ''}
+                  ${item.variant_title && item.variant_title !== 'Default Title' ? `<p class="cart-item__variant">${this.escapeHtml(item.variant_title)}</p>` : ''}
+                  <div class="cart-item__price">
+                    ${originalPrice}
+                    <span class="cart-item__price--current">${this.formatMoney(item.final_price)}</span>
+                  </div>
+                  <div class="cart-item__quantity">
+                    <div class="quantity-input" data-quantity-selector>
+                      <button type="button" class="quantity-input__btn quantity-input__btn--minus" data-quantity-selector-button="minus" aria-label="Decrease quantity" data-item-key="${item.key}" data-quantity-decrease>
+                        <svg width="9" height="9" viewBox="0 0 12 2" fill="none" xmlns="https://www.w3.org/2000/svg">
+                          <path d="M0 1H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                      <input type="number" name="quantity" value="${item.quantity}" min="1" class="quantity-input__input" data-quantity-selector-input data-item-key="${item.key}" data-quantity-input>
+                      <button type="button" class="quantity-input__btn quantity-input__btn--plus" data-quantity-selector-button="plus" aria-label="Increase quantity" data-item-key="${item.key}" data-quantity-increase>
+                        <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg">
+                          <path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="cart-item__remove" aria-label="Remove ${this.escapeHtml(item.product_title)}" data-remove-item data-item-key="${item.key}">
+                 <svg xmlns="https://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" fill="none">
+                  <path d="M1.25 4.5H2.75M2.75 4.5H14.75M2.75 4.5L2.75 15C2.75 15.3978 2.90804 15.7794 3.18934 16.0607C3.47064 16.342 3.85218 16.5 4.25 16.5H11.75C12.1478 16.5 12.5294 16.342 12.8107 16.0607C13.092 15.7794 13.25 15.3978 13.25 15V4.5M5 4.5V3C5 2.60218 5.15804 2.22064 5.43934 1.93934C5.72064 1.65804 6.10218 1.5 6.5 1.5H9.5C9.89782 1.5 10.2794 1.65804 10.5607 1.93934C10.842 2.22064 11 2.60218 11 3V4.5M6.5 8.25V12.75M9.5 8.25V12.75" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                </button>
+              </div>
+            `;
+          });
+          itemsContainer.innerHTML = itemsHTML;
+        }
+      }
+      updateShippingProgress(cartTotal) {
+        const freeShippingThreshold = 50000; // $500 in cents
+        const remaining = Math.max(0, freeShippingThreshold - cartTotal);
+        const progress = Math.min(100, (cartTotal / freeShippingThreshold) * 100);
+        const progressFill = document.querySelector('.shipping-progress-bar__fill');
+        const progressIcon = document.querySelector('.shipping-progress-bar__icon');
+        const progressMessage = document.querySelector('.shipping-progress__message');
+        const progressWarning = document.querySelector('.shipping-progress__warning');
+        if (progressFill) {
+          progressFill.style.width = `${progress}%`;
+        }
+        // if (progressIcon) {
+        //   progressIcon.style.left = `${progress}%`;
+        // }
+        if (progressMessage && progressWarning) {
+          if (cartTotal >= freeShippingThreshold) {
+            progressMessage.classList.add('shipping-progress__message--success');
+            progressMessage.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M13.3333 4L6 11.3333L2.66667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Congratulations! You've got free shipping!
+            `;
+            progressWarning.style.display = 'none';
+          } else {
+            progressMessage.classList.remove('shipping-progress__message--success');
+            progressMessage.innerHTML = `Add ${this.formatMoney(remaining)} more to get free shipping!`;
+            progressWarning.style.display = 'block';
+          }
+        }
+      }
+      hideAllAddons() {
+        this.drawer.querySelectorAll('[data-addon-content]').forEach(c => {
+          c.classList.remove('is-open');
+          c.style.display = 'none';
+        });
+        this.drawer.querySelectorAll('[data-toggle-addon]').forEach(b => b.classList.remove('active'));
+      }
+
+      async saveCartNote(note, btn = null) {
+        if (btn) {
+           btn.textContent = 'SAVING...';
+           btn.disabled = true;
+        }
+        try {
+          await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note: note })
+          });
+          this.lastSavedNote = note;
+          if (this.cartNoteInput) {
+            this.cartNoteInput.value = ''; // Clear textarea after successful save
+          }
+          if (btn) {
+            btn.textContent = 'SAVED!';
+            setTimeout(() => {
+              btn.textContent = 'SAVE';
+              btn.disabled = false;
+            }, 2000);
+          }
+        } catch (error) {
+          if (btn) {
+            btn.textContent = 'SAVE';
+            btn.disabled = false;
+          }
+        }
+      }
+
+      formatMoney(cents, format) {
+        if (typeof cents === 'string') { cents = cents.replace('.', ''); }
+        let value = '';
+        const placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+        const formatString = format || window.Shopify?.money_format || window.Shopify?.shop?.money_format || '${{amount}}';
+
+        function defaultOption(opt, def) {
+          return (typeof opt == 'undefined' ? def : opt);
+        }
+
+        function formatWithDelimiters(number, precision, thousands, decimal) {
+          precision = defaultOption(precision, 2);
+          thousands = defaultOption(thousands, ',');
+          decimal = defaultOption(decimal, '.');
+
+          if (isNaN(number) || number == null) { return 0; }
+
+          number = (number / 100.0).toFixed(precision);
+
+          var parts = number.split('.'),
+            dollars = parts[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + thousands),
+            cents = parts[1] ? (decimal + parts[1]) : '';
+
+          return dollars + cents;
+        }
+
+        switch (formatString.match(placeholderRegex)[1]) {
+          case 'amount':
+            value = formatWithDelimiters(cents, 2);
+            break;
+          case 'amount_no_decimals':
+            value = formatWithDelimiters(cents, 0);
+            break;
+          case 'amount_with_comma_separator':
+            value = formatWithDelimiters(cents, 2, '.', ',');
+            break;
+          case 'amount_no_decimals_with_comma_separator':
+            value = formatWithDelimiters(cents, 0, '.', ',');
+            break;
+        }
+
+        let formattedValue = formatString.replace(placeholderRegex, value);
+  
+        // Allow EUR swap logic if needed, plus INR logic
+        if (window.Shopify && window.Shopify.currency) {
+          if (window.Shopify.currency.active === 'EUR') {
+            formattedValue = formattedValue.replace('.', 'TEMP').replace(',', '.').replace('TEMP', ',');
+          } else if (window.Shopify.currency.active === 'INR') {
+             formattedValue = formattedValue.replace(/Rs\./g, '₹').replace(/Rs/g, '₹').replace(/R /g, '₹ ');
+          }
+        }
+        return formattedValue;
+      }
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      getCartType() {
+        if (this.drawer) {
+          return this.drawer.getAttribute('data-cart-type') || 'drawer';
+        }
+        const hasDrawerOpen = document.querySelector('[data-cart-drawer-open]');
+        if (hasDrawerOpen) {
+          return 'drawer';
+        }
+        return 'page';
+      }
+      initCountdown() {
+        const timerEl = document.getElementById('cart-countdown-timer');
+        const countdownContainer = document.querySelector('.cart-drawer__countdown');
+        if (!timerEl) return;
+
+        // If countdown already running, don't start a new one
+        if (this.countdownInterval) return;
+
+        // Initialize timer if not already set
+        if (this.countdownTime === undefined) {
+          this.countdownTime = 600; // 10 minutes in seconds
+        }
+
+        const updateTimer = () => {
+          const minutes = Math.floor(this.countdownTime / 60);
+          const seconds = this.countdownTime % 60;
+          timerEl.textContent = `${minutes.toString().padStart(2, '0')} m ${seconds.toString().padStart(2, '0')} s`;
+          if (this.countdownTime > 0) {
+            this.countdownTime--;
+          } else {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+          }
+        };
+
+        updateTimer();
+        this.countdownInterval = setInterval(updateTimer, 1000);
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        window.cartDrawer = new CartDrawer();
+        if (window.__queuedDrawerOpen) window.cartDrawer.open();
+      });
+    } else {
+      window.cartDrawer = new CartDrawer();
+      if (window.__queuedDrawerOpen) window.cartDrawer.open();
+    }
+  })();
+</script>
+

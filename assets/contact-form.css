@@ -1,0 +1,199 @@
+/* Wrapper */
+.contact-form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact-form-wrapper .contact {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Heading */
+.contact-heading-wrapper {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.contact-section-header__heading {
+  margin-bottom: 0;
+}
+
+/* Fields container */
+.contact__fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+/* First + Last name row */
+.name-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+/* Input + textarea base */
+.contact .field__input,
+.contact .text-area {
+  width: 100%;
+  border-radius: 30px;
+  border: 1px solid #e5e5e5;
+  margin-top: 20px;
+  font-family: inherit;
+  background: #FEFEFE;
+  color: #000;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Textarea */
+.contact .text-area {
+  min-height: 160px;
+  border-radius: 24px;
+  resize: none;
+}
+
+/* Field spacing */
+.contact .field {
+  width: 100%;
+}
+
+/* Placeholder */
+.contact .field__input::placeholder,
+.contact .text-area::placeholder {
+  color: #9a9a9a;
+}
+
+/* Focus state */
+.contact .field__input:focus,
+.contact .text-area:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 1px #000;
+}
+
+/* Error messages */
+.contact .form__message,
+.contact .contact__field-error {
+  color: green;
+  margin: 20px 0px;
+  font-weight: 600;
+  font-size: 16px !important;
+}
+
+/* Button wrapper */
+.contact__button {
+  margin-top: 36px;
+  text-align: center;
+}
+
+/* Submit button */
+.contact__button .button {
+  background: #000;
+  color: #FEFEFE;
+  border-radius: 40px;
+  padding: 14px 50px;
+  font-weight: 500;
+  text-transform: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.15s ease;
+}
+
+/* Button hover */
+.contact__button .button:hover {
+  background: #111;
+  transform: translateY(-1px);
+}
+
+/* Button active */
+.contact__button .button:active {
+  transform: translateY(0);
+}
+
+.contact-toast {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  background: #000;
+  color: #FEFEFE;
+  padding: 14px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Visible */
+.contact-toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Icon */
+.contact-toast .toast-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FEFEFE;
+  color: #000;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile */
+@media (max-width: 749px) {
+  .contact-toast {
+    left: 16px;
+    right: 16px;
+    top: 16px;
+  }
+
+  .contact .field__input,
+  .contact .text-area {
+    padding: 12px;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .contact-form-wrapper {
+    padding: 30px 0;
+  }
+
+  .contact__fields {
+    gap: 22px;
+  }
+
+  .name-fields {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .contact .field__input,
+  .contact .text-area {
+    padding: 15px 22px;
+  }
+
+  .contact__button {
+    margin-top: 44px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .contact-form-wrapper .contact {
+    max-width: 680px;
+  }
+}

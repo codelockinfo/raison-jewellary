@@ -1,0 +1,164 @@
+{% assign show_jewellery_switch = false %}
+
+{% if template.name == 'index' or page.handle == 'gold-jewellery' %}
+  {% assign show_jewellery_switch = true %}
+{% endif %}
+
+{% if show_jewellery_switch %}
+
+{% assign tab_1_label = section.settings.tab_1_label | default: 'Silver Jewellery' %}
+{% assign tab_1_url = section.settings.tab_1_url | default: '/' %}
+{% assign tab_2_label = section.settings.tab_2_label | default: 'Gold Jewellery' %}
+{% assign tab_2_url = section.settings.tab_2_url | default: '/pages/gold-jewellery' %}
+
+{% assign current_path = request.path %}
+{% assign tab_1_path = tab_1_url | split: '?' | first %}
+{% assign tab_2_path = tab_2_url | split: '?' | first %}
+
+<div class="jewellery-switch-wrapper">
+  <div class="jewellery-switch">
+    <a 
+      href="{{ tab_1_url }}"
+      class="{% if current_path == tab_1_path %}active{% endif %}"
+    >
+      {{ tab_1_label }}
+    </a>
+
+    <a 
+      href="{{ tab_2_url }}"
+      class="{% if current_path == tab_2_path %}active{% endif %}"
+    >
+      {{ tab_2_label }}
+    </a>
+  </div>
+</div>
+
+<style>
+#shopify-section-{{ section.id }} {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: {{ section.settings.desktop_bottom_space }}px;
+  top: auto;
+  z-index: 9999;
+  background: transparent;
+  pointer-events: none;
+}
+
+#shopify-section-{{ section.id }} .jewellery-switch-wrapper {
+  pointer-events: auto;
+  background: transparent;
+  padding: 0 15px;
+}
+
+#shopify-section-{{ section.id }} .jewellery-switch {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  border: 1px solid #d7a03c;
+  border-radius: 40px;
+  padding: 4px;
+  background: #FEFEFE;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+#shopify-section-{{ section.id }} .jewellery-switch a {
+  width: 50%;
+  text-align: center;
+  padding: 8px 15px;
+  border-radius: 40px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+#shopify-section-{{ section.id }} .jewellery-switch a.active {
+  {% comment %} background: #a83f5c; {% endcomment %}
+   background: #4E032A;
+  color: #FEFEFE;
+}
+
+@media (max-width: 768px) {
+  #shopify-section-{{ section.id }} {
+    bottom: {{ section.settings.mobile_bottom_space }}px;
+  }
+
+  #shopify-section-{{ section.id }} .jewellery-switch-wrapper {
+    padding: 0 12px;
+  }
+
+  #shopify-section-{{ section.id }} .jewellery-switch a {
+    padding: 4px 10px;
+    font-size: 14px;
+  }
+}
+</style>
+
+{% endif %}
+
+{% schema %}
+{
+  "name": "Jewellery Switch",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Tab 1"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_label",
+      "label": "Tab 1 name",
+      "default": "Silver Jewellery"
+    },
+    {
+      "type": "url",
+      "id": "tab_1_url",
+      "label": "Tab 1 URL"
+    },
+    {
+      "type": "header",
+      "content": "Tab 2"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_label",
+      "label": "Tab 2 name",
+      "default": "Gold Jewellery"
+    },
+    {
+      "type": "url",
+      "id": "tab_2_url",
+      "label": "Tab 2 URL"
+    },
+    {
+      "type": "header",
+      "content": "Bottom Sticky Settings"
+    },
+    {
+      "type": "range",
+      "id": "desktop_bottom_space",
+      "label": "Desktop bottom space",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "mobile_bottom_space",
+      "label": "Mobile bottom space",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    }
+  ],
+  "presets": [
+    {
+      "name": "Jewellery Switch"
+    }
+  ]
+}
+{% endschema %}

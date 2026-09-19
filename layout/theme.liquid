@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}"{% unless request.design_mode %} class="skeleton-loading"{% endunless %}>
+  <head>
+
+    <!-- Swiper (Local Assets) - LOAD SYNCHRONOUSLY TO PREVENT JUMPS -->
+    {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag: preload: true }}
+    {% render 'css-variables' %}
+
+    <!-- ================= FONT PRECONNECT ================= -->
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    <!-- ================= FAVICON ================= -->
+    {% if settings.use_favicon and settings.favicon != blank %}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+    {% endif %}
+
+    <!-- ================= SHOPIFY FONT PRELOADS (SAFE) ================= -->
+
+    {%- if settings.type_heading_font and settings.type_heading_font.system? == false -%}
+      {{ settings.type_heading_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {%- endif -%}
+
+    {%- if settings.type_body_font and settings.type_body_font.system? == false -%}
+      {{ settings.type_body_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {%- endif -%}
+
+    {%- if settings.type_button_font and settings.type_button_font.system? == false -%}
+      {{ settings.type_button_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {%- endif -%}
+
+    {%- if settings.type_menu_font and settings.type_menu_font.system? == false -%}
+      {{ settings.type_menu_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {%- endif -%}
+
+    <!-- ================= CUSTOM BRAND FONTS (MANUAL) ================= -->
+    {{ 'https://cdn.shopify.com/s/files/1/0678/7678/2370/files/Brand.woff2?v=1766817656' | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+
+    {{ 'https://cdn.shopify.com/s/files/1/0678/7678/2370/files/LibreBaskerville-VariableFont_wght.woff2?v=1766817667' | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+
+
+    <!-- ================= STYLES ================= -->
+    <style>
+      .visually-hidden {
+        position: absolute !important;
+        overflow: hidden !important;
+        width: 1px !important;
+        height: 1px !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        clip: rect(0 0 0 0) !important;
+        word-wrap: normal !important;
+      }
+    </style>
+    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'header.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'custom-style.css' | asset_url | stylesheet_tag: preload: true }}
+    {{ 'buttons.css' | asset_url | stylesheet_tag: preload: true }}
+    
+    {%- if request.design_mode -%}
+      <link rel="stylesheet" href="{{ 'agree-terms-checkbox.css' | asset_url }}">
+      {{ 'product-badge.css' | asset_url | stylesheet_tag: preload: true }}
+      <link rel="stylesheet" href="{{ 'wishlist.css' | asset_url }}">
+      <link rel="stylesheet" href="{{ 'toast.css' | asset_url }}">
+      <link rel="stylesheet" href="{{ 'cart.css' | asset_url }}">
+      {{ 'custom-css.css' | asset_url | stylesheet_tag: preload: true }}
+      <link rel="stylesheet" href="{{ 'compare.css' | asset_url }}">
+      <link rel="stylesheet" href="{{ 'filter-sidebar.css' | asset_url }}">
+      {{ 'quick-view-popup.css' | asset_url | stylesheet_tag: preload: true }}
+      {{ 'store-locations.css' | asset_url | stylesheet_tag: preload: true }}
+      <link rel="stylesheet" href="{{ 'collection-page.css' | asset_url }}">
+      <link rel="stylesheet" href="{{ 'collection.css' | asset_url }}">
+
+
+      {{ 'product-showcase-card.css' | asset_url | stylesheet_tag: preload: true }}
+      {{ 'product-popup.css' | asset_url | stylesheet_tag: preload: true }}
+      {{ 'product.css' | asset_url | stylesheet_tag: preload: true }}
+{%- else -%}
+      <link rel="stylesheet" href="{{ 'agree-terms-checkbox.css' | asset_url }}" media="print" onload="this.media='all'">
+      {{ 'product-badge.css' | asset_url | stylesheet_tag: preload: true }}
+      <link rel="stylesheet" href="{{ 'wishlist.css' | asset_url }}" media="print" onload="this.media='all'">
+      <link rel="stylesheet" href="{{ 'toast.css' | asset_url }}" media="print" onload="this.media='all'">
+      <link rel="stylesheet" href="{{ 'cart.css' | asset_url }}" media="print" onload="this.media='all'">
+      {{ 'custom-css.css' | asset_url | stylesheet_tag: preload: true }}
+      <link rel="stylesheet" href="{{ 'compare.css' | asset_url }}" media="print" onload="this.media='all'">
+      
+      {% if template contains 'product' %}
+        {{ 'product.css' | asset_url | stylesheet_tag: preload: true }}
+      {% endif %}
+
+      {% if template contains 'collection' or template contains 'search' %}
+        {{ 'filter-sidebar.css' | asset_url | stylesheet_tag }}
+      {% else %}
+        <link rel="stylesheet" href="{{ 'filter-sidebar.css' | asset_url }}" media="print" onload="this.media='all'">
+      {% endif %}
+
+      <link rel="stylesheet" href="{{ 'quick-view-popup.css' | asset_url }}" media="print" onload="this.media='all'">
+      <link rel="stylesheet" href="{{ 'store-locations.css' | asset_url }}" media="print" onload="this.media='all'">
+
+      {% if template contains 'collection' or template contains 'product' %}
+        {{ 'collection-page.css' | asset_url | stylesheet_tag }}
+        {{ 'collection.css' | asset_url | stylesheet_tag }}
+      {% else %}
+        <link rel="stylesheet" href="{{ 'collection-page.css' | asset_url }}" media="print" onload="this.media='all'">
+        <link rel="stylesheet" href="{{ 'collection.css' | asset_url }}" media="print" onload="this.media='all'">
+      {% endif %}
+    {%- endif -%}
+    {{ 'theme.css' | asset_url | stylesheet_tag }}
+
+    <noscript>
+      {{ 'agree-terms-checkbox.css' | asset_url | stylesheet_tag }}
+      {{ 'wishlist.css' | asset_url | stylesheet_tag }}
+      {{ 'toast.css' | asset_url | stylesheet_tag }}
+      {{ 'cart.css' | asset_url | stylesheet_tag }}
+      {{ 'compare.css' | asset_url | stylesheet_tag }}
+      {{ 'filter-sidebar.css' | asset_url | stylesheet_tag }}
+      {{ 'quick-view-popup.css' | asset_url | stylesheet_tag }}
+      {{ 'store-locations.css' | asset_url | stylesheet_tag }}
+      {{ 'product-showcase-card.css' | asset_url | stylesheet_tag }}
+      {{ 'product-popup.css' | asset_url | stylesheet_tag }}
+    </noscript>
+
+    {%- render 'meta-tags' -%}
+
+    {%- if request.design_mode -%}
+      <script src="{{ 'theme-editor.js' | asset_url }}" defer></script>
+    {%- endif -%}
+
+    {{ content_for_header }}
+    
+    <!-- ================= MONEY FORMAT ================= -->
+    <script>
+      window.Shopify = window.Shopify || {};
+      {%- liquid
+        assign money_format = 0 | money | replace: '0.00', '{{amount}}' | replace: '0,00', '{{amount}}' | replace: '0', '{{amount}}'
+        if settings.currency_code_enabled
+          assign money_format = 0 | money_with_currency | replace: '0.00', '{{amount}}' | replace: '0,00', '{{amount}}' | replace: '0', '{{amount}}'
+        endif
+        
+        if cart.currency.iso_code == 'INR'
+          assign money_format = money_format | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+        elsif cart.currency.iso_code == 'EUR'
+           # Handle comma/dot swap for EUR if needed
+           if money_format contains '.' and money_format contains ','
+             assign money_format = money_format | replace: '.', 'TEMP' | replace: ',', '.' | replace: 'TEMP', ','
+           endif
+        endif
+      -%}
+      window.Shopify.money_format = {{ money_format | json }};
+    </script>
+
+    <script>
+      window.__queuedDrawerOpen = false;
+      document.addEventListener('click', function(e) {
+        const openBtn = e.target.closest('[data-cart-drawer-open]');
+        if (openBtn && !window.cartDrawer) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.__queuedDrawerOpen = true;
+        }
+      }, true);
+    </script>
+
+    <!-- ================= GLOBAL SETTINGS ================= -->
+    <script>
+      window.theme = {
+        settings: {
+          currency_code_enabled: {{ settings.currency_code_enabled | json }}
+        }
+      };
+      window.__ACTIVE_CURRENCY__ = {
+        iso: "{{ localization.country.currency.iso_code }}",
+        symbol: "{{ localization.country.currency.symbol }}",
+        country: "{{ localization.country.iso_code }}"
+      };
+      window.__GDPR_SETTINGS__ = {
+        agree_text: {{ settings.agree_text | json }},
+        show_agree_on_cart: {{ settings.show_agree_on_cart | json }},
+        show_agree_on_product: {{ settings.show_agree_on_product | json }},
+        show_agree_on_register: {{ settings.show_agree_on_register | json }}
+      };
+    </script>
+
+  </head>
+  <body class="color-{{ settings.default_color_scheme.id }} template-{{ template | replace: '.', '-' | handle }} {{ template.name }}-template{% if request.design_mode %} shopify-design-mode{% endif %}">
+
+    <script src="{{ 'inventory.js' | asset_url }}" defer></script>
+    
+    {%- render 'scroll-top-button' -%}
+    {%- render 'script-tags' -%}
+
+    {%- sections 'header-group' -%}
+
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {%- sections 'footer-group' -%}
+
+    {%- if settings.enable_cart_drawer -%}
+      {%- render 'cart-drawer' -%}
+    {%- endif -%}
+
+    {%- # Load global JS -%}
+    <script>
+      window.__PRODUCT_VARIANTS__ = {{ product.variants | json }} || [];
+      window.__ENABLE_CART_DRAWER__ = {{ settings.enable_cart_drawer | json }};
+      window.__TEMPLATE_NAME__ = {{ template.name | json }};
+    </script>
+    <script src="{{ 'global-scripts.js' | asset_url }}" defer></script>
+    <script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+    <script src="{{ 'compare.js' | asset_url }}" defer></script>
+    <script src="{{ 'product-popup.js' | asset_url }}" defer></script>
+    <script src="{{ 'quick-view-popup.js' | asset_url }}" defer></script>
+    <script src="{{ 'store-locations.js' | asset_url }}" defer></script>
+    <script src="{{ 'quantity-input.js' | asset_url }}" defer></script>
+    <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer></script>
+
+    {%- if template == 'index' -%}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "{{ shop.name }}",
+          "url": "{{ shop.url }}",
+          "logo": "{{ settings.logo | image_url: width: 500 }}",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "{{ shop.phone }}",
+            "contactType": "customer service"
+          }
+        }
+      </script>
+    {%- endif -%}
+
+    <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer></script>
+    <script src="{{ 'header.js' | asset_url }}" defer></script>
+
+    <script>
+      // Skeleton Loader — remove skeleton-loading class to reveal content
+      (function() {
+        function revealContent() {
+          document.documentElement.classList.remove('skeleton-loading');
+          document.body.classList.remove('skeleton-loading');
+          
+          // Re-init swiper instances and fire resize
+          requestAnimationFrame(() => {
+            document.querySelectorAll('.swiper, .swiper-container, .swiper-initialized').forEach(el => {
+              if (el.swiper) {
+                el.swiper.update();
+              }
+            });
+            window.dispatchEvent(new Event('resize'));
+          });
+        }
+        
+        // Reveal after DOM is ready + very short smooth delay
+        // We no longer wait for 'load' because that waits for EVERY image (slow!)
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(revealContent, 100);
+        });
+        
+        // Hard failsafe — always reveal quickly
+        setTimeout(revealContent, 1500);
+      })();
+    </script>
+
+
+    
+  </body>
+</html>
+

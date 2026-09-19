@@ -1,0 +1,269 @@
+.store-locations-section {
+    padding: var(--padding-desktop);
+}
+
+.store-locations__container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.our-store-section--container {
+  max-width: var(--container-width, 1440px);
+}
+
+.our-store-section--full-container {
+  max-width: var(--container-width, 1990px);
+}
+
+.store-locations__heading-wrapper {
+    margin-bottom: 0px;
+}
+
+.store-locations__heading {
+    color: var(--color-heading, currentColor);
+    font-size: var(--heading-size);
+    font-weight: 700;
+}
+
+.store-locations__subheading {
+    margin: 15px 0;
+    color: var(--color-text, currentColor);
+}
+
+.store-layout {
+    display: grid;
+    grid-template-columns: 1fr 500px;
+    gap: 0;
+    margin-top: 25px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border, #e0e0e0);
+}
+
+.store-layout.map-right {
+    grid-template-columns: 380px 1fr;
+    /* Map Right */
+}
+
+.store-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    order: 2;
+    border-left: 1px solid var(--color-border, #e0e0e0);
+}
+
+.store-map {
+    height: 650px;
+    order: 1;
+}
+
+.map-right .store-list-wrapper {
+    order: 1;
+    border-left: 0;
+    border-right: 1px solid #e0e0e0;
+}
+
+.map-right .store-map {
+    order: 2;
+}
+
+.store-locator-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.store-locator-top {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.store-locations__title {
+    font-weight: 700;
+    margin: 0;
+    color: #000;
+}
+
+.use-location-btn {
+    background: none;
+    border: none;
+    color: #0056b3;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+}
+
+.store-search-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.store-search-container .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    display: flex;
+}
+
+.store-search-input {
+    width: 100%;
+    padding: 10px 10px 10px 35px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.store-map {
+    height: 650px;
+}
+
+.store-map iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.store-list {
+    height: 650px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.store-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.store-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.store-card {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.store-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.store-name-link {
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-heading, #000);
+}
+
+.store-address-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 15px;
+}
+
+.store-address {
+    color: var(--color-subtext);
+    margin: 0;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.chevron-down {
+    margin-left: 10px;
+    color: #000;
+}
+
+.store-card-image {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    border-bottom: 1px solid #eee;
+}
+
+.store-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.store-details {
+    margin-bottom: 15px;
+}
+
+.store-detail-item {
+    color: var(--color-subtext);
+    font-size: 14px;
+    margin: 0 0 5px;
+    line-height: 1.4;
+}
+
+.store-detail-item strong {
+    color: var(--color-heading);
+    font-size: 15px !important;
+}
+
+.store-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.store-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 10px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.store-btn--primary {
+    background: #0081ff;
+    color: #FEFEFE;
+}
+
+.store-btn--secondary {
+    background: #FEFEFE;
+    color: #0081ff;
+}
+
+.store-btn:hover {
+    opacity: 0.8;
+}
+
+.store-timing p {
+    color: var(--color-subtext);
+    font-size: 14px;
+    margin: 6px 0 !important;
+}
+
+@media (max-width: 1200px) {
+    .store-layout {
+        grid-template-columns: 1fr 400px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .store-locations-section {
+        padding: var(--padding-mobile);
+    }
+
+    .store-layout {
+        grid-template-columns: 1fr;
+        border: none;
+    }
+
+    .store-list-wrapper {
+        border-right: 0;
+    }
+
+    .store-map {
+        height: 400px;
+        order: -1;
+    }
+}

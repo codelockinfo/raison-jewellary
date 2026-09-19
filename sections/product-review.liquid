@@ -1,0 +1,205 @@
+{% assign reviews = product.metafields.custom.product_reviews.value %}
+
+{% if product and reviews != blank %}
+
+  {% assign total_rating = 0 %}
+  {% assign review_count = reviews.count %}
+
+  {% for review in reviews %}
+    {% assign total_rating = total_rating | plus: review.review_rating.value %}
+  {% endfor %}
+
+  {% assign average_rating = total_rating | divided_by: review_count %}
+
+  <section class="custom-product-reviews container-width">
+    <div class="page-width">
+
+      <h2 class="reviews-heading">
+        {{ section.settings.heading }}
+      </h2>
+
+      <div class="review-summary">
+
+        <div class="review-average">
+
+          <div class="rating-display">
+            <div class="rating-stars-bg">★★★★★</div>
+
+            <div
+              class="rating-stars-fill"
+              style="width:{{ average_rating | times: 20 }}%;"
+            >
+              ★★★★★
+            </div>
+          </div>
+
+          <div class="avg-rating">
+            {{ average_rating | round: 1 }} out of 5
+          </div>
+
+          <div class="review-count">
+            Based on {{ review_count }} reviews
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="reviews-list">
+
+        {% for review in reviews %}
+
+          <div class="review-card">
+
+            <div class="review-top">
+
+              <div class="rating-display small">
+                <div class="rating-stars-bg">★★★★★</div>
+
+                <div
+                  class="rating-stars-fill"
+                  style="width:{{ review.review_rating.value | times: 20 }}%;"
+                >
+                  ★★★★★
+                </div>
+              </div>
+
+              <span class="review-date">
+                {{ review.review_date.value | date: "%d/%m/%Y" }}
+              </span>
+
+            </div>
+
+            <div class="review-author">
+              {{ review.review_name.value }}
+            </div>
+
+            <h4>
+              {{ review.review_title.value }}
+            </h4>
+
+            <p>
+              {{ review.review_text.value }}
+            </p>
+
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+  </section>
+
+{% endif %}
+<style>
+
+.custom-product-reviews{
+  padding:40px 30px;
+}
+
+.reviews-heading{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.review-summary{
+  margin-bottom:20px;
+}
+
+.review-average{
+  text-align:center;
+}
+
+.rating-display{
+  position:relative;
+  display:inline-block;
+  font-size:28px;
+  line-height:1;
+}
+
+.rating-display.small{
+  font-size:18px;
+}
+
+.rating-stars-bg{
+  color:#ddd;
+}
+
+.rating-stars-fill{
+  position:absolute;
+  left:0;
+  top:0;
+  overflow:hidden;
+  white-space:nowrap;
+  color:#f8a100;
+}
+
+.avg-rating{
+  font-size:24px;
+  font-weight:700;
+  margin-top:10px;
+}
+
+.review-count{
+  color:#777;
+  margin-top:5px;
+}
+
+.reviews-list{
+  display:grid;
+  gap:25px;
+}
+
+.review-card{
+  border:1px solid #e5e5e5;
+  border-radius:12px;
+  padding:25px;
+}
+
+.review-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.review-author{
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.review-card h4{
+  margin-bottom:10px;
+}
+
+.review-card p{
+  margin:0;
+}
+
+@media (max-width: 768px) {
+    .custom-product-reviews {
+        padding: 30px 15px;
+    }
+}
+
+</style>
+{% schema %}
+{
+  "name": "Product Reviews",
+  "templates": ["product"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Customer Reviews"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Reviews"
+    }
+  ]
+}
+{% endschema %}

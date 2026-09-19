@@ -1,0 +1,168 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "title_mU48eA": {
+          "type": "title",
+          "settings": {}
+        },
+        "rating_9ekDRt": {
+          "type": "rating",
+          "settings": {
+            "show_count": true,
+            "show_empty_rating": false
+          }
+        },
+        "inventory_XgjKEj": {
+          "type": "inventory",
+          "settings": {}
+        },
+        "price_7LGG6E": {
+          "type": "price",
+          "settings": {
+            "show_saving": true,
+            "sale_badge_type": "percentage"
+          }
+        },
+        "variants_q4KYwa": {
+          "type": "variants",
+          "settings": {}
+        },
+        "quantity_TgVz7g": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buttons_kGV7rz": {
+          "type": "buttons",
+          "settings": {
+            "add_to_cart_text": "Add to Cart",
+            "show_buy_now": true
+          }
+        },
+        "wishlist_W3TJVM": {
+          "type": "wishlist",
+          "settings": {
+            "show_next_to_title": true
+          }
+        },
+        "custom_buttons_WUmtRG": {
+          "type": "custom_buttons",
+          "settings": {
+            "show_ask_question": true,
+            "show_share": true,
+            "show_compare": true
+          }
+        },
+        "description_WBReTj": {
+          "type": "description",
+          "settings": {}
+        },
+        "collapsible_tab_486JPD": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping and Returns",
+            "content": "<p>Enjoy <strong>free shipping on orders above ₹499</strong> within India. International delivery is also available.</p><ul><li>✅ Free Shipping on all orders above ₹499 within India.</li><li>🌎 International shipping takes <strong>8–10 days</strong>.</li><li>📦 Please order your Rakhi early to ensure it reaches on time.</li></ul><p>*Applicable on all orders. International delivery times may vary by location.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_tab_bDXQ7r": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Return Policies",
+            "content": "<p>we offer a <strong>10-day return policy</strong> on all products, counted from the date of delivery.</p><ul><li><strong>Rakhis and Rakhi Combo Sets</strong> are non-returnable.</li><li>Returns for <strong>lab-grown diamond jewellery</strong> are accepted <strong>only after a quality check</strong> is completed.</li><li>All accompanying items, including the <strong>authenticity certificate</strong> and product packaging, must be returned to be eligible for a refund.</li></ul>",
+            "page": ""
+          }
+        },
+        "icon_text_row_NxTLzG": {
+          "type": "icon_text_row",
+          "settings": {
+            "icon_1": "shopify://shop_images/free-shipping.png",
+            "text_1": "Free shipping",
+            "icon_2": "shopify://shop_images/return_9a4b13d2-e638-4eaf-b7c0-8f0bd9a7de2f.png",
+            "text_2": "Easy 15 Day Return",
+            "icon_3": "shopify://shop_images/test.png",
+            "text_3": "4X Lab Tested"
+          }
+        }
+      },
+      "block_order": [
+        "title_mU48eA",
+        "rating_9ekDRt",
+        "inventory_XgjKEj",
+        "price_7LGG6E",
+        "variants_q4KYwa",
+        "quantity_TgVz7g",
+        "buttons_kGV7rz",
+        "wishlist_W3TJVM",
+        "custom_buttons_WUmtRG",
+        "description_WBReTj",
+        "collapsible_tab_486JPD",
+        "collapsible_tab_bDXQ7r",
+        "icon_text_row_NxTLzG"
+      ],
+      "settings": {
+        "show_breadcrumbs": true,
+        "show_sticky_cart": true,
+        "show_arrows": true,
+        "arrow_bg_color": "#4E032A",
+        "arrow_color": "#FEFEFE",
+        "arrow_border_radius": 50,
+        "enable_zoom": true,
+        "enable_cursor_zoom": false,
+        "show_thumbnails": true,
+        "thumbnail_layout": "bottom"
+      }
+    },
+    "product_recomand_PQTk8c": {
+      "type": "product-recomand",
+      "name": "Related Products Slider",
+      "settings": {
+        "color_scheme": "scheme-e6380cb9-d101-44f7-aead-258d53328ff4",
+        "heading": "Related Products",
+        "product_card_style": "horizontal",
+        "show_wishlist": true,
+        "show_quick_view": true,
+        "show_compare": false,
+        "show_add_to_cart": true,
+        "show_rating": true,
+        "show_colors": true,
+        "arrow_shape": "round",
+        "section_padding_desktop": "30px 0",
+        "section_padding_mobile": "20px 15px"
+      }
+    },
+    "recently_viewed_wgMchN": {
+      "type": "recently-viewed",
+      "name": "Recently Viewed Slider",
+      "settings": {
+        "color_scheme": "scheme-e6380cb9-d101-44f7-aead-258d53328ff4",
+        "heading": "Recently Viewed Products",
+        "product_card_style": "horizontal",
+        "show_wishlist": true,
+        "show_quick_view": true,
+        "show_compare": false,
+        "show_add_to_cart": true,
+        "show_rating": true,
+        "show_colors": true,
+        "arrow_shape": "round",
+        "section_padding_desktop": "30px 0 60px 0",
+        "section_padding_mobile": "20px 15px 40px 15px"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product_recomand_PQTk8c",
+    "recently_viewed_wgMchN"
+  ]
+}

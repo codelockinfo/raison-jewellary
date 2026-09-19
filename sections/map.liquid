@@ -1,0 +1,181 @@
+
+
+<section class="custom-map-section page-width">
+
+
+  <div class="map-wrapper">
+    <!-- Left content -->
+    <div class="map-content">
+          {% if section.settings.heading != blank %}
+    <h2 class="map-heading">
+      {{ section.settings.heading }}
+    </h2>
+  {% endif %}
+      {% if section.settings.address_hours != blank %}
+        <div class="map-address">
+          {{ section.settings.address_hours }}
+        </div>
+      {% endif %}
+
+      {% if section.settings.map_link_label != blank and section.settings.map_address != blank %}
+        <a
+          class="map-link"
+          href="https://www.google.com/maps/search/?api=1&query={{ section.settings.map_address | url_encode }}"
+          {% if section.settings.open_new_window %}target="_blank"{% endif %}
+        >
+          {{ section.settings.map_link_label }}
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Right map -->
+    <div class="map-embed">
+      {% if section.settings.google_map_iframe != blank %}
+        <iframe
+          src="{{ section.settings.google_map_iframe }}"
+          width="100%"
+          height="350"
+          style="border:0;"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Map",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>Our store</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "address_hours",
+      "label": "Address and hours",
+      "default": "<p>123 Fake St.<br>Toronto, Canada<br>Mon–Fri, 10am–9pm</p>"
+    },
+    {
+      "type": "text",
+      "id": "map_address",
+      "label": "Map address",
+      "default": "80 Spadina Ave, Toronto",
+      "info": "Google maps will find the exact location"
+    },
+    {
+      "type": "text",
+      "id": "map_link_label",
+      "label": "Map link label",
+      "default": "Get directions"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_new_window",
+      "label": "Open link in new window",
+      "default": false
+    },
+    {
+      "type": "textarea",
+      "id": "google_map_iframe",
+      "label": "Google maps iframe source"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Map",
+         "category": "Store Information",
+    }
+  ]
+}
+{% endschema %}
+<style>
+.custom-map-section {
+  position: relative;
+  padding: 30px 0px 0px;
+}
+
+/* Full-width map */
+.map-wrapper {
+  position: relative;
+  display: block;
+}
+
+/* Map iframe full screen style */
+.map-embed iframe {
+  width: 100%;
+  height: 500px;
+  border: 0;
+}
+
+/* White overlay card */
+.map-content {
+  position: absolute;
+  top: 60%;
+  left: 10%;
+  transform: translateY(-50%);
+  background: #FEFEFE;
+  padding: 30px 28px;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 5;
+}
+
+/* Heading */
+.map-heading {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* Address text */
+.map-address {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #000;
+}
+
+/* Get directions button */
+.map-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  padding: 12px 20px;
+  border: 1px solid #c44b2a;
+  color: #c44b2a;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.map-link:hover {
+  background: #c44b2a;
+  color: #FEFEFE;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .custom-map-section {
+    padding: 0;
+  }
+  .map-content {
+    position: static;
+    transform: none;
+    max-width: 100%;
+    box-shadow: none;
+    margin: 0;
+    padding: 20px 15px;
+  }
+
+  .map-embed iframe {
+    height: 350px;
+  }
+}
+
+</style>

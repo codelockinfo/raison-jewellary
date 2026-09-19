@@ -1,0 +1,292 @@
+<section class="two-text-cards-section section-{{ section.id }} color-{{ section.settings.color_scheme }} skeleton-container"
+  style="
+    --section-padding-desktop: {{ section.settings.section_padding_desktop }};
+    --section-padding-mobile: {{ section.settings.section_padding_mobile }};
+    --card-radius: {{ section.settings.card_radius }}px;
+    --card-shadow: {% if section.settings.enable_shadow %}0 8px 25px rgba(0,0,0,0.08){% else %}none{% endif %};
+  ">
+
+  <div class="container_width">
+    <div class="two-text-cards-wrapper cards-{{ section.settings.cards_per_row }} align-{{ section.settings.text_alignment }}">
+
+      {% for block in section.blocks %}
+        <div class="two-text-card" {{ block.shopify_attributes }}>
+          {% if block.settings.heading != blank %}
+            <div class="common-heading">
+              {% render 'heading-style-banner',
+                heading: block.settings.heading,
+                heading_tag: section.settings.heading_tag,
+                heading_alignment: section.settings.heading_alignment,
+                wrapper_class: 'two-text-cards-section'
+              %}
+            </div>
+          {% endif %}
+
+          {% if block.settings.text != blank %}
+            <div class="two-text-card-text">
+              {{ block.settings.text }}
+            </div>
+          {% endif %}
+
+          {% if block.settings.button_text != blank %}
+            <a href="{{ block.settings.button_url }}" class="common-btn">
+              {{ block.settings.button_text }}
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+<style>
+.section-{{ section.id }}{
+  padding: var(--section-padding-desktop);
+}
+
+.section-{{ section.id }} .two-text-cards-wrapper{
+  display:grid;
+  gap: {{ section.settings.card_gap }}px;
+}
+
+.section-{{ section.id }} .cards-1{
+  grid-template-columns: 1fr;
+}
+
+.section-{{ section.id }} .cards-2{
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.section-{{ section.id }} .cards-3{
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.section-{{ section.id }} .two-text-card{
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  border: {% if section.settings.enable_border %}1px solid {{ section.settings.border_color }}{% else %}none{% endif %};
+  padding: 30px;
+}
+
+.section-{{ section.id }} .two-text-card-text{
+  font-size: var(--subheading-size);
+}
+
+.section-{{ section.id }} .two-text-card-text p{
+  margin: 0 0 14px;
+}
+
+.section-{{ section.id }} .two-text-card-text p:last-child{
+  margin-bottom: 0;
+}
+
+.section-{{ section.id }} .align-left .two-text-card{
+  text-align:left;
+}
+
+.section-{{ section.id }} .align-center .two-text-card{
+  text-align:center;
+}
+
+.section-{{ section.id }} .align-right .two-text-card{
+  text-align:right;
+}
+
+.section-{{ section.id }} .common-btn{
+  margin-top: 24px;
+}
+
+@media(max-width: 990px){
+  .section-{{ section.id }} .cards-3{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media(max-width: 768px){
+  .section-{{ section.id }}{
+    padding: var(--section-padding-mobile);
+  }
+
+  .section-{{ section.id }} .two-text-cards-wrapper{
+    grid-template-columns: 1fr;
+    gap: {{ section.settings.card_gap_mobile }}px;
+  }
+
+  .section-{{ section.id }} .two-text-card-text{
+    font-size: var(--subheading-size);
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Two Text Cards",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "cards_per_row",
+      "label": "Cards per row",
+      "default": "2",
+      "options": [
+        { "value": "1", "label": "1 card" },
+        { "value": "2", "label": "2 cards" },
+        { "value": "3", "label": "3 cards" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Tag",
+      "default": "h2",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card gap desktop",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "card_gap_mobile",
+      "label": "Card gap mobile",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_shadow",
+      "label": "Enable shadow",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_border",
+      "label": "Enable border",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#eeeeee"
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_desktop",
+      "label": "Section Padding Desktop",
+      "default": "80px 20px 80px 20px"
+    },
+    {
+      "type": "text",
+      "id": "section_padding_mobile",
+      "label": "Section Padding Mobile",
+      "default": "50px 20px 50px 20px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_card",
+      "name": "Text Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "THE PHOENIX STORY"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>We at Phoenix started out with a very simple idea: to create luxury pieces that do much more than look refined.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Button URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Two Text Cards",
+      "blocks": [
+        {
+          "type": "text_card",
+          "settings": {
+            "heading": "THE PHOENIX STORY"
+          }
+        },
+        {
+          "type": "text_card",
+          "settings": {
+            "heading": "WHAT DRIVES US"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
