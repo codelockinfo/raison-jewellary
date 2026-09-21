@@ -1,0 +1,302 @@
+/* ═══════════════════════════════════════════════════════════
+   RISEON JEWELS - LOGIN PAGE STYLES (CUSTOMER & PARTNER)
+   ═══════════════════════════════════════════════════════════ */
+
+.login-shell {
+  min-height: calc(100vh - 160px);
+  background: #fdfbf9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  box-sizing: border-box;
+}
+
+.login-form-side {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.login-form-wrap {
+  background: #ffffff;
+  border: 1px solid #eadbcf;
+  border-radius: 16px;
+  padding: 44px 40px;
+  box-shadow: 0 10px 40px rgba(41, 0, 24, 0.04);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.login-home-link {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #887d85;
+  text-decoration: none;
+  margin-bottom: 24px;
+  transition: color 0.2s ease;
+}
+
+.login-home-link:hover {
+  color: #290018;
+}
+
+/* ── Portal Switcher Tabs ────────────────────────────────── */
+.login-portal-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #eadbcf;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 4px;
+  background: #fffaf7;
+  margin-bottom: 32px;
+}
+
+.login-tab-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 44px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  border-radius: 4px;
+  color: #584a53;
+  transition: all 0.22s ease;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  width: 100%;
+}
+
+.login-tab-btn.active {
+  background: #290018 !important;
+  color: #f7eada !important;
+  box-shadow: 0 2px 8px rgba(41, 0, 24, 0.18);
+}
+
+/* ── Form Headings & Typography ───────────────────────────── */
+.login-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #c9a15b;
+  margin-bottom: 10px;
+}
+
+.login-form-wrap h1 {
+  font-family: var(--font-heading--family, 'Cormorant Garamond', Georgia, serif);
+  font-size: 34px;
+  font-weight: 500;
+  color: #290018;
+  line-height: 1.22;
+  margin: 0 0 12px 0;
+}
+
+.login-form-summary {
+  font-size: 14px;
+  color: #6b5d66;
+  line-height: 1.55;
+  margin: 0 0 28px 0;
+}
+
+/* ── Form Controls & Input Fields ────────────────────────── */
+.login-form label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4e3d47;
+  margin-bottom: 8px;
+  margin-top: 18px;
+}
+
+.login-phone-field {
+  display: flex;
+  border: 1px solid #eadbcf;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-phone-field:focus-within {
+  border-color: #290018;
+  box-shadow: 0 0 0 3px rgba(41, 0, 24, 0.08);
+}
+
+.login-phone-field span {
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  background: #faf7f4;
+  border-right: 1px solid #eadbcf;
+  font-size: 14px;
+  font-weight: 600;
+  color: #290018;
+}
+
+.login-phone-field input {
+  flex: 1;
+  border: 0;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #290018;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.login-password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #eadbcf;
+  border-radius: 8px;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-password-field:focus-within {
+  border-color: #290018;
+  box-shadow: 0 0 0 3px rgba(41, 0, 24, 0.08);
+}
+
+.login-password-field input {
+  width: 100%;
+  border: 0;
+  padding: 14px 16px;
+  padding-right: 64px;
+  font-size: 14px;
+  color: #290018;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.js-toggle-password {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #887d85;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.js-toggle-password:hover {
+  color: #290018;
+}
+
+.login-forgot {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: #887d85;
+  text-decoration: underline;
+  margin-top: 10px;
+  margin-bottom: 24px;
+  transition: color 0.2s ease;
+}
+
+.login-forgot:hover {
+  color: #290018;
+}
+
+.login-submit {
+  width: 100%;
+  height: 50px;
+  background: #290018;
+  color: #f7eada;
+  border: 0;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: background 0.22s ease, transform 0.15s ease;
+  margin-top: 24px;
+}
+
+.login-submit:hover {
+  background: #4e032e;
+  transform: translateY(-1px);
+}
+
+/* ── Trust Row & Legal Copy ───────────────────────────────── */
+.login-trust-row {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #f2e9e1;
+  padding-top: 20px;
+  margin-top: 32px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.login-trust-row span {
+  font-size: 11px;
+  color: #887d85;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.login-bottom-copy {
+  font-size: 13px;
+  color: #584a53;
+  text-align: center;
+  margin-top: 24px;
+  line-height: 1.5;
+}
+
+.login-bottom-copy a {
+  color: #290018;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.login-legal-copy {
+  font-size: 11px;
+  color: #9c8e97;
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.login-legal-copy a {
+  color: #584a53;
+  text-decoration: underline;
+}
+
+/* ── Mobile Responsive Adjustments ───────────────────────── */
+@media (max-width: 640px) {
+  .login-shell {
+    padding: 32px 14px;
+    min-height: auto;
+  }
+  .login-form-wrap {
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+  .login-form-wrap h1 {
+    font-size: 26px;
+  }
+  .login-trust-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

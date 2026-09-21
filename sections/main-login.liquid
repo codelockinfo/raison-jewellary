@@ -1,0 +1,426 @@
+{{ 'login-page.css' | asset_url | stylesheet_tag }}
+
+<div class="login-shell" id="LoginShell" data-mode="{% if request.path contains 'partner' or search_terms contains 'type=partner' %}partner{% else %}customer{% endif %}">
+  <div class="login-form-side">
+    <div class="login-form-wrap">
+      
+      {%- if section.settings.show_back_link -%}
+        <a href="{{ section.settings.back_link | default: routes.root_url }}" class="login-home-link">
+          &larr; {{ section.settings.back_link_text | default: 'Back to Riseon' }}
+        </a>
+      {%- endif -%}
+
+      <div class="login-portal-switch" role="tablist" aria-label="Choose login portal">
+        <button 
+          type="button" 
+          class="login-tab-btn js-login-tab{% unless request.path contains 'partner' %} active{% endunless %}" 
+          data-target="customer"
+          role="tab"
+          aria-selected="{% if request.path contains 'partner' %}false{% else %}true{% endif %}"
+        >
+          {{ section.settings.tab_customer_text | default: 'Customer' }}
+        </button>
+        <button 
+          type="button" 
+          class="login-tab-btn js-login-tab{% if request.path contains 'partner' %} active{% endif %}" 
+          data-target="partner"
+          role="tab"
+          aria-selected="{% if request.path contains 'partner' %}true{% else %}false{% endif %}"
+        >
+          {{ section.settings.tab_partner_text | default: 'Brand Partner' }}
+        </button>
+      </div>
+
+      <!-- ================= CUSTOMER LOGIN VIEW ================= -->
+      <div class="login-view js-login-view" id="CustomerLoginView" data-view="customer" style="{% if request.path contains 'partner' %}display: none;{% endif %}">
+        <p class="login-eyebrow">{{ section.settings.customer_eyebrow | default: 'SECURE ACCOUNT ACCESS' }}</p>
+        <h1>{{ section.settings.customer_title | default: 'Welcome back to your Riseon account.' }}</h1>
+        <p class="login-form-summary">{{ section.settings.customer_summary | default: 'Access your orders, saved jewellery, addresses and support from one secure place.' }}</p>
+
+        {% form 'customer_login', class: 'login-form' %}
+          {{ form.errors | default_errors }}
+
+          <label for="CustomerMobile">{{ section.settings.customer_mobile_label | default: 'Mobile number' }}</label>
+          <div class="login-phone-field">
+            <span>+91</span>
+            <input 
+              id="CustomerMobile" 
+              type="tel" 
+              inputmode="numeric" 
+              autocomplete="tel-national" 
+              placeholder="Enter 10-digit number" 
+              pattern="[6-9][0-9]{9}" 
+              maxlength="10" 
+              required 
+              name="customer[email]"
+            >
+          </div>
+
+          <button class="login-submit" type="submit">
+            {{ section.settings.customer_submit_text | default: 'Request secure OTP' }}
+          </button>
+        {% endform %}
+
+        <p class="login-bottom-copy">
+          {{ section.settings.customer_bottom_text | default: 'Need order help without signing in?' }} 
+          <a href="{{ section.settings.customer_bottom_link | default: '/customer-care/track-order' }}">
+            {{ section.settings.customer_bottom_link_text | default: 'Track your order' }}
+          </a>
+        </p>
+      </div>
+
+      <!-- ================= BRAND PARTNER LOGIN VIEW ================= -->
+      <div class="login-view js-login-view" id="PartnerLoginView" data-view="partner" style="{% unless request.path contains 'partner' %}display: none;{% endunless %}">
+        <p class="login-eyebrow">{{ section.settings.partner_eyebrow | default: 'SECURE ACCOUNT ACCESS' }}</p>
+        <h1>{{ section.settings.partner_title | default: 'Access your partner workspace.' }}</h1>
+        <p class="login-form-summary">{{ section.settings.partner_summary | default: 'Sign in with your registered details to manage links, eligible sales, commissions and support.' }}</p>
+
+        <form class="login-form" action="{{ routes.account_login_url }}" method="post" id="PartnerLoginForm">
+          <label for="PartnerMobile">{{ section.settings.partner_mobile_label | default: 'Registered mobile number' }}</label>
+          <div class="login-phone-field">
+            <span>+91</span>
+            <input 
+              id="PartnerMobile" 
+              type="tel" 
+              inputmode="numeric" 
+              autocomplete="tel-national" 
+              placeholder="Enter 10-digit number" 
+              pattern="[6-9][0-9]{9}" 
+              maxlength="10" 
+              required 
+              name="partner_mobile"
+            >
+          </div>
+
+          <label for="PartnerPassword">{{ section.settings.partner_password_label | default: 'Password' }}</label>
+          <div class="login-password-field">
+            <input 
+              id="PartnerPassword" 
+              type="password" 
+              autocomplete="current-password" 
+              placeholder="Enter your password" 
+              minlength="6" 
+              required 
+              name="partner_password"
+            >
+            <button type="button" class="js-toggle-password" aria-label="Toggle password visibility">Show</button>
+          </div>
+
+          <a class="login-forgot" href="{{ section.settings.partner_forgot_link | default: 'https://wa.me/917359215333?text=Hello%20Riseon%20Jewels%2C%20I%20need%20help%20with%20my%20Brand%20Partner%20account.' }}" target="_blank" rel="noopener noreferrer">
+            {{ section.settings.partner_forgot_text | default: 'Forgot access details?' }}
+          </a>
+
+          <button class="login-submit" type="submit">
+            {{ section.settings.partner_submit_text | default: 'Sign in to partner account' }}
+          </button>
+        </form>
+
+        <p class="login-bottom-copy">
+          {{ section.settings.partner_bottom_text | default: 'Not a partner yet?' }} 
+          <a href="{{ section.settings.partner_bottom_link | default: '/pages/brand-partner-programme' }}">
+            {{ section.settings.partner_bottom_link_text | default: 'Understand the programme' }}
+          </a> {{ section.settings.partner_bottom_suffix | default: 'before applying.' }}
+        </p>
+      </div>
+
+      <!-- ================= SHARED TRUST BADGES & LEGAL FOOTER ================= -->
+      <div class="login-trust-row" aria-label="Account experience information">
+        <span>✓ {{ section.settings.trust_1 | default: 'Account-specific access' }}</span>
+        <span>✓ {{ section.settings.trust_2 | default: 'Privacy-first design' }}</span>
+        <span>✓ {{ section.settings.trust_3 | default: 'Riseon support' }}</span>
+      </div>
+
+      <p class="login-legal-copy">
+        {{ section.settings.terms_prefix | default: "By continuing, you agree to Riseon's" }}
+        <a href="{{ section.settings.terms_link | default: '/policies/terms-of-service' }}">{{ section.settings.terms_link_text | default: 'Terms' }}</a>
+        and
+        <a href="{{ section.settings.privacy_link | default: '/policies/privacy-policy' }}">{{ section.settings.privacy_link_text | default: 'Privacy Policy' }}</a>.
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function initLoginTabs() {
+      const tabs = document.querySelectorAll('.js-login-tab');
+      const views = document.querySelectorAll('.js-login-view');
+      const shell = document.getElementById('LoginShell');
+      const passInput = document.getElementById('PartnerPassword');
+      const passToggle = document.querySelector('.js-toggle-password');
+
+      function switchTab(target) {
+        tabs.forEach(t => {
+          const isActive = t.getAttribute('data-target') === target;
+          t.classList.toggle('active', isActive);
+          t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        views.forEach(v => {
+          v.style.display = (v.getAttribute('data-view') === target) ? 'block' : 'none';
+        });
+
+        if (shell) shell.setAttribute('data-mode', target);
+
+        /* Update URL query param smoothly */
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set('type', target);
+          window.history.replaceState({}, '', url);
+        } catch(e) {}
+      }
+
+      tabs.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          switchTab(this.getAttribute('data-target'));
+        });
+      });
+
+      /* Handle initial URL query param e.g. ?type=partner or ?type=customer */
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlType = urlParams.get('type') || urlParams.get('mode');
+      if (urlType === 'partner' || window.location.pathname.includes('/partner')) {
+        switchTab('partner');
+      } else if (urlType === 'customer') {
+        switchTab('customer');
+      }
+
+      /* Password visibility toggle */
+      if (passToggle && passInput) {
+        passToggle.addEventListener('click', function() {
+          const isPassword = passInput.type === 'password';
+          passInput.type = isPassword ? 'text' : 'password';
+          passToggle.textContent = isPassword ? 'Hide' : 'Show';
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLoginTabs);
+    } else {
+      initLoginTabs();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Login Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Back Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_back_link",
+      "label": "Show Back Link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "back_link_text",
+      "label": "Back Link Text",
+      "default": "Back to Riseon"
+    },
+    {
+      "type": "url",
+      "id": "back_link",
+      "label": "Back Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Portal Tabs"
+    },
+    {
+      "type": "text",
+      "id": "tab_customer_text",
+      "label": "Customer Tab Text",
+      "default": "Customer"
+    },
+    {
+      "type": "text",
+      "id": "tab_partner_text",
+      "label": "Brand Partner Tab Text",
+      "default": "Brand Partner"
+    },
+    {
+      "type": "header",
+      "content": "Customer Login Form"
+    },
+    {
+      "type": "text",
+      "id": "customer_eyebrow",
+      "label": "Customer Eyebrow",
+      "default": "SECURE ACCOUNT ACCESS"
+    },
+    {
+      "type": "text",
+      "id": "customer_title",
+      "label": "Customer Heading",
+      "default": "Welcome back to your Riseon account."
+    },
+    {
+      "type": "textarea",
+      "id": "customer_summary",
+      "label": "Customer Subtitle / Summary",
+      "default": "Access your orders, saved jewellery, addresses and support from one secure place."
+    },
+    {
+      "type": "text",
+      "id": "customer_mobile_label",
+      "label": "Mobile Label",
+      "default": "Mobile number"
+    },
+    {
+      "type": "text",
+      "id": "customer_submit_text",
+      "label": "Submit Button Text",
+      "default": "Request secure OTP"
+    },
+    {
+      "type": "text",
+      "id": "customer_bottom_text",
+      "label": "Bottom Copy Text",
+      "default": "Need order help without signing in?"
+    },
+    {
+      "type": "text",
+      "id": "customer_bottom_link_text",
+      "label": "Bottom Copy Link Text",
+      "default": "Track your order"
+    },
+    {
+      "type": "url",
+      "id": "customer_bottom_link",
+      "label": "Bottom Copy Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Brand Partner Login Form"
+    },
+    {
+      "type": "text",
+      "id": "partner_eyebrow",
+      "label": "Partner Eyebrow",
+      "default": "SECURE ACCOUNT ACCESS"
+    },
+    {
+      "type": "text",
+      "id": "partner_title",
+      "label": "Partner Heading",
+      "default": "Access your partner workspace."
+    },
+    {
+      "type": "textarea",
+      "id": "partner_summary",
+      "label": "Partner Subtitle / Summary",
+      "default": "Sign in with your registered details to manage links, eligible sales, commissions and support."
+    },
+    {
+      "type": "text",
+      "id": "partner_mobile_label",
+      "label": "Mobile Label",
+      "default": "Registered mobile number"
+    },
+    {
+      "type": "text",
+      "id": "partner_password_label",
+      "label": "Password Label",
+      "default": "Password"
+    },
+    {
+      "type": "text",
+      "id": "partner_forgot_text",
+      "label": "Forgot Password Text",
+      "default": "Forgot access details?"
+    },
+    {
+      "type": "url",
+      "id": "partner_forgot_link",
+      "label": "Forgot Password Link"
+    },
+    {
+      "type": "text",
+      "id": "partner_submit_text",
+      "label": "Submit Button Text",
+      "default": "Sign in to partner account"
+    },
+    {
+      "type": "text",
+      "id": "partner_bottom_text",
+      "label": "Bottom Copy Text",
+      "default": "Not a partner yet?"
+    },
+    {
+      "type": "text",
+      "id": "partner_bottom_link_text",
+      "label": "Bottom Copy Link Text",
+      "default": "Understand the programme"
+    },
+    {
+      "type": "url",
+      "id": "partner_bottom_link",
+      "label": "Bottom Copy Link URL"
+    },
+    {
+      "type": "text",
+      "id": "partner_bottom_suffix",
+      "label": "Bottom Copy Suffix",
+      "default": "before applying."
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges & Policies"
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Trust Badge 1",
+      "default": "Account-specific access"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Trust Badge 2",
+      "default": "Privacy-first design"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Trust Badge 3",
+      "default": "Riseon support"
+    },
+    {
+      "type": "text",
+      "id": "terms_prefix",
+      "label": "Terms Prefix",
+      "default": "By continuing, you agree to Riseon's"
+    },
+    {
+      "type": "text",
+      "id": "terms_link_text",
+      "label": "Terms Link Text",
+      "default": "Terms"
+    },
+    {
+      "type": "url",
+      "id": "terms_link",
+      "label": "Terms Link"
+    },
+    {
+      "type": "text",
+      "id": "privacy_link_text",
+      "label": "Privacy Link Text",
+      "default": "Privacy Policy"
+    },
+    {
+      "type": "url",
+      "id": "privacy_link",
+      "label": "Privacy Link"
+    }
+  ]
+}
+{% endschema %}

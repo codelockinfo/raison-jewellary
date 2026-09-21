@@ -38,10 +38,10 @@
     </button>
 
     <div class="header-actions">
-      <a href="{{ section.settings.partner_link | default: '/pages/brand-partner-programme' }}" aria-label="Partner">
+      <a href="{{ section.settings.partner_link | default: '/account/login?type=partner' }}" aria-label="Partner">
         <span>◉</span><small>Partner</small>
       </a>
-      <a href="{{ routes.account_login_url }}" aria-label="Account">
+      <a href="{{ routes.account_login_url }}?type=customer" aria-label="Account">
         <span>♙</span><small>Account</small>
       </a>
       <button type="button" aria-label="Wishlist" onclick="window.location.href='/pages/wishlist'">
