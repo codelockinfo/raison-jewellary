@@ -1039,7 +1039,8 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* Mobile bottom nav */
-.mobile-bottom {
+.mobile-bottom,
+.mobile-bottom-nav {
   display: none;
   border-top: 1px solid var(--line);
   z-index: 99999;
@@ -1054,7 +1055,8 @@ h1, h2, h3, h4, h5, h6,
 }
 
 @media (max-width: 900px) {
-  .mobile-bottom {
+  .mobile-bottom,
+  .mobile-bottom-nav {
     display: flex !important;
     position: fixed !important;
     bottom: 0 !important;
@@ -1073,7 +1075,9 @@ h1, h2, h3, h4, h5, h6,
     align-items: center !important;
   }
   .mobile-bottom a,
-  .mobile-bottom button {
+  .mobile-bottom button,
+  .mobile-bottom-nav a,
+  .mobile-bottom-nav button {
     color: #382b32 !important;
     background: transparent !important;
     border: 0 !important;
@@ -1090,7 +1094,9 @@ h1, h2, h3, h4, h5, h6,
     padding: 3px 0 !important;
   }
   .mobile-bottom a svg,
-  .mobile-bottom button svg {
+  .mobile-bottom button svg,
+  .mobile-bottom-nav a svg,
+  .mobile-bottom-nav button svg {
     stroke: #3b0024 !important;
     color: #3b0024 !important;
     width: 18px !important;
@@ -1099,11 +1105,14 @@ h1, h2, h3, h4, h5, h6,
     transition: transform 0.2s ease, stroke 0.2s ease;
   }
   .mobile-bottom a:hover svg,
-  .mobile-bottom button:hover svg {
+  .mobile-bottom button:hover svg,
+  .mobile-bottom-nav a:hover svg,
+  .mobile-bottom-nav button:hover svg {
     stroke: var(--gold, #c9a15b) !important;
     transform: translateY(-1px);
   }
-  .mobile-bottom small {
+  .mobile-bottom small,
+  .mobile-bottom-nav small {
     margin-top: 1px !important;
     font-size: 9.5px !important;
     font-weight: 500 !important;
