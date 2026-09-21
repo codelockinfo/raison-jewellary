@@ -60,6 +60,12 @@
             {{ section.settings.customer_submit_text | default: 'Request secure OTP' }}
           </button>
         {% endform %}
+        
+        <div class="login-trust-row" aria-label="Account experience information">
+          <span>{{ section.settings.trust_1 | default: 'Account-specific access' }}</span>
+          <span>{{ section.settings.trust_2 | default: 'Privacy-first design' }}</span>
+          <span>{{ section.settings.trust_3 | default: 'Riseon support' }}</span>
+        </div>
 
         <p class="login-bottom-copy">
           {{ section.settings.customer_bottom_text | default: 'Need order help without signing in?' }} 
@@ -115,6 +121,12 @@
           </button>
         </form>
 
+        <div class="login-trust-row" aria-label="Account experience information">
+          <span>{{ section.settings.trust_1 | default: 'Account-specific access' }}</span>
+          <span>{{ section.settings.trust_2 | default: 'Privacy-first design' }}</span>
+          <span>{{ section.settings.trust_3 | default: 'Riseon support' }}</span>
+        </div>
+
         <p class="login-bottom-copy">
           {{ section.settings.partner_bottom_text | default: 'Not a partner yet?' }} 
           <a href="{{ section.settings.partner_bottom_link | default: '/pages/brand-partner-programme' }}">
@@ -123,13 +135,7 @@
         </p>
       </div>
 
-      <!-- ================= SHARED TRUST BADGES & LEGAL FOOTER ================= -->
-      <div class="login-trust-row" aria-label="Account experience information">
-        <span>{{ section.settings.trust_1 | default: 'Account-specific access' }}</span>
-        <span>{{ section.settings.trust_2 | default: 'Privacy-first design' }}</span>
-        <span>{{ section.settings.trust_3 | default: 'Riseon support' }}</span>
-      </div>
-
+      <!-- ================= SHARED LEGAL FOOTER ================= -->
       <p class="login-legal-copy">
         {{ section.settings.terms_prefix | default: "By continuing, you agree to Riseon's" }}
         <a href="{{ section.settings.terms_link | default: '/policies/terms-of-service' }}">{{ section.settings.terms_link_text | default: 'Terms' }}</a>
