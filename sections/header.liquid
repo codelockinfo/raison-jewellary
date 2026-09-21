@@ -38,18 +38,24 @@
     </button>
 
     <div class="header-actions">
-      <a href="{{ section.settings.partner_link | default: '/account/login?type=partner' }}" aria-label="Partner">
-        <span>◉</span><small>Partner</small>
+      <a href="{{ section.settings.partner_link | default: '/account/login?type=partner' }}" aria-label="{{ section.settings.partner_label | default: 'Partner' }}">
+        <span>◉</span><small>{{ section.settings.partner_label | default: 'Partner' }}</small>
       </a>
-      <a href="{{ routes.account_login_url }}?type=customer" aria-label="Account">
-        <span>♙</span><small>Account</small>
+      <a href="{{ section.settings.account_link | default: '/account/login?type=customer' }}" aria-label="{{ section.settings.account_label | default: 'Account' }}">
+        <span>♙</span><small>{{ section.settings.account_label | default: 'Account' }}</small>
       </a>
-      <button type="button" aria-label="Wishlist" onclick="window.location.href='/pages/wishlist'">
-        <span>♡</span><b class="js-wishlist-count">0</b><small>Wishlist</small>
-      </button>
-      <button type="button" class="cart-btn" aria-label="Open cart" data-cart-drawer-open>
-        <span>♧</span><b class="js-cart-count">{{ cart.item_count }}</b><small>Cart</small>
-      </button>
+      <a href="{{ section.settings.wishlist_link | default: '/pages/wishlist' }}" aria-label="{{ section.settings.wishlist_label | default: 'Wishlist' }}">
+        <span>♡</span><b class="js-wishlist-count">0</b><small>{{ section.settings.wishlist_label | default: 'Wishlist' }}</small>
+      </a>
+      {%- if section.settings.cart_link != blank -%}
+        <a href="{{ section.settings.cart_link }}" class="cart-btn" aria-label="{{ section.settings.cart_label | default: 'Cart' }}">
+          <span>♧</span><b class="js-cart-count">{{ cart.item_count }}</b><small>{{ section.settings.cart_label | default: 'Cart' }}</small>
+        </a>
+      {%- else -%}
+        <button type="button" class="cart-btn" aria-label="{{ section.settings.cart_label | default: 'Cart' }}" data-cart-drawer-open>
+          <span>♧</span><b class="js-cart-count">{{ cart.item_count }}</b><small>{{ section.settings.cart_label | default: 'Cart' }}</small>
+        </button>
+      {%- endif -%}
     </div>
   </header>
 
@@ -383,9 +389,52 @@
       "default": "Search lightweight rings, earrings, pendants…"
     },
     {
+      "type": "header",
+      "content": "Action Icons Links & Labels"
+    },
+    {
+      "type": "text",
+      "id": "partner_label",
+      "label": "Partner Label",
+      "default": "Partner"
+    },
+    {
       "type": "url",
       "id": "partner_link",
       "label": "Partner Link"
+    },
+    {
+      "type": "text",
+      "id": "account_label",
+      "label": "Account Label",
+      "default": "Account"
+    },
+    {
+      "type": "url",
+      "id": "account_link",
+      "label": "Account Link"
+    },
+    {
+      "type": "text",
+      "id": "wishlist_label",
+      "label": "Wishlist Label",
+      "default": "Wishlist"
+    },
+    {
+      "type": "url",
+      "id": "wishlist_link",
+      "label": "Wishlist Link"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Cart Label",
+      "default": "Cart"
+    },
+    {
+      "type": "url",
+      "id": "cart_link",
+      "label": "Cart Link (Leave blank for Drawer)"
     },
     {
       "type": "color",
