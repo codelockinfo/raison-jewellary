@@ -125,9 +125,9 @@
 
       <!-- ================= SHARED TRUST BADGES & LEGAL FOOTER ================= -->
       <div class="login-trust-row" aria-label="Account experience information">
-        <span>✓ {{ section.settings.trust_1 | default: 'Account-specific access' }}</span>
-        <span>✓ {{ section.settings.trust_2 | default: 'Privacy-first design' }}</span>
-        <span>✓ {{ section.settings.trust_3 | default: 'Riseon support' }}</span>
+        <span>{{ section.settings.trust_1 | default: 'Account-specific access' }}</span>
+        <span>{{ section.settings.trust_2 | default: 'Privacy-first design' }}</span>
+        <span>{{ section.settings.trust_3 | default: 'Riseon support' }}</span>
       </div>
 
       <p class="login-legal-copy">
