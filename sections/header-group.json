@@ -53,7 +53,7 @@
         "partner_label": "Partner",
         "partner_link": "https://riseonjewels.com/pages/login-page?type=partner",
         "account_label": "Account",
-        "account_link": "",
+        "account_link": "https://riseonjewels.com/pages/login-page?type=customer",
         "wishlist_label": "Wishlist",
         "wishlist_link": "shopify://pages/wishlist",
         "cart_label": "Cart",
