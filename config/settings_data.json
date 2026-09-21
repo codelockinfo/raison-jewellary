@@ -10,6 +10,7 @@
 {
   "current": {
     "use_favicon": true,
+    "favicon": "shopify://shop_images/svg-code-1024x1024.png",
     "show_scroll_top_button": false,
     "scroll_top_bg_color": "#4E032A",
     "scroll_top_border_color": "#4E032A",
