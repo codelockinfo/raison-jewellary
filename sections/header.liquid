@@ -282,14 +282,14 @@
 
       /* ── Smart Sticky Header on scroll (matching reference site) ───── */
       let lastScrollY = window.scrollY;
-      const headerGroup = document.querySelector('.shopify-section-group-header-group') || document.querySelector('.site-top-shell');
+      const siteTopShell = document.getElementById('SiteTopShell-{{ section.id }}') || document.querySelector('.site-top-shell');
 
       function onHeaderScroll() {
-        if (!headerGroup) return;
+        if (!siteTopShell) return;
 
         /* Always sticky on mobile (screen <= 1100px) */
         if (window.innerWidth <= 1100) {
-          headerGroup.classList.remove('is-hidden', 'is-pinned');
+          siteTopShell.classList.remove('is-hidden', 'is-pinned');
           return;
         }
 
@@ -299,15 +299,15 @@
 
         /* When drawer or search is open, keep header visible & pinned */
         if (isSearchOpen || isNavOpen) {
-          headerGroup.classList.add('is-pinned');
-          headerGroup.classList.remove('is-hidden');
+          siteTopShell.classList.add('is-pinned');
+          siteTopShell.classList.remove('is-hidden');
           lastScrollY = currentY;
           return;
         }
 
         /* At the top of page (scrollY <= 20px) -> return to normal static flow */
         if (currentY <= 20) {
-          headerGroup.classList.remove('is-pinned', 'is-hidden');
+          siteTopShell.classList.remove('is-pinned', 'is-hidden');
           lastScrollY = currentY;
           return;
         }
@@ -317,11 +317,11 @@
 
         if (diff > 0 && currentY > 100) {
           /* Scrolling DOWN -> hide header smoothly */
-          headerGroup.classList.add('is-pinned', 'is-hidden');
+          siteTopShell.classList.add('is-pinned', 'is-hidden');
         } else if (diff < 0) {
           /* Scrolling UP -> reveal pinned sticky header smoothly */
-          headerGroup.classList.add('is-pinned');
-          headerGroup.classList.remove('is-hidden');
+          siteTopShell.classList.add('is-pinned');
+          siteTopShell.classList.remove('is-hidden');
         }
 
         lastScrollY = currentY;
