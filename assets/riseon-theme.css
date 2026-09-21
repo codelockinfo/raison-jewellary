@@ -253,19 +253,11 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .shopify-section-group-header-group {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  will-change: transform;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
   display: block !important;
-}
-
-.shopify-section-group-header-group.is-hidden {
-  transform: translateY(-100%);
+  width: 100% !important;
 }
 
 .shopify-section-group-header-group .nav,
@@ -278,7 +270,7 @@ h1, h2, h3, h4, h5, h6,
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
-  will-change: transform;
+  z-index: 9999 !important;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
 }
 
@@ -287,7 +279,7 @@ h1, h2, h3, h4, h5, h6,
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  z-index: 9999 !important;
+  z-index: 99999 !important;
   box-shadow: 0 6px 24px rgba(38, 0, 21, 0.28) !important;
   transform: translateY(0) !important;
 }
@@ -297,7 +289,7 @@ h1, h2, h3, h4, h5, h6,
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  z-index: 9999 !important;
+  z-index: 99999 !important;
   transform: translateY(-100%) !important;
 }
 
@@ -725,20 +717,22 @@ h1, h2, h3, h4, h5, h6,
    MOBILE: Slide-in drawer (≤1100px)
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
-  .shopify-section-group-header-group,
-  .header-section,
   .site-top-shell {
-    position: sticky !important;
+    position: fixed !important;
     top: 0 !important;
-    z-index: 9999 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 99999 !important;
     transform: none !important;
+    box-shadow: 0 4px 16px rgba(38, 0, 21, 0.15) !important;
   }
   .site-top-shell.is-hidden,
-  .site-top-shell.is-pinned,
-  .shopify-section-group-header-group.is-hidden,
-  .shopify-section-group-header-group.is-pinned {
-    position: sticky !important;
+  .site-top-shell.is-pinned {
+    position: fixed !important;
     top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     transform: none !important;
   }
 
