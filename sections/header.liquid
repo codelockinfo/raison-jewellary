@@ -287,12 +287,6 @@
       function onHeaderScroll() {
         if (!siteTopShell) return;
 
-        /* Always sticky on mobile (screen <= 1100px) */
-        if (window.innerWidth <= 1100) {
-          siteTopShell.classList.remove('is-hidden', 'is-pinned');
-          return;
-        }
-
         const currentY = window.scrollY;
         const isSearchOpen = searchOverlay && searchOverlay.classList.contains('open');
         const isNavOpen = nav && nav.classList.contains('open');
