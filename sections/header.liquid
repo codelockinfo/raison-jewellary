@@ -280,54 +280,33 @@
         }
       });
 
-      /* ── Smart Sticky Header on scroll ────────────────────────── */
-      let lastScrollY = window.scrollY;
+      /* ── Sticky Header on scroll ────────────────────────── */
       const headerGroup = document.querySelector('.shopify-section-group-header-group') || document.querySelector('.site-top-shell');
+      const siteTopShell = document.querySelector('.site-top-shell');
 
       function onHeaderScroll() {
-        if (!headerGroup) return;
-
-        /* Always sticky on mobile (screen <= 1100px) */
-        if (window.innerWidth <= 1100) {
-          headerGroup.classList.remove('is-hidden');
-          return;
-        }
-
         const currentY = window.scrollY;
-        const isSearchOpen = searchOverlay && searchOverlay.classList.contains('open');
-        const isNavOpen = nav && nav.classList.contains('open');
 
-        /* When drawer or search is open, keep header visible & pinned */
-        if (isSearchOpen || isNavOpen) {
-          headerGroup.classList.add('is-pinned');
-          headerGroup.classList.remove('is-hidden');
-          lastScrollY = currentY;
-          return;
+        if (currentY > 20) {
+          if (headerGroup) {
+            headerGroup.classList.add('is-pinned', 'is-scrolled');
+            headerGroup.classList.remove('is-hidden');
+          }
+          if (siteTopShell) {
+            siteTopShell.classList.add('is-pinned', 'is-scrolled');
+          }
+        } else {
+          if (headerGroup) {
+            headerGroup.classList.remove('is-pinned', 'is-scrolled', 'is-hidden');
+          }
+          if (siteTopShell) {
+            siteTopShell.classList.remove('is-pinned', 'is-scrolled');
+          }
         }
-
-        /* At the top of page (scrollY <= 20px) -> return to normal static flow */
-        if (currentY <= 20) {
-          headerGroup.classList.remove('is-pinned', 'is-hidden');
-          lastScrollY = currentY;
-          return;
-        }
-
-        const diff = currentY - lastScrollY;
-        if (Math.abs(diff) < 4) return;
-
-        if (diff > 0 && currentY > 100) {
-          /* Scrolling DOWN -> hide header */
-          headerGroup.classList.add('is-pinned', 'is-hidden');
-        } else if (diff < 0) {
-          /* Scrolling UP -> reveal pinned sticky header at top across ALL sections */
-          headerGroup.classList.add('is-pinned');
-          headerGroup.classList.remove('is-hidden');
-        }
-
-        lastScrollY = currentY;
       }
 
       window.addEventListener('scroll', onHeaderScroll, { passive: true });
+      onHeaderScroll();
 
       /* ── Live update cart count ──────────────────────────────── */
       function updateCartCount() {
