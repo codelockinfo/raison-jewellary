@@ -14,9 +14,19 @@
     "footer": {
       "type": "footer",
       "settings": {
-        "show_facebook": true,
+        "brand_tagline": "Modern fine jewellery for women rising in their own way.",
         "show_instagram": true,
-        "show_youtube": true
+        "instagram_link": "",
+        "show_youtube": true,
+        "youtube_link": "",
+        "show_facebook": true,
+        "facebook_link": "",
+        "menu_shop": "shop",
+        "menu_care": "",
+        "menu_about": "",
+        "menu_journal": "",
+        "menu_policies": "",
+        "popular_searches": "Lightweight Gold Jewellery · Laboratory-Grown Diamond Rings · Office-Wear Jewellery for Women · Daily-Wear Diamond Earrings · Gold Pendants for Women · Jewellery Up to ₹24,999"
       }
     }
   },
