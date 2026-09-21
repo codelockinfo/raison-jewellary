@@ -50,7 +50,7 @@
         "logo": "shopify://shop_images/riseon-logo-trimmed.png",
         "menu": "header-menu",
         "search_placeholder": "Search lightweight rings, earrings, pendants…",
-        "partner_link": "",
+        "partner_link": "https://riseonjewels.com/pages/login-page?type=partner",
         "icon_color": "#c9a15b",
         "icon_hover_color": "#f5e4bd",
         "label_color": "#f7eada",
