@@ -16,16 +16,12 @@
           "type": "title",
           "settings": {}
         },
-        "rating_9ekDRt": {
-          "type": "rating",
+        "description_WBReTj": {
+          "type": "description",
           "settings": {
-            "show_count": true,
-            "show_empty_rating": false
+            "as_accordion": false,
+            "heading": ""
           }
-        },
-        "inventory_XgjKEj": {
-          "type": "inventory",
-          "settings": {}
         },
         "price_7LGG6E": {
           "type": "price",
@@ -59,32 +55,16 @@
             "show_next_to_title": true
           }
         },
-        "custom_buttons_WUmtRG": {
-          "type": "custom_buttons",
+        "pincode_checker_XdC4XV": {
+          "type": "pincode_checker",
           "settings": {
-            "show_ask_question": true,
-            "show_share": true,
-            "show_compare": true
-          }
-        },
-        "description_WBReTj": {
-          "type": "description",
-          "settings": {}
-        },
-        "collapsible_tab_486JPD": {
-          "type": "collapsible_tab",
-          "settings": {
-            "heading": "Shipping and Returns",
-            "content": "<p>Enjoy <strong>free shipping on orders above ₹499</strong> within India. International delivery is also available.</p><ul><li>✅ Free Shipping on all orders above ₹499 within India.</li><li>🌎 International shipping takes <strong>8–10 days</strong>.</li><li>📦 Please order your Rakhi early to ensure it reaches on time.</li></ul><p>*Applicable on all orders. International delivery times may vary by location.</p>",
-            "page": ""
-          }
-        },
-        "collapsible_tab_bDXQ7r": {
-          "type": "collapsible_tab",
-          "settings": {
-            "heading": "Return Policies",
-            "content": "<p>we offer a <strong>10-day return policy</strong> on all products, counted from the date of delivery.</p><ul><li><strong>Rakhis and Rakhi Combo Sets</strong> are non-returnable.</li><li>Returns for <strong>lab-grown diamond jewellery</strong> are accepted <strong>only after a quality check</strong> is completed.</li><li>All accompanying items, including the <strong>authenticity certificate</strong> and product packaging, must be returned to be eligible for a refund.</li></ul>",
-            "page": ""
+            "title": "DELIVERY PINCODE",
+            "placeholder": "Enter 6-digit pincode",
+            "btn_text": "Check",
+            "success_message": "✓ Delivery available for this pincode",
+            "error_message": "✗ Sorry, delivery not available for this pincode",
+            "invalid_msg": "Please enter a valid 6-digit pincode",
+            "serviceable_pincodes": ""
           }
         },
         "icon_text_row_NxTLzG": {
@@ -92,10 +72,13 @@
           "settings": {
             "icon_1": "shopify://shop_images/free-shipping.png",
             "text_1": "Free shipping",
+            "link_1": "",
             "icon_2": "shopify://shop_images/return_9a4b13d2-e638-4eaf-b7c0-8f0bd9a7de2f.png",
             "text_2": "Easy 15 Day Return",
+            "link_2": "",
             "icon_3": "shopify://shop_images/test.png",
-            "text_3": "4X Lab Tested"
+            "text_3": "4X Lab Tested",
+            "link_3": ""
           }
         },
         "certification_cert89": {
@@ -108,23 +91,21 @@
             "title_2": "SGL Grading",
             "subtext_2": "Shown only when supplied",
             "title_3": "BIS Hallmark",
-            "subtext_3": "Hallmarked gold jewellery"
+            "subtext_3": "Hallmarked gold jewellery",
+            "title_4": "",
+            "subtext_4": ""
           }
         }
       },
       "block_order": [
         "title_mU48eA",
-        "rating_9ekDRt",
-        "inventory_XgjKEj",
+        "description_WBReTj",
         "price_7LGG6E",
         "variants_q4KYwa",
         "quantity_TgVz7g",
         "buttons_kGV7rz",
         "wishlist_W3TJVM",
-        "custom_buttons_WUmtRG",
-        "description_WBReTj",
-        "collapsible_tab_486JPD",
-        "collapsible_tab_bDXQ7r",
+        "pincode_checker_XdC4XV",
         "icon_text_row_NxTLzG",
         "certification_cert89"
       ],
@@ -155,7 +136,16 @@
             "label_3": "Product code",
             "value_3": "",
             "label_4": "Setting",
-            "value_4": "Final SKU detail pending"
+            "value_4": "Final SKU detail pending",
+            "label_5": "",
+            "value_5": "",
+            "label_6": "",
+            "value_6": "",
+            "label_7": "",
+            "value_7": "",
+            "label_8": "",
+            "value_8": "",
+            "content": ""
           }
         },
         "spec_weight_purity": {
@@ -169,7 +159,16 @@
             "label_3": "Net gold weight",
             "value_3": "Final SKU detail pending",
             "label_4": "Bracelet length",
-            "value_4": "7 in"
+            "value_4": "7 in",
+            "label_5": "",
+            "value_5": "",
+            "label_6": "",
+            "value_6": "",
+            "label_7": "",
+            "value_7": "",
+            "label_8": "",
+            "value_8": "",
+            "content": ""
           }
         },
         "spec_diamond_gemstone": {
@@ -183,14 +182,33 @@
             "label_3": "Colour / clarity",
             "value_3": "Final SKU detail pending",
             "label_4": "Shape / gemstone",
-            "value_4": "Final SKU detail pending"
+            "value_4": "Final SKU detail pending",
+            "label_5": "",
+            "value_5": "",
+            "label_6": "",
+            "value_6": "",
+            "label_7": "",
+            "value_7": "",
+            "label_8": "",
+            "value_8": "",
+            "content": ""
           }
         },
         "spec_price_breakup": {
           "type": "price_breakup",
           "settings": {
             "title": "Price breakup",
-            "description": "<p>Gold, diamond, making and GST components will be displayed here when the approved SKU data is synced.</p>"
+            "description": "<p>Gold, diamond, making and GST components will be displayed here when the approved SKU data is synced.</p>",
+            "label_1": "Gold component",
+            "value_1": "",
+            "label_2": "Diamond component",
+            "value_2": "",
+            "label_3": "Making charges",
+            "value_3": "",
+            "label_4": "GST (3%)",
+            "value_4": "",
+            "label_5": "Total",
+            "value_5": ""
           }
         }
       },
@@ -204,7 +222,14 @@
         "heading": "PRODUCT INFORMATION",
         "show_sku": true,
         "sku_override": "",
-        "disclaimer_note": "*Estimated or catalogue values. Final invoice, actual metal weight, report partner, certificate number, BIS hallmark and HUID must match the exact shipped SKU."
+        "disclaimer_note": "*Estimated or catalogue values. Final invoice, actual metal weight, report partner, certificate number, BIS hallmark and HUID must match the exact shipped SKU.",
+        "section_bg": "#fbfaf9",
+        "card_bg": "#ffffff",
+        "border_color": "#e4dcd8",
+        "title_color": "#4e032e",
+        "group_title_color": "#3a1726",
+        "padding_top": 36,
+        "padding_bottom": 76
       }
     },
     "product_recomand_PQTk8c": {
