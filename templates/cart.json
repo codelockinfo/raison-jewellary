@@ -1,1 +1,72 @@
-{"sections":{"main":{"type":"cart","settings":{"cart_design":"design_1","show_trust_boxes":true,"show_sidebar_info":true,"show_cart_recommendations":true}}},"order":["main"]}
+{
+  "sections": {
+    "main": {
+      "type": "step-cart",
+      "settings": {
+        "hide_theme_header": true,
+        "hide_theme_footer": false,
+        "show_header": true,
+        "logo_width": 156,
+        "show_security_badge": true,
+        "security_badge_text": "🔒 100% secure checkout",
+        "show_stepper": true,
+        "step_1_text": "BAG",
+        "step_2_text": "DELIVERY",
+        "step_3_text": "PAYMENT",
+        "bag_eyebrow": "YOUR SELECTION",
+        "bag_title": "Shopping bag",
+        "item_collection_badge": "GOLD · LABORATORY-GROWN DIAMONDS",
+        "show_sku": true,
+        "show_promises": true,
+        "promise_1_icon": "✓",
+        "promise_1_text": "Certified & hallmarked",
+        "promise_2_icon": "⌾",
+        "promise_2_text": "Free insured delivery",
+        "promise_3_icon": "↺",
+        "promise_3_text": "15-day easy return",
+        "show_coupon": true,
+        "coupon_title": "Referral or coupon code",
+        "coupon_placeholder": "Enter code",
+        "coupon_button_text": "Apply",
+        "delivery_eyebrow": "GUEST CHECKOUT",
+        "delivery_title": "Contact & delivery",
+        "delivery_badge": "No account required",
+        "payment_eyebrow": "SECURE PAYMENT",
+        "payment_title": "Choose payment method",
+        "payment_badge": "Powered by authorised gateway",
+        "show_cod": true,
+        "cod_title": "Cash on Delivery",
+        "cod_text": "Shown only after pincode and order eligibility are verified.",
+        "summary_title": "Order summary",
+        "show_gst": true,
+        "gst_label": "GST",
+        "gst_value": "₹0",
+        "show_insured_delivery": true,
+        "insured_delivery_label": "Insured delivery",
+        "insured_delivery_value": "FREE",
+        "total_tax_note": "Inclusive of all taxes",
+        "checkout_btn_text": "SECURE CHECKOUT",
+        "show_security_note": true,
+        "security_note": "▣ Payments are processed by an authorised provider. Riseon does not store your card number, CVV or UPI PIN.",
+        "show_help": true,
+        "help_title": "Need help before ordering?",
+        "help_phone": "Call 7359215333",
+        "help_number": "7359215333"
+      }
+    },
+    "cart": {
+      "type": "cart",
+      "disabled": true,
+      "settings": {
+        "cart_design": "design_1",
+        "show_trust_boxes": true,
+        "show_sidebar_info": true,
+        "show_cart_recommendations": true
+      }
+    }
+  },
+  "order": [
+    "main",
+    "cart"
+  ]
+}

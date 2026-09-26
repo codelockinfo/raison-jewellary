@@ -1,0 +1,1885 @@
+{% liquid
+  assign show_header = section.settings.show_header
+  assign logo = section.settings.logo
+  assign logo_width = section.settings.logo_width | default: 156
+  assign show_security_badge = section.settings.show_security_badge
+  assign security_badge_text = section.settings.security_badge_text | default: '🔒 100% secure checkout'
+  assign show_stepper = section.settings.show_stepper
+  assign hide_theme_header = section.settings.hide_theme_header
+  assign hide_theme_footer = section.settings.hide_theme_footer
+%}
+
+{%- style -%}
+  :root {
+    --wine: #4e032e;
+    --deep: #290018;
+    --gold: #c9a15b;
+    --soft: #e5c98c;
+    --ivory: #faf7f2;
+    --ink: #252124;
+    --muted: #756d72;
+    --line: #eadfd9;
+  }
+
+  {%- if hide_theme_header -%}
+    body:has(#StepCartSection) .site-top-shell,
+    body:has(#StepCartSection) .announcement,
+    body:has(#StepCartSection) .header,
+    body:has(#StepCartSection) .nav {
+      display: none !important;
+    }
+  {%- endif -%}
+
+  {%- if hide_theme_footer -%}
+    body:has(#StepCartSection) footer,
+    body:has(#StepCartSection) .footer,
+    body:has(#StepCartSection) .footer-main,
+    body:has(#StepCartSection) .popular,
+    body:has(#StepCartSection) .legal {
+      display: none !important;
+    }
+  {%- endif -%}
+
+  .smart-checkout {
+    color: #31262b;
+    background: #f8f4f1;
+    min-height: 100vh;
+    font-family: var(--font-mulish), Mulish, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding-bottom: 60px;
+  }
+
+  .smart-checkout * {
+    box-sizing: border-box;
+  }
+
+  .smart-checkout-header {
+    background: #fff;
+    border-bottom: 1px solid #eadfd9;
+    justify-content: space-between;
+    align-items: center;
+    height: 82px;
+    padding: 0 max(24px, 50vw - 640px);
+    display: flex;
+  }
+
+  .smart-checkout-header a.smart-logo-wrap {
+    width: {{ logo_width }}px;
+    display: block;
+    line-height: 1;
+  }
+
+  .smart-checkout-header img {
+    object-fit: contain;
+    width: 100%;
+    height: 54px;
+    display: block;
+  }
+
+  .smart-checkout-header span.smart-header-security {
+    color: #65595e;
+    letter-spacing: .04em;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .smart-steps {
+    grid-template-columns: repeat(3, 1fr);
+    width: min(560px, 100% - 40px);
+    margin: 24px auto 32px;
+    display: grid;
+    position: relative;
+  }
+
+  .smart-steps:before {
+    content: "";
+    background: #d9cbc4;
+    height: 1px;
+    position: absolute;
+    top: 15px;
+    left: 16%;
+    right: 16%;
+    z-index: 0;
+  }
+
+  .smart-steps button.step-btn {
+    z-index: 1;
+    color: #a19499;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 0 !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font: 600 10px/1 Mulish, Manrope, sans-serif;
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+  }
+
+  .smart-steps b {
+    background: #f8f4f1;
+    border: 1px solid #cfc0b8;
+    border-radius: 50%;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    display: grid;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+  }
+
+  .smart-steps .step-btn.active, 
+  .smart-steps .step-btn.done {
+    color: var(--wine);
+  }
+
+  .smart-steps .step-btn.active b {
+    background: var(--wine);
+    border-color: var(--wine);
+    color: #fff;
+  }
+
+  .smart-steps .step-btn.done b {
+    border-color: var(--gold);
+    color: var(--wine);
+    background: #fff7e9;
+  }
+
+  .smart-checkout-shell {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+    gap: 26px;
+    width: min(1180px, 100% - 40px);
+    margin: 0 auto 70px;
+    display: grid;
+  }
+
+  .smart-checkout-main, 
+  .smart-summary {
+    background: #fff;
+    border: 1px solid #eadfd9;
+  }
+
+  .smart-checkout-main {
+    padding: 32px;
+  }
+
+  .smart-title {
+    border-bottom: 1px solid #eee6e1;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    padding-bottom: 22px;
+    display: flex;
+  }
+
+  .smart-title span {
+    color: var(--wine);
+    letter-spacing: .14em;
+    font-size: 10px;
+    font-weight: 700;
+    display: block;
+    text-transform: uppercase;
+  }
+
+  .smart-title h1 {
+    margin: 5px 0 0;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 34px;
+    line-height: 1.05;
+    font-weight: 500;
+    color: #351c28;
+  }
+
+  .smart-title > small {
+    color: #8a7f84;
+    font-size: 11px;
+  }
+
+  .smart-cart-item {
+    border-bottom: 1px solid #eee6e1;
+    grid-template-columns: 150px minmax(0, 1fr) auto;
+    gap: 22px;
+    padding: 26px 0;
+    display: grid;
+    position: relative;
+    align-items: start;
+  }
+
+  .smart-cart-image {
+    background: #fbf8f6;
+    height: 150px;
+    display: block;
+    overflow: hidden;
+  }
+
+  .smart-cart-image img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
+  .smart-cart-copy > span {
+    color: #9a7b45;
+    letter-spacing: .1em;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: block;
+  }
+
+  .smart-cart-copy h2 {
+    margin: 7px 0 8px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 25px;
+    line-height: 1.1;
+    font-weight: 600;
+  }
+
+  .smart-cart-copy h2 a {
+    color: #351c28;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .smart-cart-copy h2 a:hover {
+    color: var(--wine);
+  }
+
+  .smart-cart-copy p, 
+  .smart-cart-copy > small {
+    color: #74696e;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    display: block;
+  }
+
+  .smart-item-actions {
+    align-items: center;
+    gap: 18px;
+    margin-top: 18px;
+    display: flex;
+  }
+
+  .smart-item-actions label {
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    color: #31262b;
+  }
+
+  .smart-item-actions select {
+    background: #fff;
+    border: 1px solid #ddcfca;
+    margin-left: 7px;
+    padding: 7px 25px 7px 8px;
+    font-size: 12px;
+    color: #31262b;
+    cursor: pointer;
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .smart-item-actions select:focus {
+    border-color: var(--wine);
+  }
+
+  .smart-item-actions button.smart-remove-btn {
+    color: var(--wine);
+    background: transparent;
+    border: 0 !important;
+    font-size: 11px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s;
+  }
+
+  .smart-item-actions button.smart-remove-btn:hover {
+    opacity: 0.75;
+  }
+
+  .smart-item-price {
+    text-align: right;
+  }
+
+  .smart-item-price strong {
+    font-size: 17px;
+    font-weight: 700;
+    color: #351c28;
+    display: block;
+  }
+
+  .smart-item-price del {
+    color: #a19599;
+    margin-top: 5px;
+    font-size: 11px;
+    display: block;
+  }
+
+  .smart-promises {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 22px 0;
+    display: grid;
+  }
+
+  .smart-promises span {
+    color: #5f5358;
+    text-align: center;
+    border: 1px solid #eee6e1;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 58px;
+    padding: 10px;
+    font-size: 10px;
+    display: flex;
+    font-weight: 500;
+  }
+
+  .smart-promises b {
+    color: var(--gold);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .smart-code {
+    padding-top: 2px;
+  }
+
+  .smart-code label {
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    display: block;
+    color: #31262b;
+  }
+
+  .smart-code > div {
+    grid-template-columns: 1fr 90px;
+    max-width: 440px;
+    display: grid;
+  }
+
+  .smart-code input {
+    border: 1px solid #ddcfca;
+    height: 42px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #31262b;
+    outline: none;
+    border-radius: 2px 0 0 2px;
+  }
+
+  .smart-code input:focus {
+    border-color: var(--wine);
+  }
+
+  .smart-code button {
+    color: var(--wine);
+    background: #efe7e2;
+    border: 0;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 0 2px 2px 0;
+    transition: background 0.2s;
+  }
+
+  .smart-code button:hover {
+    background: #e3d5ce;
+  }
+
+  .smart-code small {
+    color: #756a6f;
+    margin-top: 7px;
+    font-size: 11px;
+    display: block;
+  }
+
+  .smart-summary {
+    padding: 27px;
+    position: sticky;
+    top: 20px;
+  }
+
+  .smart-summary h2 {
+    margin: 0 0 22px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 600;
+    color: #351c28;
+  }
+
+  .smart-summary > div {
+    color: #71666b;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 8px 0;
+    font-size: 12px;
+    display: flex;
+  }
+
+  .smart-summary .free {
+    color: #2d6c4c;
+    font-weight: 700;
+  }
+
+  .smart-summary .smart-total {
+    border-top: 1px solid #ded2cc;
+    border-bottom: 1px solid #ded2cc;
+    align-items: center;
+    margin-top: 12px;
+    padding: 18px 0;
+  }
+
+  .smart-total span {
+    color: #382d32;
+    flex-direction: column;
+    font-weight: 700;
+    display: flex;
+  }
+
+  .smart-total small {
+    color: #8e8388;
+    margin-top: 4px;
+    font-size: 9px;
+    font-weight: 400;
+  }
+
+  .smart-total strong {
+    color: var(--wine);
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .smart-primary {
+    border: 1px solid var(--wine);
+    background: var(--wine);
+    color: #fff;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    width: 100%;
+    min-height: 50px;
+    margin-top: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .smart-primary:hover {
+    background: var(--deep);
+    border-color: var(--deep);
+  }
+
+  .smart-security {
+    color: #7b7075;
+    margin: 16px 0 0;
+    font-size: 10px !important;
+    line-height: 1.6;
+  }
+
+  .smart-help {
+    border-top: 1px solid #eee6e1;
+    flex-direction: column;
+    gap: 5px !important;
+    margin-top: 17px !important;
+    padding-top: 17px !important;
+    display: flex;
+  }
+
+  .smart-help b {
+    color: #3d3237;
+    font-size: 11px;
+  }
+
+  .smart-help span, 
+  .smart-help a {
+    color: var(--wine);
+    font-weight: 600;
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  /* Step 2 Form */
+  .smart-form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 17px 14px;
+    padding-top: 24px;
+    display: grid;
+  }
+
+  .smart-form-grid label {
+    color: #51464b;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .smart-form-grid label.wide {
+    grid-column: 1 / -1;
+  }
+
+  .smart-form-grid input {
+    border: 1px solid #ded2cc;
+    outline: 0;
+    width: 100%;
+    height: 44px;
+    margin-top: 7px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #31262b;
+    border-radius: 2px;
+    background: #fff;
+    font-family: inherit;
+  }
+
+  .smart-form-grid input:focus {
+    border-color: var(--wine);
+    box-shadow: 0 0 0 2px #4e032e12;
+  }
+
+  .smart-check {
+    color: #675c61;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    font-size: 11px;
+    display: flex;
+    cursor: pointer;
+  }
+
+  .smart-check input {
+    accent-color: var(--wine);
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .smart-back {
+    color: var(--wine);
+    background: 0 0;
+    border: 0;
+    margin: 13px auto 0;
+    font-size: 11px;
+    display: block;
+    cursor: pointer;
+    padding: 6px 12px;
+    transition: opacity 0.2s;
+  }
+
+  .smart-back:hover {
+    text-decoration: underline;
+  }
+
+  .smart-alert {
+    color: #6c4f19;
+    background: #fff6e6;
+    border: 1px solid #fae6be;
+    margin: 13px 0 0;
+    padding: 10px 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    border-radius: 2px;
+  }
+
+  /* Step 3 Payment */
+  .smart-payment-list {
+    gap: 10px;
+    padding-top: 24px;
+    display: grid;
+  }
+
+  .smart-payment-list label {
+    cursor: pointer;
+    border: 1px solid #e4d9d3;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 68px;
+    padding: 13px 15px;
+    display: grid;
+    transition: all 0.2s;
+    border-radius: 2px;
+    background: #fff;
+  }
+
+  .smart-payment-list label.active {
+    border-color: var(--wine);
+    box-shadow: 0 0 0 1px var(--wine);
+    background: #fffafb;
+  }
+
+  .smart-payment-list input {
+    accent-color: var(--wine);
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+  }
+
+  .smart-payment-list span {
+    flex-direction: column;
+    gap: 4px;
+    display: flex;
+  }
+
+  .smart-payment-list b {
+    font-size: 12px;
+    color: #31262b;
+  }
+
+  .smart-payment-list small {
+    color: #82777c;
+    font-size: 10px;
+  }
+
+  .smart-payment-list i {
+    color: var(--gold);
+    font-size: 20px;
+    font-style: normal;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+  }
+
+  .smart-cod-note {
+    background: #f8f4f1;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 15px;
+    padding: 14px;
+    display: flex;
+    border-radius: 2px;
+  }
+
+  .smart-cod-note b {
+    font-size: 11px;
+    color: #31262b;
+  }
+
+  .smart-cod-note span {
+    color: #776c71;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .smart-empty {
+    text-align: center;
+    background: #fff;
+    border: 1px solid #eadfd9;
+    width: min(620px, 100% - 40px);
+    margin: 90px auto;
+    padding: 60px 30px;
+  }
+
+  .smart-empty > span {
+    color: var(--gold);
+    font-size: 46px;
+    display: block;
+    line-height: 1;
+  }
+
+  .smart-empty h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 42px;
+    line-height: 1;
+    font-weight: 500;
+    margin: 16px 0 10px;
+    color: #351c28;
+  }
+
+  .smart-empty p {
+    color: #756a6f;
+    line-height: 1.7;
+    max-width: 440px;
+    margin: 0 auto;
+    font-size: 13px;
+  }
+
+  .smart-empty a {
+    background: var(--wine);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    margin-top: 24px;
+    padding: 15px 25px;
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .smart-empty a:hover {
+    background: var(--deep);
+  }
+
+  /* Responsive */
+  @media (max-width: 820px) {
+    .smart-checkout-header {
+      height: 68px;
+      padding: 0 18px;
+    }
+    .smart-checkout-header a.smart-logo-wrap {
+      width: 125px;
+    }
+    .smart-checkout-header span.smart-header-security {
+      font-size: 10px;
+    }
+    .smart-checkout-shell {
+      grid-template-columns: 1fr;
+      width: min(100% - 24px, 680px);
+      margin-bottom: 30px;
+    }
+    .smart-summary {
+      grid-row: 1;
+      padding: 20px;
+      position: static;
+    }
+    .smart-checkout-main {
+      padding: 22px;
+    }
+    .smart-cart-item {
+      grid-template-columns: 105px 1fr;
+      gap: 14px;
+    }
+    .smart-cart-image {
+      height: 112px;
+    }
+    .smart-item-price {
+      text-align: left;
+      grid-column: 2;
+      margin-top: -15px;
+    }
+    .smart-promises, 
+    .smart-form-grid {
+      grid-template-columns: 1fr;
+    }
+    .smart-form-grid label.wide {
+      grid-column: auto;
+    }
+    .smart-title h1 {
+      font-size: 29px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .smart-checkout-header span.smart-header-security {
+      font-size: 0;
+    }
+    .smart-checkout-header span.smart-header-security:after {
+      content: "🔒 Secure";
+      font-size: 10px;
+    }
+    .smart-steps {
+      margin: 18px auto 24px;
+    }
+    .smart-checkout-main {
+      padding: 18px 15px;
+    }
+    .smart-summary {
+      padding: 18px;
+    }
+    .smart-cart-item {
+      grid-template-columns: 92px 1fr;
+    }
+    .smart-cart-image {
+      height: 100px;
+    }
+    .smart-cart-copy h2 {
+      font-size: 21px;
+    }
+    .smart-cart-copy p {
+      font-size: 10px;
+    }
+    .smart-item-actions {
+      margin-top: 11px;
+    }
+    .smart-title {
+      align-items: flex-end;
+    }
+    .smart-title h1 {
+      font-size: 27px;
+    }
+    .smart-title > small {
+      font-size: 9px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="smart-checkout" id="StepCartSection" 
+     data-section-id="{{ section.id }}" 
+     data-hide-header="{{ hide_theme_header }}" 
+     data-hide-footer="{{ hide_theme_footer }}">
+
+  {%- if show_header -%}
+    <header class="smart-checkout-header">
+      <a href="{{ routes.root_url }}" class="smart-logo-wrap" aria-label="{{ shop.name }} home">
+        {%- if logo != blank -%}
+          <img src="{{ logo | image_url: width: 320 }}" 
+               alt="{{ logo.alt | default: shop.name }}" 
+               width="{{ logo_width }}" 
+               height="54" 
+               loading="eager">
+        {%- else -%}
+          <img src="https://riseon-jewels.r-katariya56.chatgpt.site/riseon-logo-trimmed.png" 
+               alt="{{ shop.name | default: 'Riseon Jewels' }}" 
+               width="{{ logo_width }}" 
+               height="54" 
+               loading="eager">
+        {%- endif -%}
+      </a>
+      {%- if show_security_badge -%}
+        <span class="smart-header-security">{{ security_badge_text }}</span>
+      {%- endif -%}
+    </header>
+  {%- endif -%}
+
+  {%- if show_stepper -%}
+    <nav class="smart-steps" aria-label="Checkout progress" id="smart-stepper-nav" {% if cart.item_count == 0 %}style="display: none;"{% endif %}>
+      <button type="button" class="step-btn active" id="step-nav-bag" data-step="bag">
+        <b>1</b>
+        <span>{{ section.settings.step_1_text | default: 'BAG' }}</span>
+      </button>
+      <button type="button" class="step-btn" id="step-nav-delivery" data-step="delivery">
+        <b>2</b>
+        <span>{{ section.settings.step_2_text | default: 'DELIVERY' }}</span>
+      </button>
+      <button type="button" class="step-btn" id="step-nav-payment" data-step="payment">
+        <b>3</b>
+        <span>{{ section.settings.step_3_text | default: 'PAYMENT' }}</span>
+      </button>
+    </nav>
+  {%- endif -%}
+
+  <div class="smart-checkout-shell" id="smart-checkout-shell" {% if cart.item_count == 0 %}style="display: none;"{% endif %}>
+    <section class="smart-checkout-main">
+      
+      <!-- ================= STEP 1: BAG ================= -->
+      <div class="step-panel" id="step-panel-bag" data-panel="bag">
+        <div class="smart-title">
+          <div>
+            <span>{{ section.settings.bag_eyebrow | default: 'YOUR SELECTION' }}</span>
+            <h1>{{ section.settings.bag_title | default: 'Shopping bag' }}</h1>
+          </div>
+          <small id="smart-cart-count-label">{{ cart.item_count }} {% if cart.item_count == 1 %}item{% else %}items{% endif %}</small>
+        </div>
+
+        <div class="smart-cart-items-list" id="smart-cart-items-list">
+          {% for item in cart.items %}
+            {%- liquid
+              assign item_price = item.final_line_price | money
+              if cart.currency.iso_code == 'INR'
+                assign item_price = item_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              endif
+              assign item_orig_price = item.original_line_price | money
+              if cart.currency.iso_code == 'INR'
+                assign item_orig_price = item_orig_price | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+              endif
+            -%}
+            <article class="smart-cart-item" data-item-key="{{ item.key }}">
+              <a href="{{ item.url }}" class="smart-cart-image">
+                {% if item.image %}
+                  <img src="{{ item.image | image_url: width: 300 }}" alt="{{ item.title | escape }}" loading="lazy">
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag }}
+                {% endif %}
+              </a>
+              <div class="smart-cart-copy">
+                <span>{{ section.settings.item_collection_badge | default: 'GOLD · LABORATORY-GROWN DIAMONDS' }}</span>
+                <h2><a href="{{ item.url }}">{{ item.product.title }}</a></h2>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p>{{ item.variant.title | replace: ' / ', ' · ' }}</p>
+                {%- endunless -%}
+                {%- if section.settings.show_sku and item.sku != blank -%}
+                  <small>SKU {{ item.sku }}</small>
+                {%- endif -%}
+                <div class="smart-item-actions">
+                  <label>
+                    Qty 
+                    <select class="smart-qty-select" data-item-key="{{ item.key }}" aria-label="Quantity for {{ item.title }}">
+                      {% for q in (1..10) %}
+                        <option value="{{ q }}" {% if item.quantity == q %}selected{% endif %}>{{ q }}</option>
+                      {% endfor %}
+                      {% if item.quantity > 10 %}
+                        <option value="{{ item.quantity }}" selected>{{ item.quantity }}</option>
+                      {% endif %}
+                    </select>
+                  </label>
+                  <button type="button" class="smart-remove-btn" data-item-key="{{ item.key }}">Remove</button>
+                </div>
+              </div>
+              <div class="smart-item-price">
+                <strong>{{ item_price }}</strong>
+                {%- if item.original_line_price > item.final_line_price -%}
+                  <del>{{ item_orig_price }}</del>
+                {%- endif -%}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+
+        {%- if section.settings.show_promises -%}
+          <div class="smart-promises">
+            {%- if section.settings.promise_1_text != blank -%}
+              <span><b>{{ section.settings.promise_1_icon | default: '✓' }}</b> {{ section.settings.promise_1_text }}</span>
+            {%- endif -%}
+            {%- if section.settings.promise_2_text != blank -%}
+              <span><b>{{ section.settings.promise_2_icon | default: '⌾' }}</b> {{ section.settings.promise_2_text }}</span>
+            {%- endif -%}
+            {%- if section.settings.promise_3_text != blank -%}
+              <span><b>{{ section.settings.promise_3_icon | default: '↺' }}</b> {{ section.settings.promise_3_text }}</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_coupon -%}
+          <form class="smart-code" onsubmit="return false;">
+            <label for="cart-code">{{ section.settings.coupon_title | default: 'Referral or coupon code' }}</label>
+            <div>
+              <input id="cart-code" 
+                     placeholder="{{ section.settings.coupon_placeholder | default: 'Enter code' }}" 
+                     autocomplete="off" 
+                     value="{%- for app in cart.discount_applications -%}{{ app.title | escape }}{% break %}{%- endfor -%}">
+              <button type="button" id="cart-code-btn">{{ section.settings.coupon_button_text | default: 'Apply' }}</button>
+            </div>
+            <small id="smart-code-msg" style="display: none;"></small>
+          </form>
+        {%- endif -%}
+      </div>
+
+      <!-- ================= STEP 2: DELIVERY ================= -->
+      <form class="step-panel" id="step-panel-delivery" data-panel="delivery" style="display: none;" onsubmit="return false;">
+        <div class="smart-title">
+          <div>
+            <span>{{ section.settings.delivery_eyebrow | default: 'GUEST CHECKOUT' }}</span>
+            <h1>{{ section.settings.delivery_title | default: 'Contact & delivery' }}</h1>
+          </div>
+          <small>{{ section.settings.delivery_badge | default: 'No account required' }}</small>
+        </div>
+
+        <div class="smart-form-grid">
+          <label class="wide">
+            Full name*
+            <input type="text" id="del-name" name="name" required autocomplete="name" placeholder="Full name">
+          </label>
+          <label>
+            Mobile number*
+            <input type="tel" id="del-mobile" name="mobile" required autocomplete="tel" placeholder="10-digit number" maxlength="10" inputmode="numeric">
+          </label>
+          <label>
+            Email for invoice
+            <input type="email" id="del-email" name="email" autocomplete="email" placeholder="Email address">
+          </label>
+          <label>
+            Pincode*
+            <input type="text" id="del-pincode" name="pincode" required autocomplete="postal-code" placeholder="6-digit pincode" maxlength="6" inputmode="numeric">
+          </label>
+          <label class="wide">
+            Flat, house or building*
+            <input type="text" id="del-address" name="address" required autocomplete="street-address" placeholder="Flat, house no., building">
+          </label>
+          <label class="wide">
+            Area / locality
+            <input type="text" id="del-locality" name="locality" placeholder="Area / locality">
+          </label>
+          <label>
+            City*
+            <input type="text" id="del-city" name="city" required autocomplete="address-level2" placeholder="City">
+          </label>
+          <label>
+            State*
+            <input type="text" id="del-state" name="state" required autocomplete="address-level1" placeholder="State">
+          </label>
+        </div>
+
+        <label class="smart-check">
+          <input type="checkbox" id="del-same-billing" checked> Billing address is the same
+        </label>
+
+        <p class="smart-alert" id="del-alert" role="alert" style="display: none;"></p>
+        
+        <button class="smart-primary" type="button" id="btn-continue-payment">Continue to payment</button>
+        <button class="smart-back" type="button" id="btn-back-to-bag">← Back to bag</button>
+      </form>
+
+      <!-- ================= STEP 3: PAYMENT ================= -->
+      <section class="step-panel" id="step-panel-payment" data-panel="payment" style="display: none;">
+        <div class="smart-title">
+          <div>
+            <span>{{ section.settings.payment_eyebrow | default: 'SECURE PAYMENT' }}</span>
+            <h1>{{ section.settings.payment_title | default: 'Choose payment method' }}</h1>
+          </div>
+          <small>{{ section.settings.payment_badge | default: 'Powered by authorised gateway' }}</small>
+        </div>
+
+        <div class="smart-payment-list">
+          <label class="active">
+            <input type="radio" name="payment_method" value="UPI" checked>
+            <span>
+              <b>UPI</b>
+              <small>Google Pay, PhonePe, Paytm or any UPI app</small>
+            </span>
+            <i>›</i>
+          </label>
+          <label>
+            <input type="radio" name="payment_method" value="Credit / Debit Card">
+            <span>
+              <b>Credit / Debit Card</b>
+              <small>Visa, Mastercard and RuPay</small>
+            </span>
+            <i>›</i>
+          </label>
+          <label>
+            <input type="radio" name="payment_method" value="Net Banking">
+            <span>
+              <b>Net Banking</b>
+              <small>All supported Indian banks</small>
+            </span>
+            <i>›</i>
+          </label>
+          <label>
+            <input type="radio" name="payment_method" value="EMI">
+            <span>
+              <b>EMI</b>
+              <small>Eligibility and tenure shown by the payment provider</small>
+            </span>
+            <i>›</i>
+          </label>
+        </div>
+
+        {%- if section.settings.show_cod -%}
+          <div class="smart-cod-note">
+            <b>{{ section.settings.cod_title | default: 'Cash on Delivery' }}</b>
+            <span>{{ section.settings.cod_text | default: 'Shown only after pincode and order eligibility are verified.' }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- liquid
+          assign cart_total_formatted = cart.total_price | money
+          if cart.currency.iso_code == 'INR'
+            assign cart_total_formatted = cart_total_formatted | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+          endif
+        -%}
+        <button class="smart-primary" type="button" id="btn-proceed-secure-payment">
+          Proceed to secure payment · <span class="smart-btn-total">{{ cart_total_formatted }}</span>
+        </button>
+
+        <p class="smart-alert" id="pay-alert" role="status" style="display: none;"></p>
+        
+        <button class="smart-back" type="button" id="btn-back-to-delivery">← Edit delivery details</button>
+      </section>
+
+    </section>
+
+    <!-- ================= RIGHT COLUMN: ORDER SUMMARY ================= -->
+    <aside class="smart-summary" id="smart-order-summary">
+      <h2>{{ section.settings.summary_title | default: 'Order summary' }}</h2>
+      
+      {%- liquid
+        assign cart_subtotal = cart.total_price | money
+        if cart.currency.iso_code == 'INR'
+          assign cart_subtotal = cart_subtotal | replace: 'Rs.', '₹' | replace: 'Rs', '₹'
+        endif
+      -%}
+      <div>
+        <span>Product total</span>
+        <b class="smart-summary-subtotal">{{ cart_subtotal }}</b>
+      </div>
+
+      {%- if section.settings.show_gst -%}
+        <div>
+          <span>{{ section.settings.gst_label | default: 'GST' }}</span>
+          <b class="smart-summary-gst">{{ section.settings.gst_value | default: '₹0' }}</b>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_insured_delivery -%}
+        <div>
+          <span>{{ section.settings.insured_delivery_label | default: 'Insured delivery' }}</span>
+          <b class="free">{{ section.settings.insured_delivery_value | default: 'FREE' }}</b>
+        </div>
+      {%- endif -%}
+
+      <div class="smart-total">
+        <span>
+          Total payable
+          <small>{{ section.settings.total_tax_note | default: 'Inclusive of all taxes' }}</small>
+        </span>
+        <strong class="smart-summary-total">{{ cart_subtotal }}</strong>
+      </div>
+
+      <!-- Action Button on Step 1 -->
+      <button class="smart-primary" type="button" id="btn-summary-checkout">
+        {{ section.settings.checkout_btn_text | default: 'SECURE CHECKOUT' }}
+      </button>
+
+      {%- if section.settings.show_security_note -%}
+        <p class="smart-security">
+          {{ section.settings.security_note | default: '▣ Payments are processed by an authorised provider. Riseon does not store your card number, CVV or UPI PIN.' }}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.show_help -%}
+        <div class="smart-help">
+          <b>{{ section.settings.help_title | default: 'Need help before ordering?' }}</b>
+          {% if section.settings.help_number != blank %}
+            <a href="tel:{{ section.settings.help_number | escape }}">{{ section.settings.help_phone | default: 'Call 7359215333' }}</a>
+          {% else %}
+            <span>{{ section.settings.help_phone | default: 'Call 7359215333' }}</span>
+          {% endif %}
+        </div>
+      {%- endif -%}
+    </aside>
+  </div>
+
+  <!-- ================= EMPTY BAG STATE ================= -->
+  <section class="smart-empty" id="smart-empty-bag" {% if cart.item_count > 0 %}style="display: none;"{% endif %}>
+    <span>◇</span>
+    <h1>Your bag is empty</h1>
+    <p>Explore lightweight gold and laboratory-grown diamond jewellery designed for everyday wear.</p>
+    <a href="{{ routes.all_products_collection_url | default: '/collections/all' }}">Continue shopping</a>
+  </section>
+
+</div>
+
+<script>
+(function() {
+  function formatRupees(cents) {
+    var rupees = Math.round(cents / 100);
+    return '₹' + rupees.toLocaleString('en-IN');
+  }
+
+  var currentStep = 'bag';
+  var deliveryInfo = {
+    name: '',
+    mobile: '',
+    email: '',
+    pincode: '',
+    address: '',
+    locality: '',
+    city: '',
+    state: ''
+  };
+
+  // Restore saved delivery info from localStorage if available
+  try {
+    var savedInfo = localStorage.getItem('riseon_delivery_info');
+    if (savedInfo) {
+      deliveryInfo = Object.assign(deliveryInfo, JSON.parse(savedInfo));
+      if (document.getElementById('del-name')) document.getElementById('del-name').value = deliveryInfo.name || '';
+      if (document.getElementById('del-mobile')) document.getElementById('del-mobile').value = deliveryInfo.mobile || '';
+      if (document.getElementById('del-email')) document.getElementById('del-email').value = deliveryInfo.email || '';
+      if (document.getElementById('del-pincode')) document.getElementById('del-pincode').value = deliveryInfo.pincode || '';
+      if (document.getElementById('del-address')) document.getElementById('del-address').value = deliveryInfo.address || '';
+      if (document.getElementById('del-locality')) document.getElementById('del-locality').value = deliveryInfo.locality || '';
+      if (document.getElementById('del-city')) document.getElementById('del-city').value = deliveryInfo.city || '';
+      if (document.getElementById('del-state')) document.getElementById('del-state').value = deliveryInfo.state || '';
+    }
+  } catch(e) {}
+
+  // Check URL params for step
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('step') === 'delivery') {
+    setStep('delivery');
+  } else if (urlParams.get('step') === 'payment') {
+    setStep('payment');
+  }
+
+  function setStep(step) {
+    currentStep = step;
+    
+    // Hide all panels
+    var panels = document.querySelectorAll('.step-panel');
+    panels.forEach(function(p) { p.style.display = 'none'; });
+
+    // Show target panel
+    var activePanel = document.getElementById('step-panel-' + step);
+    if (activePanel) activePanel.style.display = 'block';
+
+    // Summary button visibility (shown on bag, hidden on delivery/payment)
+    var summaryBtn = document.getElementById('btn-summary-checkout');
+    if (summaryBtn) {
+      summaryBtn.style.display = (step === 'bag') ? 'inline-flex' : 'none';
+    }
+
+    // Update stepper classes
+    var btnBag = document.getElementById('step-nav-bag');
+    var btnDel = document.getElementById('step-nav-delivery');
+    var btnPay = document.getElementById('step-nav-payment');
+
+    if (btnBag) btnBag.className = 'step-btn' + (step === 'bag' ? ' active' : ' done');
+    if (btnDel) btnDel.className = 'step-btn' + (step === 'delivery' ? ' active' : (step === 'payment' ? ' done' : ''));
+    if (btnPay) btnPay.className = 'step-btn' + (step === 'payment' ? ' active' : '');
+
+    // Scroll to section top smoothly
+    var sec = document.getElementById('StepCartSection');
+    if (sec) {
+      window.scrollTo({
+        top: sec.offsetTop,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  // Stepper buttons click
+  var navBag = document.getElementById('step-nav-bag');
+  if (navBag) {
+    navBag.addEventListener('click', function() {
+      setStep('bag');
+    });
+  }
+  var navDel = document.getElementById('step-nav-delivery');
+  if (navDel) {
+    navDel.addEventListener('click', function() {
+      if (validateDelivery(false)) {
+        setStep('delivery');
+      } else {
+        setStep('delivery');
+      }
+    });
+  }
+  var navPay = document.getElementById('step-nav-payment');
+  if (navPay) {
+    navPay.addEventListener('click', function() {
+      if (validateDelivery(true)) {
+        setStep('payment');
+      }
+    });
+  }
+
+  // "Secure checkout" button in summary
+  var summaryCheckoutBtn = document.getElementById('btn-summary-checkout');
+  if (summaryCheckoutBtn) {
+    summaryCheckoutBtn.addEventListener('click', function() {
+      setStep('delivery');
+    });
+  }
+
+  // "Back to bag" button
+  var backToBagBtn = document.getElementById('btn-back-to-bag');
+  if (backToBagBtn) {
+    backToBagBtn.addEventListener('click', function() {
+      setStep('bag');
+    });
+  }
+
+  // "Back to delivery" button
+  var backToDeliveryBtn = document.getElementById('btn-back-to-delivery');
+  if (backToDeliveryBtn) {
+    backToDeliveryBtn.addEventListener('click', function() {
+      setStep('delivery');
+    });
+  }
+
+  // Validation function
+  function validateDelivery(showError) {
+    var name = (document.getElementById('del-name')?.value || '').trim();
+    var mobile = (document.getElementById('del-mobile')?.value || '').trim();
+    var email = (document.getElementById('del-email')?.value || '').trim();
+    var pincode = (document.getElementById('del-pincode')?.value || '').trim();
+    var address = (document.getElementById('del-address')?.value || '').trim();
+    var locality = (document.getElementById('del-locality')?.value || '').trim();
+    var city = (document.getElementById('del-city')?.value || '').trim();
+    var state = (document.getElementById('del-state')?.value || '').trim();
+
+    var isValid = name.length >= 3 && 
+                  /^\d{10}$/.test(mobile) && 
+                  /^\d{6}$/.test(pincode) && 
+                  address.length >= 5 && 
+                  city.length >= 2 && 
+                  state.length >= 2;
+
+    var alertEl = document.getElementById('del-alert');
+    if (!isValid) {
+      if (showError && alertEl) {
+        alertEl.textContent = 'Please complete the required delivery fields.';
+        alertEl.style.display = 'block';
+      }
+      return false;
+    }
+
+    if (alertEl) alertEl.style.display = 'none';
+
+    deliveryInfo = {
+      name: name,
+      mobile: mobile,
+      email: email,
+      pincode: pincode,
+      address: address,
+      locality: locality,
+      city: city,
+      state: state
+    };
+
+    try {
+      localStorage.setItem('riseon_delivery_info', JSON.stringify(deliveryInfo));
+    } catch(e) {}
+
+    return true;
+  }
+
+  // Continue to Payment button
+  var continuePayBtn = document.getElementById('btn-continue-payment');
+  if (continuePayBtn) {
+    continuePayBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (validateDelivery(true)) {
+        setStep('payment');
+      }
+    });
+  }
+
+  // Payment radio option change
+  var paymentLabels = document.querySelectorAll('.smart-payment-list label');
+  paymentLabels.forEach(function(lbl) {
+    lbl.addEventListener('click', function() {
+      paymentLabels.forEach(function(l) { l.classList.remove('active'); });
+      lbl.classList.add('active');
+      var r = lbl.querySelector('input[type="radio"]');
+      if (r) r.checked = true;
+    });
+  });
+
+  // Proceed to secure payment
+  var proceedPaymentBtn = document.getElementById('btn-proceed-secure-payment');
+  if (proceedPaymentBtn) {
+    proceedPaymentBtn.addEventListener('click', function() {
+      if (!validateDelivery(true)) {
+        setStep('delivery');
+        return;
+      }
+
+      var selectedMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'UPI';
+      var couponVal = (document.getElementById('cart-code')?.value || '').trim();
+
+      proceedPaymentBtn.textContent = 'Securing checkout...';
+      proceedPaymentBtn.style.opacity = '0.7';
+      proceedPaymentBtn.disabled = true;
+
+      // Update cart attributes with all collected delivery & payment details
+      var payload = {
+        attributes: {
+          'Full Name': deliveryInfo.name,
+          'Mobile Number': deliveryInfo.mobile,
+          'Email': deliveryInfo.email,
+          'Delivery Address': deliveryInfo.address + (deliveryInfo.locality ? ', ' + deliveryInfo.locality : '') + ', ' + deliveryInfo.city + ', ' + deliveryInfo.state + ' - ' + deliveryInfo.pincode,
+          'City': deliveryInfo.city,
+          'State': deliveryInfo.state,
+          'Pincode': deliveryInfo.pincode,
+          'Payment Option': selectedMethod,
+          'Discount Code': couponVal
+        },
+        note: 'Customer: ' + deliveryInfo.name + ' (' + deliveryInfo.mobile + ') | Address: ' + deliveryInfo.address + (deliveryInfo.locality ? ', ' + deliveryInfo.locality : '') + ', ' + deliveryInfo.city + ', ' + deliveryInfo.state + ' - ' + deliveryInfo.pincode + ' | Selected Method: ' + selectedMethod
+      };
+
+      fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function() {
+        var checkoutUrl = '/checkout';
+        if (couponVal) {
+          checkoutUrl += '?discount=' + encodeURIComponent(couponVal);
+        }
+        window.location.href = checkoutUrl;
+      })
+      .catch(function() {
+        window.location.href = '/checkout';
+      });
+    });
+  }
+
+  // Coupon code apply
+  var couponBtn = document.getElementById('cart-code-btn');
+  var couponInput = document.getElementById('cart-code');
+  var couponMsg = document.getElementById('smart-code-msg');
+
+  if (couponBtn && couponInput) {
+    couponBtn.addEventListener('click', function() {
+      var code = couponInput.value.trim();
+      if (!code) {
+        if (couponMsg) {
+          couponMsg.textContent = 'Enter a referral or coupon code.';
+          couponMsg.style.display = 'block';
+        }
+        return;
+      }
+      couponBtn.textContent = 'Applying...';
+      
+      // Store in cart attribute and notify user
+      fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          attributes: { 'Discount Code': code }
+        })
+      }).then(function() {
+        couponBtn.textContent = 'Apply';
+        if (couponMsg) {
+          couponMsg.textContent = 'Code ' + code + ' saved. Eligibility will be verified before payment.';
+          couponMsg.style.display = 'block';
+        }
+      }).catch(function() {
+        couponBtn.textContent = 'Apply';
+        if (couponMsg) {
+          couponMsg.textContent = 'Code saved. Eligibility will be verified at checkout.';
+          couponMsg.style.display = 'block';
+        }
+      });
+    });
+  }
+
+  // Quantity dropdowns
+  var qtySelects = document.querySelectorAll('.smart-qty-select');
+  qtySelects.forEach(function(select) {
+    select.addEventListener('change', function() {
+      var itemKey = select.getAttribute('data-item-key');
+      var newQty = parseInt(select.value, 10);
+      updateLineItem(itemKey, newQty);
+    });
+  });
+
+  // Remove buttons
+  var removeBtns = document.querySelectorAll('.smart-remove-btn');
+  removeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var itemKey = btn.getAttribute('data-item-key');
+      updateLineItem(itemKey, 0);
+    });
+  });
+
+  function updateLineItem(itemKey, quantity) {
+    // Show loading state
+    var itemRow = document.querySelector('.smart-cart-item[data-item-key="' + itemKey + '"]');
+    if (itemRow) itemRow.style.opacity = '0.5';
+
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: itemKey,
+        quantity: quantity
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(cart) {
+      if (cart.item_count === 0) {
+        var shell = document.getElementById('smart-checkout-shell');
+        var stepper = document.getElementById('smart-stepper-nav');
+        var emptyBag = document.getElementById('smart-empty-bag');
+        if (shell) shell.style.display = 'none';
+        if (stepper) stepper.style.display = 'none';
+        if (emptyBag) emptyBag.style.display = 'block';
+        return;
+      }
+
+      // If removed item, remove row
+      if (quantity === 0 && itemRow) {
+        itemRow.remove();
+      }
+
+      // Update count label
+      var countLabel = document.getElementById('smart-cart-count-label');
+      if (countLabel) {
+        countLabel.textContent = cart.item_count + (cart.item_count === 1 ? ' item' : ' items');
+      }
+
+      // Update subtotal & total
+      var formattedTotal = formatRupees(cart.total_price);
+      document.querySelectorAll('.smart-summary-subtotal, .smart-summary-total, .smart-btn-total').forEach(function(el) {
+        el.textContent = formattedTotal;
+      });
+
+      // Update line price
+      if (quantity > 0) {
+        var updatedItem = cart.items.find(function(it) { return it.key === itemKey; });
+        if (updatedItem && itemRow) {
+          var priceEl = itemRow.querySelector('.smart-item-price strong');
+          if (priceEl) priceEl.textContent = formatRupees(updatedItem.final_line_price);
+          itemRow.style.opacity = '1';
+        }
+      }
+
+      // Dispatch theme event
+      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart: cart } }));
+    })
+    .catch(function(err) {
+      if (itemRow) itemRow.style.opacity = '1';
+    });
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Step Checkout Cart",
+  "tag": "section",
+  "class": "step-cart-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page & Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_theme_header",
+      "label": "Hide Store Main Header on Cart",
+      "default": true,
+      "info": "Gives a distraction-free checkout experience matching the reference site"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_theme_footer",
+      "label": "Hide Store Footer on Cart",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Header Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "Show Header Bar",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 260,
+      "step": 4,
+      "unit": "px",
+      "label": "Logo Width",
+      "default": 156
+    },
+    {
+      "type": "checkbox",
+      "id": "show_security_badge",
+      "label": "Show Security Badge in Header",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "security_badge_text",
+      "label": "Security Badge Text",
+      "default": "🔒 100% secure checkout"
+    },
+    {
+      "type": "header",
+      "content": "Step Progress Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stepper",
+      "label": "Show Stepper Navigation",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "step_1_text",
+      "label": "Step 1 Label",
+      "default": "BAG"
+    },
+    {
+      "type": "text",
+      "id": "step_2_text",
+      "label": "Step 2 Label",
+      "default": "DELIVERY"
+    },
+    {
+      "type": "text",
+      "id": "step_3_text",
+      "label": "Step 3 Label",
+      "default": "PAYMENT"
+    },
+    {
+      "type": "header",
+      "content": "Step 1: Bag Details"
+    },
+    {
+      "type": "text",
+      "id": "bag_eyebrow",
+      "label": "Eyebrow Text",
+      "default": "YOUR SELECTION"
+    },
+    {
+      "type": "text",
+      "id": "bag_title",
+      "label": "Bag Title",
+      "default": "Shopping bag"
+    },
+    {
+      "type": "text",
+      "id": "item_collection_badge",
+      "label": "Product Tagline Subtitle",
+      "default": "GOLD · LABORATORY-GROWN DIAMONDS"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "label": "Show SKU",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Trust & Promises"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promises",
+      "label": "Show 3 Trust Badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "promise_1_icon",
+      "label": "Badge 1 Icon",
+      "default": "✓"
+    },
+    {
+      "type": "text",
+      "id": "promise_1_text",
+      "label": "Badge 1 Text",
+      "default": "Certified & hallmarked"
+    },
+    {
+      "type": "text",
+      "id": "promise_2_icon",
+      "label": "Badge 2 Icon",
+      "default": "⌾"
+    },
+    {
+      "type": "text",
+      "id": "promise_2_text",
+      "label": "Badge 2 Text",
+      "default": "Free insured delivery"
+    },
+    {
+      "type": "text",
+      "id": "promise_3_icon",
+      "label": "Badge 3 Icon",
+      "default": "↺"
+    },
+    {
+      "type": "text",
+      "id": "promise_3_text",
+      "label": "Badge 3 Text",
+      "default": "15-day easy return"
+    },
+    {
+      "type": "header",
+      "content": "Coupon Code Box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_coupon",
+      "label": "Show Coupon Code Input",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "coupon_title",
+      "label": "Coupon Label",
+      "default": "Referral or coupon code"
+    },
+    {
+      "type": "text",
+      "id": "coupon_placeholder",
+      "label": "Coupon Placeholder",
+      "default": "Enter code"
+    },
+    {
+      "type": "text",
+      "id": "coupon_button_text",
+      "label": "Coupon Button Text",
+      "default": "Apply"
+    },
+    {
+      "type": "header",
+      "content": "Step 2: Delivery Details"
+    },
+    {
+      "type": "text",
+      "id": "delivery_eyebrow",
+      "label": "Delivery Eyebrow",
+      "default": "GUEST CHECKOUT"
+    },
+    {
+      "type": "text",
+      "id": "delivery_title",
+      "label": "Delivery Title",
+      "default": "Contact & delivery"
+    },
+    {
+      "type": "text",
+      "id": "delivery_badge",
+      "label": "Delivery Badge",
+      "default": "No account required"
+    },
+    {
+      "type": "header",
+      "content": "Step 3: Payment Details"
+    },
+    {
+      "type": "text",
+      "id": "payment_eyebrow",
+      "label": "Payment Eyebrow",
+      "default": "SECURE PAYMENT"
+    },
+    {
+      "type": "text",
+      "id": "payment_title",
+      "label": "Payment Title",
+      "default": "Choose payment method"
+    },
+    {
+      "type": "text",
+      "id": "payment_badge",
+      "label": "Payment Gateway Badge",
+      "default": "Powered by authorised gateway"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cod",
+      "label": "Show Cash on Delivery Note",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cod_title",
+      "label": "COD Note Title",
+      "default": "Cash on Delivery"
+    },
+    {
+      "type": "text",
+      "id": "cod_text",
+      "label": "COD Note Description",
+      "default": "Shown only after pincode and order eligibility are verified."
+    },
+    {
+      "type": "header",
+      "content": "Order Summary Sidebar"
+    },
+    {
+      "type": "text",
+      "id": "summary_title",
+      "label": "Summary Title",
+      "default": "Order summary"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gst",
+      "label": "Show GST Row",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "gst_label",
+      "label": "GST Label",
+      "default": "GST"
+    },
+    {
+      "type": "text",
+      "id": "gst_value",
+      "label": "GST Display Value",
+      "default": "₹0"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_insured_delivery",
+      "label": "Show Insured Delivery Row",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "insured_delivery_label",
+      "label": "Insured Delivery Label",
+      "default": "Insured delivery"
+    },
+    {
+      "type": "text",
+      "id": "insured_delivery_value",
+      "label": "Insured Delivery Value",
+      "default": "FREE"
+    },
+    {
+      "type": "text",
+      "id": "total_tax_note",
+      "label": "Tax Note Under Total",
+      "default": "Inclusive of all taxes"
+    },
+    {
+      "type": "text",
+      "id": "checkout_btn_text",
+      "label": "Bag Step Checkout Button Text",
+      "default": "SECURE CHECKOUT"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_security_note",
+      "label": "Show Gateway Security Note",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "security_note",
+      "label": "Security Note Text",
+      "default": "▣ Payments are processed by an authorised provider. Riseon does not store your card number, CVV or UPI PIN."
+    },
+    {
+      "type": "header",
+      "content": "Need Help Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help",
+      "label": "Show Help Block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "help_title",
+      "label": "Help Title",
+      "default": "Need help before ordering?"
+    },
+    {
+      "type": "text",
+      "id": "help_phone",
+      "label": "Help Phone Display",
+      "default": "Call 7359215333"
+    },
+    {
+      "type": "text",
+      "id": "help_number",
+      "label": "Help Phone Number (digits only)",
+      "default": "7359215333"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Step Checkout Cart"
+    }
+  ]
+}
+{% endschema %}
