@@ -1011,9 +1011,8 @@ a.product-feature-item:hover {
                 {% endunless %}
               </div>
 
-
             {% when 'quantity' %}
-              <div class="qty-wrapper" {{ block.shopify_attributes }}>
+              <div class="product-quantity-only-wrapper" {{ block.shopify_attributes }}>
                 {% render 'quantity-input', 
                     value: 1, 
                     min: 1,
@@ -1023,12 +1022,68 @@ a.product-feature-item:hover {
                 %}
               </div>
 
+            {% when 'add_to_cart' %}
+              {% assign layout_mode = block.settings.button_layout | default: 'full' %}
+              {% assign cart_btn_text = block.settings.button_text %}
+              {% if cart_btn_text == blank %}
+                {% assign cart_btn_text = 'Add to Cart' %}
+              {% endif %}
+
+              <div class="product-add-to-cart-block layout-{{ layout_mode }}" {{ block.shopify_attributes }}>
+                {% if layout_mode == 'with_quantity' %}
+                  <div class="qty-half">
+                    {% render 'quantity-input', 
+                        value: 1, 
+                        min: 1,
+                        data_attributes: 'data-quantity-selector-input',
+                        minus_attributes: 'data-quantity-decrease aria-label="Decrease quantity"',
+                        plus_attributes: 'data-quantity-increase aria-label="Increase quantity"'
+                    %}
+                  </div>
+                  <div class="cart-half">
+                    {% render 'add-to-cart-button',
+                      product: product,
+                      class: 'primary-btn add-to-cart-btn-main',
+                      text: cart_btn_text
+                    %}
+                  </div>
+                {% elsif layout_mode == 'with_buynow' %}
+                  <div class="cart-half">
+                    {% render 'add-to-cart-button',
+                      product: product,
+                      class: 'primary-btn add-to-cart-btn-main',
+                      text: cart_btn_text
+                    %}
+                  </div>
+                  <div class="buynow-half">
+                    {{ form | payment_button }}
+                  </div>
+                {% else %}
+                  <div class="cart-full">
+                    {% render 'add-to-cart-button',
+                      product: product,
+                      class: 'primary-btn add-to-cart-btn-main',
+                      text: cart_btn_text
+                    %}
+                  </div>
+                {% endif %}
+              </div>
+
+            {% when 'buy_now' %}
+              <div class="product-buy-now-block" {{ block.shopify_attributes }}>
+                {{ form | payment_button }}
+              </div>
+
             {% when 'buttons' %}
+              {% assign legacy_btn_text = block.settings.add_to_cart_text %}
+              {% if legacy_btn_text == blank %}
+                {% assign legacy_btn_text = 'Add to Cart' %}
+              {% endif %}
               <div class="button_area" {{ block.shopify_attributes }}>
                 {% render 'add-to-cart-button',
                   product: product,
                   class: 'primary-btn add-to-cart-btn-main',
-                  text: block.settings.add_to_cart_text | default: 'Add to Cart'
+                  text: legacy_btn_text
                 %}
                 {% if block.settings.show_buy_now %}
                   <div class="buy-now-wrapper">
@@ -2205,6 +2260,36 @@ document.addEventListener('DOMContentLoaded', function () {
     },
         { "type": "quantity", "name": "Quantity Selector", "limit": 1 },
         {
+          "type": "add_to_cart",
+          "name": "Add to Cart Button",
+          "limit": 1,
+          "settings": [
+            {
+              "type": "select",
+              "id": "button_layout",
+              "label": "Button Layout",
+              "options": [
+                { "value": "full", "label": "Full Width (100%)" },
+                { "value": "with_quantity", "label": "With Quantity Selector (50% - 50%)" },
+                { "value": "with_buynow", "label": "With Buy Now Button (50% - 50%)" }
+              ],
+              "default": "full"
+            },
+            {
+              "type": "text",
+              "id": "button_text",
+              "label": "Button Text",
+              "default": "Add to Cart"
+            }
+          ]
+        },
+        {
+          "type": "buy_now",
+          "name": "Buy Now Button",
+          "limit": 1,
+          "settings": []
+        },
+        {
           "type": "buttons",
           "name": "Add to Cart / Buy Now",
           "limit": 1,
@@ -2495,7 +2580,8 @@ document.addEventListener('DOMContentLoaded', function () {
       { "type": "price" },
       { "type": "variants" },
       { "type": "quantity" },
-      { "type": "buttons" },
+      { "type": "add_to_cart" },
+      { "type": "buy_now" },
       { "type": "description" },
       { "type": "certification" }
     ]

@@ -46,12 +46,16 @@
           "type": "quantity",
           "settings": {}
         },
-        "buttons_kGV7rz": {
-          "type": "buttons",
+        "add_to_cart_main": {
+          "type": "add_to_cart",
           "settings": {
-            "add_to_cart_text": "Add to Cart",
-            "show_buy_now": true
+            "button_layout": "full",
+            "button_text": "Add to Cart"
           }
+        },
+        "buy_now_main": {
+          "type": "buy_now",
+          "settings": {}
         },
         "wishlist_W3TJVM": {
           "type": "wishlist",
@@ -119,7 +123,8 @@
         "price_7LGG6E",
         "variants_q4KYwa",
         "quantity_TgVz7g",
-        "buttons_kGV7rz",
+        "add_to_cart_main",
+        "buy_now_main",
         "wishlist_W3TJVM",
         "custom_buttons_WUmtRG",
         "description_WBReTj",
