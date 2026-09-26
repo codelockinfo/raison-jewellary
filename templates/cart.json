@@ -1,1 +1,25 @@
-{"sections":{"main":{"type":"cart","settings":{"cart_design":"design_1","show_trust_boxes":true,"show_sidebar_info":true,"show_cart_recommendations":true}}},"order":["main"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "cart",
+      "settings": {
+        "cart_design": "design_1",
+        "show_trust_boxes": false,
+        "show_sidebar_info": false,
+        "show_cart_recommendations": false
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
