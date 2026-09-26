@@ -36,7 +36,11 @@
         },
         "variants_q4KYwa": {
           "type": "variants",
-          "settings": {}
+          "settings": {
+            "selected_text_template": "Selected: [purity] [color] Gold · Bracelet length [length]",
+            "available_badge_text": "Available",
+            "pending_badge_text": "Pending"
+          }
         },
         "quantity_TgVz7g": {
           "type": "quantity",
@@ -93,6 +97,19 @@
             "icon_3": "shopify://shop_images/test.png",
             "text_3": "4X Lab Tested"
           }
+        },
+        "certification_cert89": {
+          "type": "certification",
+          "settings": {
+            "heading": "CERTIFICATION & HALLMARKING",
+            "subtext": "Report details will be linked to the final SKU",
+            "title_1": "IGI Grading",
+            "subtext_1": "Diamond report, as applicable",
+            "title_2": "SGL Grading",
+            "subtext_2": "Shown only when supplied",
+            "title_3": "BIS Hallmark",
+            "subtext_3": "Hallmarked gold jewellery"
+          }
         }
       },
       "block_order": [
@@ -108,7 +125,8 @@
         "description_WBReTj",
         "collapsible_tab_486JPD",
         "collapsible_tab_bDXQ7r",
-        "icon_text_row_NxTLzG"
+        "icon_text_row_NxTLzG",
+        "certification_cert89"
       ],
       "settings": {
         "show_breadcrumbs": true,
@@ -121,6 +139,72 @@
         "enable_cursor_zoom": false,
         "show_thumbnails": true,
         "thumbnail_layout": "bottom"
+      }
+    },
+    "product_specifications": {
+      "type": "product-specifications",
+      "blocks": {
+        "spec_product_details": {
+          "type": "spec_group",
+          "settings": {
+            "title": "Product details",
+            "label_1": "Product type",
+            "value_1": "Bracelet",
+            "label_2": "Collection",
+            "value_2": "Everyday Edit",
+            "label_3": "Product code",
+            "value_3": "",
+            "label_4": "Setting",
+            "value_4": "Final SKU detail pending"
+          }
+        },
+        "spec_weight_purity": {
+          "type": "spec_group",
+          "settings": {
+            "title": "Weight & purity",
+            "label_1": "Gold purity",
+            "value_1": "14K",
+            "label_2": "Gold colour",
+            "value_2": "Rose",
+            "label_3": "Net gold weight",
+            "value_3": "Final SKU detail pending",
+            "label_4": "Bracelet length",
+            "value_4": "7 in"
+          }
+        },
+        "spec_diamond_gemstone": {
+          "type": "spec_group",
+          "settings": {
+            "title": "Diamond & gemstone",
+            "label_1": "Diamond type",
+            "value_1": "Lab-grown",
+            "label_2": "Total weight",
+            "value_2": "Final SKU detail pending",
+            "label_3": "Colour / clarity",
+            "value_3": "Final SKU detail pending",
+            "label_4": "Shape / gemstone",
+            "value_4": "Final SKU detail pending"
+          }
+        },
+        "spec_price_breakup": {
+          "type": "price_breakup",
+          "settings": {
+            "title": "Price breakup",
+            "description": "<p>Gold, diamond, making and GST components will be displayed here when the approved SKU data is synced.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "spec_product_details",
+        "spec_weight_purity",
+        "spec_diamond_gemstone",
+        "spec_price_breakup"
+      ],
+      "settings": {
+        "heading": "PRODUCT INFORMATION",
+        "show_sku": true,
+        "sku_override": "",
+        "disclaimer_note": "*Estimated or catalogue values. Final invoice, actual metal weight, report partner, certificate number, BIS hallmark and HUID must match the exact shipped SKU."
       }
     },
     "product_recomand_PQTk8c": {
@@ -144,6 +228,7 @@
   },
   "order": [
     "main",
+    "product_specifications",
     "product_recomand_PQTk8c"
   ]
 }

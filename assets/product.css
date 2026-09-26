@@ -25,7 +25,7 @@
   margin: auto;
   padding: 20px 30px;
   display: flex;
-  gap: 50px;
+  gap: 30px;
   align-items: flex-start;
 }
 
@@ -34,10 +34,10 @@
 }
 
 .product-gallery {
-  width: 40%;
+  width: 55%;
 }
 .product-details-info {
-  width: 50%;
+  width: 45%;
 }
 
 .product-item-img,
@@ -117,6 +117,7 @@
 
 .product-gallery.thumbnail-layout-left {
   display: flex;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
@@ -131,7 +132,7 @@
 
 .product-gallery.thumbnail-layout-left .product-media-slider {
   flex: 1;
-  min-width: 0;
+  min-width: calc(100% - 85px);
 }
 
 .product-gallery.thumbnail-layout-left .thumbnails::-webkit-scrollbar {
@@ -152,73 +153,256 @@
   margin-bottom: 20px;
 }
 
+/* ========================================================
+   RISEON LUXURY JEWELLERY - VARIANT SELECTOR STYLES
+   ======================================================== */
+.product-variants-wrapper {
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
 .variant-group {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
-.variant-label {
-  font-weight: 600;
-  margin-bottom: 18px;
-  font-size: 18px;
-}
-
-.swatch input {
-  display: none;
-}
-
-.swatch input:checked+.text-pill {
-  background: #000;
-  color: #FEFEFE;
-  border-color: #000;
-}
-
-.swatches {
+/* Step Header */
+.variant-step-header {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
-  margin: 10px 0;
+  margin-bottom: 12px;
 }
 
-.swatch {
-  cursor: pointer;
-  position: relative;
-  display: inline-block;
-}
-
-.text-pill {
+.variant-step-badge {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background-color: #F8EFEF;
+  color: #4E032A;
+  font-size: 12.5px;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  background: #FEFEFE;
+  line-height: 1;
 }
 
-.color-swatches {
-  display: flex;
+.variant-step-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222222;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-transform: none;
+}
+
+/* Grid of Options */
+.variant-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
-.color-circle {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 2px solid #ddd;
+@media (max-width: 480px) {
+  .variant-options-grid {
+    gap: 8px;
+  }
+}
+
+/* Option Label Wrapper */
+.variant-option-label {
+  position: relative;
+  display: block;
+  margin: 0;
   cursor: pointer;
+  user-select: none;
+}
+
+.variant-option-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Base Card Style */
+.variant-card {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1.5px solid #E8E8E8;
+  border-radius: 2px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
   position: relative;
 }
 
-.swatch input:checked+.color-circle {
-  border-color: #000;
-  outline: 1px solid #000;
-  outline-offset: 2px;
+.variant-card:hover {
+  border-color: #c9a15b;
+  background-color: #f3e1b4;
+  color: #4e032e;
+}
+
+/* 1. PURITY CARDS (e.g. 9K, 14K, 18K) */
+.variant-card--purity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px 10px;
+  min-height: 58px;
+  text-align: center;
+}
+
+.variant-card--purity .variant-card__val {
+  font-size: 15px;
+  font-weight: 700;
+ line-height: 1.2;
+  margin-bottom: 3px;
+  transition: color 0.2s ease;
+}
+
+.variant-card--purity .variant-card__sub {
+  font-size: 12px;
+  line-height: 1.2;
+  color: #B5B5B5;
+  transition: color 0.2s ease;
+}
+
+.variant-card--purity .variant-card__sub.status--available {
+  color: #666666;
+}
+
+.variant-card--purity .variant-card__sub.status--pending {
+  color: #B5B5B5;
+}
+
+/* Selected Purity Card */
+.variant-option-input:checked + .variant-card--purity {
+  border: 2px solid #4E032A;
+  background: #FFFFFF;
+}
+
+.variant-option-input:checked + .variant-card--purity .variant-card__val {
+  color: #1A1A1A;
+  font-weight: 700;
+}
+
+.variant-option-input:checked + .variant-card--purity .variant-card__sub {
+  color: #555555;
+}
+
+/* 2. COLOUR CARDS (e.g. Yellow, Rose, White) */
+.variant-card--colour {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 8px;
+  min-height: 48px;
+  text-align: center;
+}
+
+.colour-radio-ring {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--swatch-ring, #C69A3D);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.colour-radio-dot {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  border-radius: 50%;
+  background-color: var(--swatch-dot, #D4AF37);
+  display: block;
+}
+
+.colour-card__name {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #333333;
+  line-height: 1.2;
+  transition: color 0.2s ease;
+}
+
+/* Selected Colour Card */
+.variant-option-input:checked + .variant-card--colour {
+  border: 2px solid #4E032A;
+  background: #FFFFFF;
+}
+
+.variant-option-input:checked + .variant-card--colour .colour-card__name {
+  color: #4E032A;
+  font-weight: 600;
+}
+
+/* 3. LENGTH / SIZE CARDS (e.g. 6.5 in, 7 in, 7.5 in) */
+.variant-card--standard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 8px;
+  min-height: 48px;
+  text-align: center;
+}
+
+.variant-card--standard .standard-card__val {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #333333;
+  line-height: 1.2;
+  transition: color 0.2s ease;
+}
+
+.variant-card--standard:hover {
+  background: #FDFBF9;
+  border-color: #4E032A;
+}
+
+/* Selected Length / Size Card */
+.variant-option-input:checked + .variant-card--standard {
+  background: #4E032A;
+  border: 2px solid #4E032A;
+}
+
+.variant-option-input:checked + .variant-card--standard .standard-card__val {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* SELECTED SUMMARY BANNER */
+.variant-selected-summary-box {
+  background-color: #FAF7F5;
+  border-left: 3.5px solid #C5A059;
+  padding: 13px 18px;
+  margin: 18px 0 22px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  border-radius: 0 3px 3px 0;
+}
+
+.variant-selected-summary-box .summary-prefix {
+  font-weight: 700;
+  color: #4E032A;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.variant-selected-summary-box .summary-dynamic-text {
+  color: #333333;
+  font-weight: 400;
 }
 
 .product-title-row {
@@ -1260,4 +1444,172 @@
   .custom-buttons-inner {
     gap: 16px;
   }
+}
+
+/* ========================================================
+   CERTIFICATION & HALLMARKING BLOCK
+   ======================================================== */
+.easy-gallery-cert {
+  background: #ffffff;
+  border: 1px solid #e7dfdb;
+  border-radius: 4px;
+  margin-top: 16px;
+  width: 100%;
+  flex-basis: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.easy-gallery-cert-head {
+  background: #fffdfc;
+  border-bottom: 1px solid #eee8e4;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  display: flex;
+}
+
+.easy-gallery-cert-head span {
+  color: #4E032A;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.easy-gallery-cert-head small {
+  color: #887d82;
+  text-align: right;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.easy-gallery-cert-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid;
+}
+
+.easy-gallery-cert-grid article {
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 88px;
+  padding: 12px 14px;
+  display: flex;
+  box-sizing: border-box;
+}
+
+.easy-gallery-cert-grid article + article {
+  border-left: 1px solid #eee8e4;
+}
+
+.easy-lab-logo {
+  background: #ffffff;
+  flex: 0 0 65px;
+  width: 65px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.easy-lab-logo img {
+  object-fit: contain;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+}
+
+.easy-lab-logo.bis-logo {
+  padding: 2px 4px;
+}
+
+.easy-gallery-cert-grid div {
+  text-align: left;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  display: flex;
+}
+
+.easy-gallery-cert-grid strong {
+  color: #222222;
+  font-size: 12.5px;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 0;
+  white-space: normal;
+}
+
+.easy-gallery-cert-grid small {
+  color: #777777;
+  font-size: 10px;
+  line-height: 1.35;
+  margin: 0;
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .easy-gallery-cert-grid {
+    grid-template-columns: 1fr;
+  }
+  .easy-gallery-cert-grid article {
+    min-height: 60px;
+    padding: 10px 14px;
+    justify-content: flex-start;
+  }
+  .easy-gallery-cert-grid article + article {
+    border-top: 1px solid #eee8e4;
+    border-left: 0;
+  }
+  .easy-gallery-cert-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 14px;
+  }
+  .easy-gallery-cert-head small {
+    text-align: left;
+  }
+  .easy-lab-logo {
+    flex: 0 0 58px;
+    width: 58px;
+    height: 40px;
+  }
+}
+
+/* Direct Product Description Styles */
+.product-description-direct {
+  margin: 18px 0;
+  padding: 0 0 16px 0;
+}
+
+.product-description-title {
+  font-family: var(--font-heading, 'Cormorant Garamond', Georgia, serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: #3a1726;
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee8e4;
+}
+
+.product-description-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a4045;
+}
+
+.product-description-content p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.product-description-content p:last-child {
+  margin-bottom: 0;
 }

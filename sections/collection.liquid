@@ -268,6 +268,9 @@
                             <span>{{ t }}</span>
                           </label>
                         {%- endfor -%}
+                      </div>
+                    </details>
+                  {%- endif -%}
                 {%- when 'variant_filter' -%}
                   <details class="filter-group" {{ block.shopify_attributes }}>
                     <summary>{{ block.settings.title | default: 'Color' }}</summary>

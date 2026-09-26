@@ -42,10 +42,139 @@
   .product-features-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 0;
+  align-items: stretch;
+  margin: 16px 0;
+  padding: 0;
+  border: 1px solid #E8E4DF;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.product-feature-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #333333;
+  line-height: 1.35;
+  text-align: center;
+  padding: 14px 10px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  border-right: 1px solid #E8E4DF;
+  position: relative;
+}
+
+.product-feature-item:last-child {
+  border-right: none;
+}
+
+a.product-feature-item:hover {
+  background: #FAF7F5;
+  text-decoration: none;
+  color: #4E032A;
+}
+
+.product-feature-item img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.product-feature-item span {
+  display: block;
+  font-size: 12.5px;
+  color: inherit;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Delivery Pincode Block */
+.delivery-pincode-block {
+  border: 1px solid #E8E4DF;
+  border-radius: 4px;
+  padding: 14px 16px;
   margin: 12px 0;
-  padding: 14px 0;
+}
+
+.delivery-pincode-block__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #777777;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.delivery-pincode-block__form {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  border: 1px solid #CCCCCC;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.delivery-pincode-block__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #333333;
+  background: #FFFFFF;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.delivery-pincode-block__input::placeholder {
+  color: #AAAAAA;
+  font-size: 14px;
+}
+
+.delivery-pincode-block__btn {
+  background: #FFFFFF;
+  border: none;
+  border-left: 1px solid #CCCCCC;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #4E032A;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.delivery-pincode-block__btn:hover {
+  background: #4E032A;
+  color: #FFFFFF;
+}
+
+.delivery-pincode-block__result {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 0;
+}
+
+.delivery-pincode-block__result.is-success {
+  color: #2D7A4F;
+}
+
+.delivery-pincode-block__result.is-error {
+  color: #C0392B;
+}
+
+.delivery-pincode-block__result.is-loading {
+  color: #777777;
 }
 
 .product-feature-item {
@@ -56,6 +185,13 @@
   color: #111;
   line-height: 1.3;
   white-space: nowrap;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+a.product-feature-item:hover {
+  opacity: 0.75;
+  text-decoration: underline;
 }
 
 .product-feature-item img {
@@ -173,17 +309,26 @@
 }
 @media (max-width: 510px) {
   .product-features-row {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
   }
   .product-feature-item {
     white-space: normal;
+    font-size: 11px;
+    padding: 10px 6px;
   }
 }
 
 @media (max-width: 350px) {
   .product-features-row {
     grid-template-columns: 1fr;
+  }
+  .product-feature-item {
+    border-right: none;
+    border-bottom: 1px solid #E8E4DF;
+  }
+  .product-feature-item:last-child {
+    border-bottom: none;
   }
 }
 </style>
@@ -206,19 +351,25 @@
     {% endif %}
     <div style="flex: 1; min-width: 0;">
        <div class="skeleton-box skeleton-shimmer" style="width: 100%; aspect-ratio: 2/3; border-radius: 14px;"></div>
-       {% if section.settings.show_thumbnails and section.settings.thumbnail_layout == 'bottom' %}
+         {% if section.settings.show_thumbnails and section.settings.thumbnail_layout == 'bottom' %}
          <div class="thumbnails">
             {% for i in (1..4) %}
               <div class="skeleton-box skeleton-shimmer" style="width: 100px; aspect-ratio: 2/3; border-radius: 8px;"></div>
             {% endfor %}
          </div>
        {% endif %}
+       {% for block in section.blocks %}
+         {% if block.type == 'certification' %}
+           <div class="skeleton-box skeleton-shimmer" style="width: 100%; height: 95px; margin-top: 14px; border-radius: 4px;"></div>
+         {% endif %}
+       {% endfor %}
     </div>
   </div>
 
   <!-- SKELETON: INFO -->
   <div class="skeleton-visible product-details-info">
     {% for block in section.blocks %}
+      {% if block.type == 'certification' %}{% continue %}{% endif %}
       <div class="main-product__block main-product__block-{{ block.type }}">
         {% case block.type %}
           {% when 'title' %}
@@ -285,30 +436,54 @@
             {% when 'icon_text_row' %}
               <div class="product-features-row" {{ block.shopify_attributes }}>
                 {% if block.settings.icon_1 != blank or block.settings.text_1 != blank %}
-                  <div class="product-feature-item">
+                  {% if block.settings.link_1 != blank %}
+                    <a href="{{ block.settings.link_1 }}" class="product-feature-item">
+                  {% else %}
+                    <div class="product-feature-item">
+                  {% endif %}
                     {% if block.settings.icon_1 != blank %}
-                      <img src="{{ block.settings.icon_1 | image_url: width: 40 }}" alt="{{ block.settings.text_1 | escape }}" width="20" height="20">
+                      <img src="{{ block.settings.icon_1 | image_url: width: 60 }}" alt="{{ block.settings.text_1 | escape }}" width="24" height="24" loading="lazy">
                     {% endif %}
                     <span>{{ block.settings.text_1 }}</span>
-                  </div>
+                  {% if block.settings.link_1 != blank %}
+                    </a>
+                  {% else %}
+                    </div>
+                  {% endif %}
                 {% endif %}
 
                 {% if block.settings.icon_2 != blank or block.settings.text_2 != blank %}
-                  <div class="product-feature-item">
+                  {% if block.settings.link_2 != blank %}
+                    <a href="{{ block.settings.link_2 }}" class="product-feature-item">
+                  {% else %}
+                    <div class="product-feature-item">
+                  {% endif %}
                     {% if block.settings.icon_2 != blank %}
-                      <img src="{{ block.settings.icon_2 | image_url: width: 40 }}" alt="{{ block.settings.text_2 | escape }}" width="20" height="20">
+                      <img src="{{ block.settings.icon_2 | image_url: width: 60 }}" alt="{{ block.settings.text_2 | escape }}" width="24" height="24" loading="lazy">
                     {% endif %}
                     <span>{{ block.settings.text_2 }}</span>
-                  </div>
+                  {% if block.settings.link_2 != blank %}
+                    </a>
+                  {% else %}
+                    </div>
+                  {% endif %}
                 {% endif %}
 
                 {% if block.settings.icon_3 != blank or block.settings.text_3 != blank %}
-                  <div class="product-feature-item">
+                  {% if block.settings.link_3 != blank %}
+                    <a href="{{ block.settings.link_3 }}" class="product-feature-item">
+                  {% else %}
+                    <div class="product-feature-item">
+                  {% endif %}
                     {% if block.settings.icon_3 != blank %}
-                      <img src="{{ block.settings.icon_3 | image_url: width: 40 }}" alt="{{ block.settings.text_3 | escape }}" width="20" height="20">
+                      <img src="{{ block.settings.icon_3 | image_url: width: 60 }}" alt="{{ block.settings.text_3 | escape }}" width="24" height="24" loading="lazy">
                     {% endif %}
                     <span>{{ block.settings.text_3 }}</span>
-                  </div>
+                  {% if block.settings.link_3 != blank %}
+                    </a>
+                  {% else %}
+                    </div>
+                  {% endif %}
                 {% endif %}
               </div>
         {% endcase %}
@@ -429,6 +604,82 @@
           {% endfor %}
         </div>
       {% endif %}
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'certification' -%}
+          <section class="easy-gallery-cert" aria-label="Diamond certification and gold hallmarking" {{ block.shopify_attributes }}>
+            <div class="easy-gallery-cert-head">
+              <span>{{ block.settings.heading | default: 'CERTIFICATION & HALLMARKING' }}</span>
+              {% if block.settings.subtext != blank %}
+                <small>{{ block.settings.subtext }}</small>
+              {% endif %}
+            </div>
+            <div class="easy-gallery-cert-grid">
+              {% if block.settings.title_1 != blank %}
+                <article>
+                  <span class="easy-lab-logo">
+                    {% if block.settings.image_1 != blank %}
+                      <img src="{{ block.settings.image_1 | image_url: width: 200 }}" alt="{{ block.settings.title_1 | escape }}" width="82" height="58" loading="lazy">
+                    {% else %}
+                      <img src="{{ 'igi-logo.png' | asset_url }}" alt="{{ block.settings.title_1 | escape }}" width="82" height="58" loading="lazy">
+                    {% endif %}
+                  </span>
+                  <div>
+                    <strong>{{ block.settings.title_1 }}</strong>
+                    {% if block.settings.subtext_1 != blank %}<small>{{ block.settings.subtext_1 }}</small>{% endif %}
+                  </div>
+                </article>
+              {% endif %}
+
+              {% if block.settings.title_2 != blank %}
+                <article>
+                  <span class="easy-lab-logo">
+                    {% if block.settings.image_2 != blank %}
+                      <img src="{{ block.settings.image_2 | image_url: width: 200 }}" alt="{{ block.settings.title_2 | escape }}" width="82" height="58" loading="lazy">
+                    {% else %}
+                      <img src="{{ 'sgl-logo.png' | asset_url }}" alt="{{ block.settings.title_2 | escape }}" width="82" height="58" loading="lazy">
+                    {% endif %}
+                  </span>
+                  <div>
+                    <strong>{{ block.settings.title_2 }}</strong>
+                    {% if block.settings.subtext_2 != blank %}<small>{{ block.settings.subtext_2 }}</small>{% endif %}
+                  </div>
+                </article>
+              {% endif %}
+
+              {% if block.settings.title_3 != blank %}
+                <article>
+                  <span class="easy-lab-logo bis-logo">
+                    {% if block.settings.image_3 != blank %}
+                      <img src="{{ block.settings.image_3 | image_url: width: 200 }}" alt="{{ block.settings.title_3 | escape }}" width="82" height="58" loading="lazy">
+                    {% else %}
+                      <img src="{{ 'bis-logo.png' | asset_url }}" alt="{{ block.settings.title_3 | escape }}" width="82" height="58" loading="lazy">
+                    {% endif %}
+                  </span>
+                  <div>
+                    <strong>{{ block.settings.title_3 }}</strong>
+                    {% if block.settings.subtext_3 != blank %}<small>{{ block.settings.subtext_3 }}</small>{% endif %}
+                  </div>
+                </article>
+              {% endif %}
+
+              {% if block.settings.title_4 != blank %}
+                <article>
+                  <span class="easy-lab-logo">
+                    {% if block.settings.image_4 != blank %}
+                      <img src="{{ block.settings.image_4 | image_url: width: 200 }}" alt="{{ block.settings.title_4 | escape }}" width="82" height="58" loading="lazy">
+                    {% endif %}
+                  </span>
+                  <div>
+                    <strong>{{ block.settings.title_4 }}</strong>
+                    {% if block.settings.subtext_4 != blank %}<small>{{ block.settings.subtext_4 }}</small>{% endif %}
+                  </div>
+                </article>
+              {% endif %}
+            </div>
+          </section>
+        {%- endif -%}
+      {%- endfor -%}
     </div>
     <div class="product-details-info">
       {% form 'product', product, id: "product-form" %}
@@ -442,6 +693,7 @@
 
         <div class="product-details">
           {% for block in section.blocks %}
+            {% if block.type == 'certification' %}{% continue %}{% endif %}
          <div
       class="main-product__block main-product__block-{{ block.type }}"
       {{ block.shopify_attributes }}
@@ -539,134 +791,226 @@
             {% when 'description' %}
               {%- assign description_check = product.description | strip_html | strip -%}
               {% if description_check != blank or product.description contains '<img' or product.description contains '<iframe' %}
-                <div class="product-collapsible-tab description-tab" {{ block.shopify_attributes }}>
-                  <details class="smooth-details">
-                    <summary class="tab-header" aria-label="Description">
-                      <span>Description</span>
-                      <svg width="12" height="12" viewBox="0 0 10 10" fill="none">
-                        <path d="M1 3.5L5 7.5L9 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </summary>
-                    <div class="smooth-collapsible">
-                      <div class="tab-content smooth-collapsible-inner">
-                        <div class="tab-content-inner">
-                          {{ product.description }}
+                {% assign is_accordion = block.settings.as_accordion %}
+                {% if block.settings.as_accordion == nil %}
+                  {% assign is_accordion = true %}
+                {% endif %}
+
+                {% if is_accordion %}
+                  {%- assign accordion_title = block.settings.heading | default: 'Description' -%}
+                  <div class="product-collapsible-tab description-tab" {{ block.shopify_attributes }}>
+                    <details class="smooth-details">
+                      <summary class="tab-header" aria-label="{{ accordion_title | escape }}">
+                        <span>{{ accordion_title }}</span>
+                        <svg width="12" height="12" viewBox="0 0 10 10" fill="none">
+                          <path d="M1 3.5L5 7.5L9 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </summary>
+                      <div class="smooth-collapsible">
+                        <div class="tab-content smooth-collapsible-inner">
+                          <div class="tab-content-inner">
+                            {{ product.description }}
+                          </div>
                         </div>
                       </div>
+                    </details>
+                  </div>
+                {% else %}
+                  <div class="product-description-direct" {{ block.shopify_attributes }}>
+                    {% if block.settings.heading != blank %}
+                      <h3 class="product-description-title">{{ block.settings.heading }}</h3>
+                    {% endif %}
+                    <div class="product-description-content">
+                      {{ product.description }}
                     </div>
-                  </details>
-                </div>
+                  </div>
+                {% endif %}
               {% endif %}
-
                 {% when 'variants' %}
-              <div {{ block.shopify_attributes }}>
+              <div class="product-variants-wrapper" {{ block.shopify_attributes }}>
                 {% unless product.has_only_default_variant %}
                   {% for option in product.options_with_values %}
-                  <div class="variant-group"  data-option-index="{{ forloop.index0 }}">
-                    <p class="variant-label">{{ option.name }} : <span class="variant-selected-value">{{ option.selected_value }}</span></p>
+                    {% liquid
+                      assign opt_name_downcase = option.name | downcase
+                      assign is_purity = false
+                      assign is_colour = false
 
-                    {% assign option_name_downcase = option.name | downcase %}
+                      if opt_name_downcase contains 'purity' or opt_name_downcase contains 'karat' or opt_name_downcase contains 'kt'
+                        assign is_purity = true
+                      elsif opt_name_downcase contains 'color' or opt_name_downcase contains 'colour'
+                        assign is_colour = true
+                      endif
 
-<div class="swatches {% if option_name_downcase contains 'color' or option_name_downcase contains 'colour' %}color-swatches{% else %}text-swatches{% endif %}">
-                      {% for value in option.values %}
-                        <label class="swatch">
-                          <input
-                            type="radio"
-                            name="options[{{ option.name }}]"
-                            value="{{ value }}"
-                            {% if option.selected_value == value %}checked{% endif %}
-                          >
-                          {% if option_name_downcase contains 'color' or option_name_downcase contains 'colour' %}
-                            {% liquid
-                              assign swatch_handle = value | handle
-                              assign swatch_file = swatch_handle | append: '.png' 
-                              assign swatch_color = nil
-                              assign meta_image_url = nil
+                      # Determine step title
+                      if opt_name_downcase contains 'choose'
+                        assign step_title = option.name
+                      elsif is_purity
+                        if opt_name_downcase contains 'gold'
+                          assign step_title = 'Choose ' | append: option.name | downcase
+                        else
+                          assign step_title = 'Choose gold purity'
+                        endif
+                      elsif is_colour
+                        if opt_name_downcase contains 'gold'
+                          assign step_title = 'Choose ' | append: option.name | downcase
+                        else
+                          assign step_title = 'Choose gold colour'
+                        endif
+                      elsif opt_name_downcase contains 'length' or opt_name_downcase contains 'size'
+                        assign step_title = 'Choose ' | append: option.name | downcase
+                      else
+                        assign step_title = 'Choose ' | append: option.name | downcase
+                      endif
+                    %}
 
-                              # 1. Try Shopify Native Swatches (Highest Priority)
-                              if value.swatch != blank
-                                if value.swatch.color != blank
-                                  assign swatch_color = value.swatch.color
-                                endif
-                                if value.swatch.image != blank
-                                  assign meta_image_url = value.swatch.image | image_url: width: 100
-                                endif
+                    <div 
+                      class="variant-group" 
+                      data-option-index="{{ forloop.index0 }}"
+                      data-option-name="{{ option.name | escape }}"
+                      data-option-type="{% if is_purity %}purity{% elsif is_colour %}colour{% else %}standard{% endif %}"
+                    >
+                      <div class="variant-step-header">
+                        <span class="variant-step-badge">{{ forloop.index }}</span>
+                        <h3 class="variant-step-title">{{ step_title }}</h3>
+                      </div>
+
+                      <div class="variant-options-grid">
+                        {% for value in option.values %}
+                          {% liquid
+                            assign is_val_available = false
+                            for v in product.variants
+                              if v.options contains value and v.available
+                                assign is_val_available = true
+                                break
                               endif
+                            endfor
+                          %}
 
-                              # 2. Try Theme Settings Mapping (if not found above)
-                              if swatch_color == nil
-                                assign raw_mappings = settings.custom_color_mapping | newline_to_br | replace: '<br />', '##' | replace: '<br>', '##' | split: '##'
-                                for row in raw_mappings
-                                  if row contains ':'
-                                    assign parts = row | split: ":"
-                                    assign m_name = parts[0] | strip | downcase
-                                    assign m_color = parts[1] | strip | split: ' ' | first
-                                    if m_name == value.downcase or m_name == swatch_handle
-                                      assign swatch_color = m_color
-                                      break
-                                    endif
-                                  endif
-                                endfor
-                              endif
+                          <label class="variant-option-label">
+                            <input
+                              type="radio"
+                              name="options[{{ option.name | escape }}]"
+                              value="{{ value | escape }}"
+                              class="variant-option-input"
+                              {% if option.selected_value == value %}checked{% endif %}
+                            >
 
-                              # 3. Deep Metaobject search (if not found above)
-                              if swatch_color == nil
-                                assign t1 = shop.metaobjects.color[swatch_handle]
-                                assign t2 = shop.metaobjects.swatch[swatch_handle]
-                                assign t3 = shop.metaobjects['shopify--color-swatch'][swatch_handle]
-                                assign meta_entry = t1 | default: t2 | default: t3
+                            {% if is_purity %}
+                              <div class="variant-card variant-card--purity{% unless is_val_available or option.selected_value == value %} is-pending{% endunless %}">
+                                <div class="variant-card__val">{{ value }}</div>
+                                <div 
+                                  class="variant-card__status {% if is_val_available or option.selected_value == value %}status--available{% else %}status--pending{% endif %}"
+                                  data-available-text="{{ block.settings.available_badge_text | default: 'Available' }}"
+                                  data-pending-text="{{ block.settings.pending_badge_text | default: 'Pending' }}"
+                                >
+                                  {% if is_val_available or option.selected_value == value %}
+                                    {{ block.settings.available_badge_text | default: 'Available' }}
+                                  {% else %}
+                                    {{ block.settings.pending_badge_text | default: 'Pending' }}
+                                  {% endif %}
+                                </div>
+                              </div>
+
+                            {% elsif is_colour %}
+                              {% liquid
+                                assign v_lower = value | downcase
+                                assign ring_color = '#C69A3D'
+                                assign dot_color = '#D4AF37'
                                 
-                                if meta_entry != blank
-                                  assign meta_color_val = meta_entry.color | default: meta_entry.hex | default: meta_entry.hex_code | default: meta_entry.swatch_color
-                                  assign meta_img_obj = meta_entry.image | default: meta_entry.swatch_image | default: meta_entry.file
-                                  if meta_color_val != blank
-                                    assign swatch_color = meta_color_val
-                                  endif
-                                  if meta_img_obj != blank
-                                    assign meta_image_url = meta_img_obj | image_url: width: 100
-                                  endif
+                                if v_lower contains 'rose'
+                                  assign ring_color = '#B76E79'
+                                  assign dot_color = '#C88A83'
+                                elsif v_lower contains 'white' or v_lower contains 'silver'
+                                  assign ring_color = '#CCCCCC'
+                                  assign dot_color = '#C0C0C0'
+                                elsif v_lower contains 'yellow' or v_lower contains 'gold'
+                                  assign ring_color = '#C69A3D'
+                                  assign dot_color = '#D4AF37'
+                                elsif v_lower contains 'platinum'
+                                  assign ring_color = '#B0B0B0'
+                                  assign dot_color = '#D8D8D8'
+                                elsif v_lower contains 'black'
+                                  assign ring_color = '#333333'
+                                  assign dot_color = '#111111'
                                 endif
-                              endif
+                              %}
+                              <div class="variant-card variant-card--colour">
+                                <span class="colour-radio-ring" style="--swatch-ring: {{ ring_color }};">
+                                  <span class="colour-radio-dot" style="--swatch-dot: {{ dot_color }};"></span>
+                                </span>
+                                <span class="colour-card__name">{{ value }}</span>
+                              </div>
 
-                              # Fallback for simple names
-                              if swatch_color == nil
-                                unless swatch_handle contains '-'
-                                  assign swatch_color = swatch_handle
-                                endunless
-                              endif
-
-                              # Final Image resolution (Assets or Files)
-                              assign final_image_url = nil
-                              if meta_image_url != blank
-                                assign final_image_url = meta_image_url
-                              else
-                                # Check if file exists in Files section via images object
-                                if images[swatch_file] != blank
-                                  assign final_image_url = images[swatch_file] | image_url: width: 100
-                                endif
-                              endif
-                            %}
-                            <span 
-                              class="color-circle swatch-{{ swatch_handle }}" 
-                              style="
-                                {% if swatch_color %}background-color: {{ swatch_color | replace: ' ', '' }};{% endif %}
-                                {% if final_image_url %}
-                                  background-image: url({{ final_image_url }});
-                                {% endif %}
-                                background-size: cover;
-                              "
-                              title="{{ value }}"
-                            ></span>
-                          {% else %}
-                            <span class="text-pill">{{ value }}</span>
-                          {% endif %}
-                        </label>
-                      {% endfor %}
-                    </div>
+                            {% else %}
+                              <div class="variant-card variant-card--standard">
+                                <span class="standard-card__val">{{ value }}</span>
+                              </div>
+                            {% endif %}
+                          </label>
+                        {% endfor %}
+                      </div>
                     </div>
                   {% endfor %}
+
+                  {% liquid
+                    assign template_str = block.settings.selected_text_template | default: 'Selected: [purity] [color] Gold · Bracelet length [length]'
+                    
+                    assign initial_purity = ''
+                    assign initial_color = ''
+                    assign initial_length = ''
+
+                    for opt in product.options_with_values
+                      assign opt_name_l = opt.name | downcase
+                      if opt_name_l contains 'purity' or opt_name_l contains 'karat' or opt_name_l contains 'kt'
+                        assign initial_purity = opt.selected_value
+                      elsif opt_name_l contains 'color' or opt_name_l contains 'colour'
+                        assign initial_color = opt.selected_value
+                      elsif opt_name_l contains 'length' or opt_name_l contains 'size'
+                        assign initial_length = opt.selected_value
+                      endif
+                    endfor
+
+                    if initial_purity == blank and product.options_with_values.size > 0
+                      assign initial_purity = product.options_with_values[0].selected_value
+                    endif
+                    if initial_color == blank and product.options_with_values.size > 1
+                      assign initial_color = product.options_with_values[1].selected_value
+                    endif
+                    if initial_length == blank and product.options_with_values.size > 2
+                      assign initial_length = product.options_with_values[2].selected_value
+                    endif
+
+                    assign initial_rendered = template_str | replace: '[purity]', initial_purity | replace: '{purity}', initial_purity
+                    assign initial_rendered = initial_rendered | replace: '[color]', initial_color | replace: '[colour]', initial_color | replace: '{color}', initial_color | replace: '{colour}', initial_color
+                    assign initial_rendered = initial_rendered | replace: '[length]', initial_length | replace: '[size]', initial_length | replace: '{length}', initial_length | replace: '{size}', initial_length
+
+                    for opt in product.options_with_values
+                      assign opt_placeholder = '[option' | append: forloop.index | append: ']'
+                      assign opt_placeholder_brace = '{option' | append: forloop.index | append: '}'
+                      assign initial_rendered = initial_rendered | replace: opt_placeholder, opt.selected_value | replace: opt_placeholder_brace, opt.selected_value
+                    endfor
+
+                    assign prefix_text = 'Selected:'
+                    assign dynamic_text = initial_rendered
+
+                    if initial_rendered contains 'Selected:'
+                      assign parts = initial_rendered | split: 'Selected:'
+                      assign prefix_text = 'Selected:'
+                      assign dynamic_text = parts[1] | strip
+                    endif
+                  %}
+
+                  <div 
+                    class="variant-selected-summary-box" 
+                    data-variant-summary 
+                    data-template="{{ template_str | escape }}"
+                  >
+                    <span class="summary-prefix">{{ prefix_text }}</span>
+                    <span class="summary-dynamic-text">{{ dynamic_text }}</span>
+                  </div>
                 {% endunless %}
               </div>
+
 
                 {% when 'quantity' %}
               <div class="qty-wrapper">
@@ -759,31 +1103,87 @@
               {% when 'icon_text_row' %}
                 <div class="product-features-row" {{ block.shopify_attributes }}>
                   {% if block.settings.icon_1 != blank or block.settings.text_1 != blank %}
-                    <div class="product-feature-item">
-                      {% if block.settings.icon_1 != blank %}
-                        <img src="{{ block.settings.icon_1 | image_url: width: 40 }}" alt="{{ block.settings.text_1 | escape }}" width="20" height="20">
+                    {% if block.settings.link_1 != blank %}
+                      <a href="{{ block.settings.link_1 }}" class="product-feature-item">
+                    {% else %}
+                      <div class="product-feature-item">
+                    {% endif %}
+                    {% if block.settings.icon_1 != blank %}
+                        <img src="{{ block.settings.icon_1 | image_url: width: 60 }}" alt="{{ block.settings.text_1 | escape }}" width="24" height="24" loading="lazy">
                       {% endif %}
                       <span>{{ block.settings.text_1 }}</span>
-                    </div>
+                    {% if block.settings.link_1 != blank %}
+                      </a>
+                    {% else %}
+                      </div>
+                    {% endif %}
                   {% endif %}
 
                   {% if block.settings.icon_2 != blank or block.settings.text_2 != blank %}
-                    <div class="product-feature-item">
-                      {% if block.settings.icon_2 != blank %}
-                        <img src="{{ block.settings.icon_2 | image_url: width: 40 }}" alt="{{ block.settings.text_2 | escape }}" width="20" height="20">
+                    {% if block.settings.link_2 != blank %}
+                      <a href="{{ block.settings.link_2 }}" class="product-feature-item">
+                    {% else %}
+                      <div class="product-feature-item">
+                    {% endif %}
+                    {% if block.settings.icon_2 != blank %}
+                        <img src="{{ block.settings.icon_2 | image_url: width: 60 }}" alt="{{ block.settings.text_2 | escape }}" width="24" height="24" loading="lazy">
                       {% endif %}
                       <span>{{ block.settings.text_2 }}</span>
-                    </div>
+                    {% if block.settings.link_2 != blank %}
+                      </a>
+                    {% else %}
+                      </div>
+                    {% endif %}
                   {% endif %}
 
                   {% if block.settings.icon_3 != blank or block.settings.text_3 != blank %}
-                    <div class="product-feature-item">
-                      {% if block.settings.icon_3 != blank %}
-                        <img src="{{ block.settings.icon_3 | image_url: width: 40 }}" alt="{{ block.settings.text_3 | escape }}" width="20" height="20">
+                    {% if block.settings.link_3 != blank %}
+                      <a href="{{ block.settings.link_3 }}" class="product-feature-item">
+                    {% else %}
+                      <div class="product-feature-item">
+                    {% endif %}
+                    {% if block.settings.icon_3 != blank %}
+                        <img src="{{ block.settings.icon_3 | image_url: width: 60 }}" alt="{{ block.settings.text_3 | escape }}" width="24" height="24" loading="lazy">
                       {% endif %}
                       <span>{{ block.settings.text_3 }}</span>
-                    </div>
+                    {% if block.settings.link_3 != blank %}
+                      </a>
+                    {% else %}
+                      </div>
+                    {% endif %}
                   {% endif %}
+                </div>
+
+              {% when 'pincode_checker' %}
+                <div class="delivery-pincode-block" {{ block.shopify_attributes }} data-pincode-block data-serviceable-pincodes="{{ block.settings.serviceable_pincodes | newline_to_br | strip_html | strip_newlines | replace: '<br />', ',' }}">
+                  {% if block.settings.title != blank %}
+                    <span class="delivery-pincode-block__label">{{ block.settings.title }}</span>
+                  {% endif %}
+                  <div class="delivery-pincode-block__form">
+                    <input
+                      type="tel"
+                      inputmode="numeric"
+                      pattern="[0-9]{6}"
+                      maxlength="6"
+                      id="pincode-input-{{ section.id }}"
+                      class="delivery-pincode-block__input"
+                      placeholder="{{ block.settings.placeholder | default: 'Enter 6-digit pincode' }}"
+                      aria-label="Enter delivery pincode"
+                    >
+                    <button
+                      type="button"
+                      class="delivery-pincode-block__btn"
+                      data-pincode-check-btn
+                      data-input-id="pincode-input-{{ section.id }}"
+                      data-result-id="pincode-result-{{ section.id }}"
+                      data-success-msg="{{ block.settings.success_message | default: '✓ Delivery available for this pincode' }}"
+                      data-error-msg="{{ block.settings.error_message | default: '✗ Sorry, delivery not available for this pincode' }}"
+                      data-invalid-msg="{{ block.settings.invalid_msg | default: 'Please enter a valid 6-digit pincode' }}"
+                    >
+                      {{ block.settings.btn_text | default: 'Check' }}
+                    </button>
+                  </div>
+                  <div class="delivery-pincode-block__result" id="pincode-result-{{ section.id }}" aria-live="polite"></div>
                 </div>
 
               {% endcase %}
@@ -1123,6 +1523,104 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Update variant
+  
+  function updateSelectedSummary(selectedOptions) {
+    const summaryBoxes = document.querySelectorAll('[data-variant-summary]');
+    const form = document.querySelector('#product-form');
+    if (!summaryBoxes.length || !form) return;
+
+    summaryBoxes.forEach(box => {
+      const template = box.getAttribute('data-template') || 'Selected: [purity] [color] Gold · Bracelet length [length]';
+      let purityVal = '';
+      let colorVal = '';
+      let lengthVal = '';
+
+      const groups = form.querySelectorAll('.variant-group');
+      groups.forEach((g, idx) => {
+        const optName = (g.getAttribute('data-option-name') || '').toLowerCase();
+        const checked = g.querySelector('input:checked');
+        const val = checked ? checked.value : (selectedOptions[idx] || '');
+
+        if (optName.includes('purity') || optName.includes('karat') || optName.includes('kt')) {
+          purityVal = val;
+        } else if (optName.includes('color') || optName.includes('colour')) {
+          colorVal = val;
+        } else if (optName.includes('length') || optName.includes('size')) {
+          lengthVal = val;
+        }
+      });
+
+      if (!purityVal && selectedOptions[0]) purityVal = selectedOptions[0];
+      if (!colorVal && selectedOptions[1]) colorVal = selectedOptions[1];
+      if (!lengthVal && selectedOptions[2]) lengthVal = selectedOptions[2];
+
+      let result = template;
+      result = result.replace(/\[purity\]|\{purity\}/gi, purityVal);
+      result = result.replace(/\[colou?r\]|\{colou?r\}/gi, colorVal);
+      result = result.replace(/\[(length|size)\]|\{(length|size)\}/gi, lengthVal);
+
+      selectedOptions.forEach((optVal, i) => {
+        const reg = new RegExp(`\\\[option${i + 1}\\\]|\\{option${i + 1}\\}`, 'gi');
+        result = result.replace(reg, optVal);
+      });
+
+      const prefixEl = box.querySelector('.summary-prefix');
+      const textEl = box.querySelector('.summary-dynamic-text');
+
+      if (prefixEl && textEl) {
+        const prefixMatch = result.match(/^(Selected:?)\s*(.*)$/i);
+        if (prefixMatch) {
+          prefixEl.textContent = prefixMatch[1];
+          textEl.textContent = prefixMatch[2];
+        } else {
+          prefixEl.textContent = '';
+          textEl.textContent = result;
+        }
+      } else {
+        box.textContent = result;
+      }
+    });
+  }
+
+  function updatePurityAvailability(selectedOptions) {
+    const form = document.querySelector('#product-form');
+    if (!form || typeof variants === 'undefined') return;
+    const purityGroup = form.querySelector('.variant-group[data-option-type="purity"]');
+    if (!purityGroup) return;
+
+    const purityIndex = parseInt(purityGroup.getAttribute('data-option-index'), 10);
+    const otherSelected = [...selectedOptions];
+
+    purityGroup.querySelectorAll('.variant-option-label').forEach(label => {
+      const input = label.querySelector('input');
+      if (!input) return;
+      const purityVal = input.value;
+      const testOptions = [...otherSelected];
+      testOptions[purityIndex] = purityVal;
+
+      const matchingVar = variants.find(v =>
+        v.options.every((o, i) => o === testOptions[i])
+      );
+
+      const statusEl = label.querySelector('.variant-card__status');
+      const cardEl = label.querySelector('.variant-card--purity');
+      if (statusEl) {
+        const availableText = statusEl.getAttribute('data-available-text') || 'Available';
+        const pendingText = statusEl.getAttribute('data-pending-text') || 'Pending';
+
+        if (matchingVar && matchingVar.available) {
+          statusEl.textContent = availableText;
+          statusEl.className = 'variant-card__status status--available';
+          if (cardEl) cardEl.classList.remove('is-pending');
+        } else {
+          statusEl.textContent = pendingText;
+          statusEl.className = 'variant-card__status status--pending';
+          if (cardEl && !input.checked) cardEl.classList.add('is-pending');
+        }
+      }
+    });
+  }
+
   function updateVariant() {
     const form = document.querySelector('#product-form');
     if (!form) return;
@@ -1143,6 +1641,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const match = variants.find(v =>
       v.options.every((o, i) => o === selected[i])
     );
+
+    updateSelectedSummary(selected);
+    updatePurityAvailability(selected);
 
     // Custom Money Formatter
     function formatMoney(cents, format) {
@@ -1313,6 +1814,9 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.variant-group input').forEach(r =>
     r.addEventListener('change', updateVariant)
   );
+
+  // Initial variant state & summary sync
+  updateVariant();
 
   const stickyBtn = document.getElementById('sticky-add-to-cart');
   const stickyCart = document.getElementById('sticky-cart-bar');
@@ -1494,6 +1998,59 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(enableProductButtons, 1000);
     setTimeout(enableProductButtons, 3000);
   }
+
+  // ─── Delivery Pincode Checker ────────────────────────────────────────
+  document.querySelectorAll('[data-pincode-check-btn]').forEach(function(btn) {
+    var inputId   = btn.dataset.inputId;
+    var resultId  = btn.dataset.resultId;
+    var successMsg = btn.dataset.successMsg;
+    var errorMsg   = btn.dataset.errorMsg;
+    var invalidMsg = btn.dataset.invalidMsg;
+
+    var input  = document.getElementById(inputId);
+    var result = document.getElementById(resultId);
+
+    if (!input || !result) return;
+
+    // Read serviceable pincodes from the data attribute (rendered from block settings)
+    var serviceableAttr = btn.closest('[data-pincode-block]').dataset.serviceablePincodes;
+    var serviceablePincodes = [];
+    if (serviceableAttr && serviceableAttr.trim() !== '') {
+      serviceablePincodes = serviceableAttr.split(/[\n,]+/).map(function(p){ return p.trim(); }).filter(Boolean);
+    }
+
+    function showResult(msg, type) {
+      result.textContent = msg;
+      result.className = 'delivery-pincode-block__result is-' + type;
+    }
+
+    function doCheck() {
+      var pincode = input.value.replace(/\D/g, '').trim();
+      if (!pincode || pincode.length !== 6) {
+        showResult(invalidMsg || 'Please enter a valid 6-digit pincode', 'error');
+        return;
+      }
+      // If no whitelist, all pincodes are deliverable
+      if (serviceablePincodes.length === 0) {
+        showResult(successMsg, 'success');
+      } else if (serviceablePincodes.indexOf(pincode) !== -1) {
+        showResult(successMsg, 'success');
+      } else {
+        showResult(errorMsg, 'error');
+      }
+    }
+
+    btn.addEventListener('click', doCheck);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doCheck();
+    });
+    // Only allow numeric input
+    input.addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '').slice(0, 6);
+      result.textContent = '';
+      result.className = 'delivery-pincode-block__result';
+    });
+  });
 });
 </script>
 
@@ -1620,7 +2177,32 @@ document.addEventListener('DOMContentLoaded', function () {
       "name": "Inventory Message",
       "limit": 1
     },
-        { "type": "variants", "name": "Variants", "limit": 1 },
+            {
+      "type": "variants",
+      "name": "Variants",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "selected_text_template",
+          "label": "Selected text format",
+          "default": "Selected: [purity] [color] Gold · Bracelet length [length]",
+          "info": "Dynamic placeholders: [purity], [color], [length] or [option1], [option2], [option3]."
+        },
+        {
+          "type": "text",
+          "id": "available_badge_text",
+          "label": "Available badge text",
+          "default": "Available"
+        },
+        {
+          "type": "text",
+          "id": "pending_badge_text",
+          "label": "Pending badge text",
+          "default": "Pending"
+        }
+      ]
+    },
         { "type": "quantity", "name": "Quantity Selector", "limit": 1 },
         {
           "type": "buttons",
@@ -1643,7 +2225,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       ]
     },
-    { "type": "description", "name": "Product Description", "limit": 1 },
+    {
+      "type": "description",
+      "name": "Product Description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "as_accordion",
+          "label": "Display as Accordion / Collapsible tab",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Title / Heading",
+          "default": "Description"
+        }
+      ]
+    },
     {
       "type": "collapsible_tab",
       "name": "Collapsible Tab",
@@ -1693,6 +2293,11 @@ document.addEventListener('DOMContentLoaded', function () {
           "default": "Phoenix Guarantee"
         },
         {
+          "type": "url",
+          "id": "link_1",
+          "label": "Link 1"
+        },
+        {
           "type": "image_picker",
           "id": "icon_2",
           "label": "Icon 2"
@@ -1704,6 +2309,11 @@ document.addEventListener('DOMContentLoaded', function () {
           "default": "5-7 Days Shipping"
         },
         {
+          "type": "url",
+          "id": "link_2",
+          "label": "Link 2"
+        },
+        {
           "type": "image_picker",
           "id": "icon_3",
           "label": "Icon 3"
@@ -1713,6 +2323,165 @@ document.addEventListener('DOMContentLoaded', function () {
           "id": "text_3",
           "label": "Text 3",
           "default": "Buy now - Pay later"
+        },
+        {
+          "type": "url",
+          "id": "link_3",
+          "label": "Link 3"
+        }
+      ]
+    },
+    {
+      "type": "pincode_checker",
+      "name": "Delivery Pincode",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "DELIVERY PINCODE"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Input placeholder",
+          "default": "Enter 6-digit pincode"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Button text",
+          "default": "Check"
+        },
+        {
+          "type": "text",
+          "id": "success_message",
+          "label": "Success message",
+          "default": "\u2713 Delivery available for this pincode"
+        },
+        {
+          "type": "text",
+          "id": "error_message",
+          "label": "Unavailable message",
+          "default": "\u2717 Sorry, delivery not available for this pincode"
+        },
+        {
+          "type": "text",
+          "id": "invalid_msg",
+          "label": "Invalid pincode message",
+          "default": "Please enter a valid 6-digit pincode"
+        },
+        {
+          "type": "paragraph",
+          "content": "Enter serviceable pincodes below (one per line). Leave empty to mark all pincodes as available."
+        },
+        {
+          "type": "textarea",
+          "id": "serviceable_pincodes",
+          "label": "Serviceable Pincodes (one per line)",
+          "placeholder": "400001\n400002\n110001"
+        }
+      ]
+    },
+    {
+      "type": "certification",
+      "name": "Certification & Hallmark",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "CERTIFICATION & HALLMARKING"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Header Note",
+          "default": "Report details will be linked to the final SKU"
+        },
+        {
+          "type": "header",
+          "content": "Certification 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Logo 1"
+        },
+        {
+          "type": "text",
+          "id": "title_1",
+          "label": "Title 1",
+          "default": "IGI Grading"
+        },
+        {
+          "type": "text",
+          "id": "subtext_1",
+          "label": "Subtext 1",
+          "default": "Diamond report, as applicable"
+        },
+        {
+          "type": "header",
+          "content": "Certification 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Logo 2"
+        },
+        {
+          "type": "text",
+          "id": "title_2",
+          "label": "Title 2",
+          "default": "SGL Grading"
+        },
+        {
+          "type": "text",
+          "id": "subtext_2",
+          "label": "Subtext 2",
+          "default": "Shown only when supplied"
+        },
+        {
+          "type": "header",
+          "content": "Certification 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Logo 3"
+        },
+        {
+          "type": "text",
+          "id": "title_3",
+          "label": "Title 3",
+          "default": "BIS Hallmark"
+        },
+        {
+          "type": "text",
+          "id": "subtext_3",
+          "label": "Subtext 3",
+          "default": "Hallmarked gold jewellery"
+        },
+        {
+          "type": "header",
+          "content": "Certification 4 (Optional)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Logo 4"
+        },
+        {
+          "type": "text",
+          "id": "title_4",
+          "label": "Title 4"
+        },
+        {
+          "type": "text",
+          "id": "subtext_4",
+          "label": "Subtext 4"
         }
       ]
     }
@@ -1727,7 +2496,8 @@ document.addEventListener('DOMContentLoaded', function () {
       { "type": "variants" },
       { "type": "quantity" },
       { "type": "buttons" },
-      { "type": "description" }
+      { "type": "description" },
+      { "type": "certification" }
     ]
   }
 ],

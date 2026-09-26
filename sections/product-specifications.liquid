@@ -1,0 +1,757 @@
+{% comment %}
+  Product Specifications Section
+  Matching RISEON JEWELS "PRODUCT INFORMATION" box design
+{% endcomment %}
+
+<section class="easy-spec-section" id="ProductSpecifications-{{ section.id }}" aria-label="Product specifications and price breakup">
+  <div class="easy-spec-panel">
+    <div class="easy-spec-panel-head">
+      <span>{{ section.settings.heading | default: 'PRODUCT INFORMATION' }}</span>
+      {% if section.settings.show_sku %}
+        <strong data-spec-sku>
+          {% if section.settings.sku_override != blank %}
+            {{ section.settings.sku_override }}
+          {% else %}
+            {{ product.selected_or_first_available_variant.sku | default: 'RI-INA-STACKABLE-BANG-R-7in' }}
+          {% endif %}
+        </strong>
+      {% endif %}
+    </div>
+
+    <div class="easy-spec-panel-body">
+      {% for block in section.blocks %}
+        <article class="easy-spec-group{% if block.type == 'price_breakup' %} easy-price-card{% endif %}" {{ block.shopify_attributes }}>
+          {% if block.settings.title != blank %}
+            <h2>{{ block.settings.title }}</h2>
+          {% endif %}
+
+          {% if block.type == 'price_breakup' %}
+            {% if block.settings.description != blank %}
+              <div class="easy-pending-copy">{{ block.settings.description }}</div>
+            {% endif %}
+
+            {% if block.settings.value_1 != blank or block.settings.value_2 != blank or block.settings.value_3 != blank or block.settings.value_4 != blank or block.settings.value_5 != blank %}
+              <div class="easy-breakup-list">
+                {% if block.settings.label_1 != blank and block.settings.value_1 != blank %}
+                  <div class="easy-breakup-row">
+                    <span class="easy-breakup-label">{{ block.settings.label_1 }}</span>
+                    <strong class="easy-breakup-val">{{ block.settings.value_1 }}</strong>
+                  </div>
+                {% endif %}
+                {% if block.settings.label_2 != blank and block.settings.value_2 != blank %}
+                  <div class="easy-breakup-row">
+                    <span class="easy-breakup-label">{{ block.settings.label_2 }}</span>
+                    <strong class="easy-breakup-val">{{ block.settings.value_2 }}</strong>
+                  </div>
+                {% endif %}
+                {% if block.settings.label_3 != blank and block.settings.value_3 != blank %}
+                  <div class="easy-breakup-row">
+                    <span class="easy-breakup-label">{{ block.settings.label_3 }}</span>
+                    <strong class="easy-breakup-val">{{ block.settings.value_3 }}</strong>
+                  </div>
+                {% endif %}
+                {% if block.settings.label_4 != blank and block.settings.value_4 != blank %}
+                  <div class="easy-breakup-row">
+                    <span class="easy-breakup-label">{{ block.settings.label_4 }}</span>
+                    <strong class="easy-breakup-val">{{ block.settings.value_4 }}</strong>
+                  </div>
+                {% endif %}
+                {% if block.settings.label_5 != blank and block.settings.value_5 != blank %}
+                  <div class="easy-breakup-row is-total">
+                    <span class="easy-breakup-label">{{ block.settings.label_5 }}</span>
+                    <strong class="easy-breakup-val">{{ block.settings.value_5 }}</strong>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+          {% else %}
+            {% comment %} Standard Specification Group {% endcomment %}
+            <dl>
+              {% for i in (1..8) %}
+                {% assign label_key = 'label_' | append: i %}
+                {% assign val_key = 'value_' | append: i %}
+                {% assign row_label = block.settings[label_key] %}
+                {% assign row_val = block.settings[val_key] %}
+
+                {% if row_label != blank %}
+                  {% assign label_lower = row_label | downcase %}
+                  {% assign data_attr = '' %}
+
+                  {% if row_val == blank %}
+                    {% if label_lower contains 'product code' or label_lower contains 'sku' %}
+                      {% assign row_val = product.selected_or_first_available_variant.sku | default: 'RI-INA-STACKABLE-BANG-R-7in' %}
+                      {% assign data_attr = 'data-spec-key="sku"' %}
+                    {% elsif label_lower contains 'product type' %}
+                      {% assign row_val = product.type | default: 'Bracelet' %}
+                    {% elsif label_lower contains 'collection' %}
+                      {% assign row_val = product.collections.first.title | default: 'Everyday Edit' %}
+                    {% elsif label_lower contains 'purity' %}
+                      {% assign data_attr = 'data-spec-key="purity"' %}
+                    {% elsif label_lower contains 'colour' or label_lower contains 'color' %}
+                      {% assign data_attr = 'data-spec-key="color"' %}
+                    {% elsif label_lower contains 'length' or label_lower contains 'size' %}
+                      {% assign data_attr = 'data-spec-key="length"' %}
+                    {% endif %}
+                  {% else %}
+                    {% if label_lower contains 'product code' or label_lower contains 'sku' %}
+                      {% assign data_attr = 'data-spec-key="sku"' %}
+                    {% elsif label_lower contains 'purity' %}
+                      {% assign data_attr = 'data-spec-key="purity"' %}
+                    {% elsif label_lower contains 'colour' or label_lower contains 'color' %}
+                      {% assign data_attr = 'data-spec-key="color"' %}
+                    {% elsif label_lower contains 'length' or label_lower contains 'size' %}
+                      {% assign data_attr = 'data-spec-key="length"' %}
+                    {% endif %}
+                  {% endif %}
+
+                  <div>
+                    <dt>{{ row_label }}</dt>
+                    <dd {{ data_attr }}>{{ row_val }}</dd>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </dl>
+
+            {% if block.settings.content != blank %}
+              <div class="easy-pending-copy" style="margin-top: 14px;">{{ block.settings.content }}</div>
+            {% endif %}
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if section.settings.disclaimer_note != blank %}
+    <p class="easy-data-note">{{ section.settings.disclaimer_note }}</p>
+  {% endif %}
+</section>
+
+<style>
+  #ProductSpecifications-{{ section.id }} {
+    background: {{ section.settings.section_bg | default: '#fbfaf9' }};
+    border-top: 1px solid #eee8e4;
+    border-bottom: 1px solid #eee8e4;
+    padding-top: {{ section.settings.padding_top | default: 36 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 78 }}px;
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-panel {
+    background: {{ section.settings.card_bg | default: '#ffffff' }};
+    border: 1px solid {{ section.settings.border_color | default: '#e4dcd8' }};
+    border-radius: 4px;
+    width: min(1280px, 100%);
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(78, 3, 46, 0.035);
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-panel-head {
+    background: #fffdfc;
+    border-bottom: 1px solid #e8e1dd;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    min-height: 72px;
+    padding: 18px 28px;
+    display: flex;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-panel-head span {
+    color: {{ section.settings.title_color | default: '#4e032e' }};
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-panel-head strong {
+    color: #746a6e;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-panel-body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: grid;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group {
+    padding: 28px 30px 30px;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group:nth-child(odd) {
+    border-right: 1px solid #e8e1dd;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group:nth-child(-n+2) {
+    border-bottom: 1px solid #e8e1dd;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group h2 {
+    color: {{ section.settings.group_title_color | default: '#3a1726' }};
+    border-bottom: 1px solid #eee8e4;
+    margin: 0 0 16px;
+    padding-bottom: 13px;
+    font-family: var(--font-heading, 'Cormorant Garamond', Georgia, serif);
+    font-size: 27px;
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dl {
+    margin: 0;
+    padding: 0;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dl > div {
+    border-bottom: 1px solid #f2eeeb;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 10px 0;
+    display: flex;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dl > div:last-child {
+    border-bottom: 0;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dt,
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dt {
+    color: #7b7075;
+    font-weight: 400;
+    text-align: left;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-spec-group dd {
+    color: #372a30;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-pending-copy {
+    color: #73686d;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-breakup-list {
+    margin-top: 14px;
+    padding: 0;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-breakup-row {
+    border-bottom: 1px solid #f2eeeb;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 9px 0;
+    display: flex;
+    font-size: 14px;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-breakup-row .easy-breakup-label {
+    color: #7b7075;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-breakup-row .easy-breakup-val {
+    color: #372a30;
+    font-weight: 600;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-breakup-row.is-total {
+    border-top: 1px solid #d9cbc6;
+    border-bottom: 0;
+    margin-top: 6px;
+    padding-top: 13px;
+    font-size: 15px;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-breakup-row.is-total .easy-breakup-label,
+  #ProductSpecifications-{{ section.id }} .easy-breakup-row.is-total .easy-breakup-val {
+    color: #3a1726;
+    font-weight: 700;
+  }
+
+  #ProductSpecifications-{{ section.id }} .easy-data-note {
+    color: #73686d;
+    width: min(1280px, 100%);
+    margin: 18px auto 0;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    #ProductSpecifications-{{ section.id }} {
+      padding-top: 36px;
+      padding-bottom: 48px;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    #ProductSpecifications-{{ section.id }} .easy-spec-panel-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 17px 20px;
+    }
+    #ProductSpecifications-{{ section.id }} .easy-spec-panel-body {
+      grid-template-columns: 1fr;
+    }
+    #ProductSpecifications-{{ section.id }} .easy-spec-group {
+      padding: 24px 20px;
+      border-bottom: 1px solid #e8e1dd !important;
+      border-right: 0 !important;
+    }
+    #ProductSpecifications-{{ section.id }} .easy-spec-group:last-child {
+      border-bottom: 0 !important;
+    }
+    #ProductSpecifications-{{ section.id }} .easy-spec-group h2 {
+      font-size: 24px;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    window._productVariants = window._productVariants || {{ product.variants | json }};
+
+    function updateSpecDetails(variant) {
+      if (!variant) return;
+
+      // Update Header SKU & Row SKU
+      if (variant.sku) {
+        document.querySelectorAll('[data-spec-sku], [data-spec-key="sku"]').forEach(function(el) {
+          el.textContent = variant.sku;
+        });
+      }
+
+      // Update variant options if present
+      if (variant.options && variant.options.length) {
+        variant.options.forEach(function(opt) {
+          if (!opt) return;
+          const optStr = String(opt).trim();
+          
+          // Purity match: 14K, 18K, 9K, 22K
+          if (/^\d{1,2}\s*[kK]$/i.test(optStr) || /karat/i.test(optStr)) {
+            document.querySelectorAll('[data-spec-key="purity"]').forEach(function(el) {
+              el.textContent = optStr;
+            });
+          }
+          // Colour match: Rose, Yellow, White
+          else if (/^(rose|yellow|white|platinum|gold)$/i.test(optStr)) {
+            document.querySelectorAll('[data-spec-key="color"]').forEach(function(el) {
+              el.textContent = optStr;
+            });
+          }
+          // Length / Size match: 6.5 in, 7 in, 7.5 in, 18 cm
+          else if (/\b(in|inch|cm|mm)\b/i.test(optStr) || /^\d+(\.\d+)?\s*(in|cm|mm)?$/i.test(optStr)) {
+            document.querySelectorAll('[data-spec-key="length"]').forEach(function(el) {
+              el.textContent = optStr;
+            });
+          }
+        });
+      }
+    }
+
+    // Event listener for variant change
+    document.addEventListener('variant:change', function(e) {
+      if (e.detail && e.detail.variant) {
+        updateSpecDetails(e.detail.variant);
+      }
+    });
+
+    // Form change event listener
+    document.addEventListener('change', function(e) {
+      if (e.target && e.target.name === 'id') {
+        const val = e.target.value;
+        if (window._productVariants) {
+          const matched = window._productVariants.find(function(v) { return String(v.id) === String(val); });
+          if (matched) updateSpecDetails(matched);
+        }
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product Specifications",
+  "tag": "section",
+  "class": "section-product-specifications",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "PRODUCT INFORMATION"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "label": "Show SKU in Header",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sku_override",
+      "label": "SKU Text Override",
+      "info": "Leave blank to automatically display current variant SKU, or connect a metafield."
+    },
+    {
+      "type": "textarea",
+      "id": "disclaimer_note",
+      "label": "Bottom Disclaimer Note",
+      "default": "*Estimated or catalogue values. Final invoice, actual metal weight, report partner, certificate number, BIS hallmark and HUID must match the exact shipped SKU."
+    },
+    {
+      "type": "header",
+      "content": "Appearance & Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section Background",
+      "default": "#fbfaf9"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#e4dcd8"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Header Title Color",
+      "default": "#4e032e"
+    },
+    {
+      "type": "color",
+      "id": "group_title_color",
+      "label": "Group Title Color",
+      "default": "#3a1726"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 76
+    }
+  ],
+  "blocks": [
+    {
+      "type": "spec_group",
+      "name": "Specification Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card Heading",
+          "default": "Product details"
+        },
+        {
+          "type": "header",
+          "content": "Row 1"
+        },
+        {
+          "type": "text",
+          "id": "label_1",
+          "label": "Label 1",
+          "default": "Product type"
+        },
+        {
+          "type": "text",
+          "id": "value_1",
+          "label": "Value 1",
+          "default": "Bracelet",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "header",
+          "content": "Row 2"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "Label 2",
+          "default": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "value_2",
+          "label": "Value 2",
+          "default": "Everyday Edit",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "header",
+          "content": "Row 3"
+        },
+        {
+          "type": "text",
+          "id": "label_3",
+          "label": "Label 3",
+          "default": "Product code"
+        },
+        {
+          "type": "text",
+          "id": "value_3",
+          "label": "Value 3",
+          "info": "Leave blank to display current variant SKU, or connect a Metafield."
+        },
+        {
+          "type": "header",
+          "content": "Row 4"
+        },
+        {
+          "type": "text",
+          "id": "label_4",
+          "label": "Label 4",
+          "default": "Setting"
+        },
+        {
+          "type": "text",
+          "id": "value_4",
+          "label": "Value 4",
+          "default": "Final SKU detail pending",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "header",
+          "content": "Row 5 (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "label_5",
+          "label": "Label 5"
+        },
+        {
+          "type": "text",
+          "id": "value_5",
+          "label": "Value 5",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "header",
+          "content": "Row 6 (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "label_6",
+          "label": "Label 6"
+        },
+        {
+          "type": "text",
+          "id": "value_6",
+          "label": "Value 6",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "header",
+          "content": "Row 7 (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "label_7",
+          "label": "Label 7"
+        },
+        {
+          "type": "text",
+          "id": "value_7",
+          "label": "Value 7",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "header",
+          "content": "Row 8 (Optional)"
+        },
+        {
+          "type": "text",
+          "id": "label_8",
+          "label": "Label 8"
+        },
+        {
+          "type": "text",
+          "id": "value_8",
+          "label": "Value 8",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Additional Information / Note"
+        }
+      ]
+    },
+    {
+      "type": "price_breakup",
+      "name": "Price Breakup Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card Heading",
+          "default": "Price breakup"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Pending Copy or Description",
+          "default": "<p>Gold, diamond, making and GST components will be displayed here when the approved SKU data is synced.</p>"
+        },
+        {
+          "type": "header",
+          "content": "Optional Breakdown Rows"
+        },
+        {
+          "type": "text",
+          "id": "label_1",
+          "label": "Row 1 Label",
+          "default": "Gold component"
+        },
+        {
+          "type": "text",
+          "id": "value_1",
+          "label": "Row 1 Value",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "Row 2 Label",
+          "default": "Diamond component"
+        },
+        {
+          "type": "text",
+          "id": "value_2",
+          "label": "Row 2 Value",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "text",
+          "id": "label_3",
+          "label": "Row 3 Label",
+          "default": "Making charges"
+        },
+        {
+          "type": "text",
+          "id": "value_3",
+          "label": "Row 3 Value",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "text",
+          "id": "label_4",
+          "label": "Row 4 Label",
+          "default": "GST (3%)"
+        },
+        {
+          "type": "text",
+          "id": "value_4",
+          "label": "Row 4 Value",
+          "info": "Supports Dynamic Sources (Metafields)"
+        },
+        {
+          "type": "text",
+          "id": "label_5",
+          "label": "Total Label",
+          "default": "Total"
+        },
+        {
+          "type": "text",
+          "id": "value_5",
+          "label": "Total Value",
+          "info": "Supports Dynamic Sources (Metafields)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Specifications",
+      "blocks": [
+        {
+          "type": "spec_group",
+          "settings": {
+            "title": "Product details",
+            "label_1": "Product type",
+            "value_1": "Bracelet",
+            "label_2": "Collection",
+            "value_2": "Everyday Edit",
+            "label_3": "Product code",
+            "value_3": "",
+            "label_4": "Setting",
+            "value_4": "Final SKU detail pending"
+          }
+        },
+        {
+          "type": "spec_group",
+          "settings": {
+            "title": "Weight & purity",
+            "label_1": "Gold purity",
+            "value_1": "14K",
+            "label_2": "Gold colour",
+            "value_2": "Rose",
+            "label_3": "Net gold weight",
+            "value_3": "Final SKU detail pending",
+            "label_4": "Bracelet length",
+            "value_4": "7 in"
+          }
+        },
+        {
+          "type": "spec_group",
+          "settings": {
+            "title": "Diamond & gemstone",
+            "label_1": "Diamond type",
+            "value_1": "Lab-grown",
+            "label_2": "Total weight",
+            "value_2": "Final SKU detail pending",
+            "label_3": "Colour / clarity",
+            "value_3": "Final SKU detail pending",
+            "label_4": "Shape / gemstone",
+            "value_4": "Final SKU detail pending"
+          }
+        },
+        {
+          "type": "price_breakup",
+          "settings": {
+            "title": "Price breakup",
+            "description": "<p>Gold, diamond, making and GST components will be displayed here when the approved SKU data is synced.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
