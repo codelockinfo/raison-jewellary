@@ -1012,28 +1012,28 @@ a.product-feature-item:hover {
               </div>
 
 
-                {% when 'quantity' %}
-              <div class="qty-wrapper">
+            {% when 'quantity' %}
+              <div class="qty-wrapper" {{ block.shopify_attributes }}>
                 {% render 'quantity-input', 
                     value: 1, 
                     min: 1,
                     data_attributes: 'data-quantity-selector-input',
                     minus_attributes: 'data-quantity-decrease aria-label="Decrease quantity"',
                     plus_attributes: 'data-quantity-increase aria-label="Increase quantity"'
-              %}
-     {% render 'add-to-cart-button',
-    product: product,
-    variant: product.selected_or_first_available_variant,
-    class: 'primary-btn',
-    text: 'Add to Cart'
-  %}
-
+                %}
               </div>
 
-                {% when 'buttons' %}
+            {% when 'buttons' %}
               <div class="button_area" {{ block.shopify_attributes }}>
+                {% render 'add-to-cart-button',
+                  product: product,
+                  class: 'primary-btn add-to-cart-btn-main',
+                  text: block.settings.add_to_cart_text | default: 'Add to Cart'
+                %}
                 {% if block.settings.show_buy_now %}
-                  {{ form | payment_button }}
+                  <div class="buy-now-wrapper">
+                    {{ form | payment_button }}
+                  </div>
                 {% endif %}
               </div>
 

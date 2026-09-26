@@ -471,11 +471,61 @@
   outline: none;
 }
 
+/* Product Blocks Layout */
+.product-details {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.main-product__block {
+  flex: 0 0 100%;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.main-product__block-quantity {
+  flex: 0 0 auto;
+  width: auto;
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+
+.main-product__block-buttons {
+  flex: 0 0 100%;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+/* When Quantity block is present right before Buttons block, place them side-by-side */
+.main-product__block-quantity + .main-product__block-buttons {
+  flex: 1 1 0%;
+  width: auto;
+  min-width: 0;
+}
+
 .button_area {
   display: flex;
-  gap: 15px;
-  margin: 20px 0;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+}
+
+.button_area .add-to-cart-btn-main,
+.button_area .add-to-cart-button {
+  width: 100% !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.buy-now-wrapper {
+  width: 100%;
 }
 
 .qty-wrapper input::-webkit-outer-spin-button,
