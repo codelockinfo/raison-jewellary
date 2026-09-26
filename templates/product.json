@@ -38,20 +38,12 @@
             "pending_badge_text": "Pending"
           }
         },
-        "quantity_TgVz7g": {
-          "type": "quantity",
-          "settings": {}
-        },
         "add_to_cart_main": {
           "type": "add_to_cart",
           "settings": {
-            "button_layout": "full",
+            "button_layout": "with_buynow",
             "button_text": "Add to Cart"
           }
-        },
-        "buy_now_main": {
-          "type": "buy_now",
-          "settings": {}
         },
         "wishlist_W3TJVM": {
           "type": "wishlist",
@@ -106,9 +98,7 @@
         "description_WBReTj",
         "price_7LGG6E",
         "variants_q4KYwa",
-        "quantity_TgVz7g",
         "add_to_cart_main",
-        "buy_now_main",
         "wishlist_W3TJVM",
         "pincode_checker_XdC4XV",
         "icon_text_row_NxTLzG",
