@@ -311,6 +311,7 @@
         "occ_everyday": {
           "type": "occasion_item",
           "settings": {
+            "image": "shopify://shop_images/shop-ring-v2_1.png",
             "title": "Everyday Wear",
             "subtitle": "Easy brilliance for every day",
             "link_text": "Explore designs →",
@@ -320,6 +321,7 @@
         "occ_office": {
           "type": "occasion_item",
           "settings": {
+            "image": "shopify://shop_images/shop-bracelet-bangles-v2_1.png",
             "title": "Office Wear",
             "subtitle": "Refined pieces for workdays",
             "link_text": "Explore designs →",
@@ -329,6 +331,7 @@
         "occ_datenight": {
           "type": "occasion_item",
           "settings": {
+            "image": "shopify://shop_images/shop-pendant-v2_1.png",
             "title": "Date Night",
             "subtitle": "A little extra evening shine",
             "link_text": "Explore designs →",
@@ -338,6 +341,7 @@
         "occ_festive": {
           "type": "occasion_item",
           "settings": {
+            "image": "shopify://shop_images/shop-earring-v2_2.png",
             "title": "Festive Celebrations",
             "subtitle": "Modern sparkle for festivities",
             "link_text": "Explore designs →",
@@ -347,6 +351,7 @@
         "occ_wedding": {
           "type": "occasion_item",
           "settings": {
+            "image": "shopify://shop_images/shop-mangalsutra-v2_1.png",
             "title": "Wedding Guest",
             "subtitle": "Elevated, occasion-ready designs",
             "link_text": "Explore designs →",
@@ -356,6 +361,7 @@
         "occ_gifts": {
           "type": "occasion_item",
           "settings": {
+            "image": "shopify://shop_images/shop-nose-pin-v2_1.png",
             "title": "Meaningful Gifts",
             "subtitle": "Fine jewellery for every milestone",
             "link_text": "Explore designs →",
