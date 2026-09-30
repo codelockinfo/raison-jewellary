@@ -109,6 +109,7 @@
         "cat_ring": {
           "type": "category_card",
           "settings": {
+            "image": "shopify://shop_images/category-ring-aug2026.webp",
             "title": "Ring",
             "link": "/collections/ring",
             "alt_text": ""
@@ -117,6 +118,7 @@
         "cat_earring": {
           "type": "category_card",
           "settings": {
+            "image": "shopify://shop_images/category-earring-aug2026.webp",
             "title": "Earring",
             "link": "/collections/earring",
             "alt_text": ""
@@ -125,6 +127,7 @@
         "cat_pendant": {
           "type": "category_card",
           "settings": {
+            "image": "shopify://shop_images/category-pendant-aug2026.webp",
             "title": "Pendant",
             "link": "/collections/pendant-for-her",
             "alt_text": ""
@@ -133,6 +136,7 @@
         "cat_bracelet": {
           "type": "category_card",
           "settings": {
+            "image": "shopify://shop_images/category-bracelet-aug2026.webp",
             "title": "Bracelet & Bangles",
             "link": "/collections/bracelate-for-her",
             "alt_text": ""
@@ -141,6 +145,7 @@
         "cat_nose_pin": {
           "type": "category_card",
           "settings": {
+            "image": "shopify://shop_images/category-nose-pin-aug2026.webp",
             "title": "Nose Pin",
             "link": "/collections/nose-pin",
             "alt_text": ""
@@ -149,6 +154,7 @@
         "cat_mangalsutra": {
           "type": "category_card",
           "settings": {
+            "image": "shopify://shop_images/category-mangalsutra-aug2026.webp",
             "title": "Mangalsutra",
             "link": "/collections/mangalsutra-pendant",
             "alt_text": ""
@@ -371,7 +377,7 @@
       "type": "campaign-poster",
       "settings": {
         "eyebrow": "RISE IN STYLE",
-        "heading": "Your ambition<br>deserves its own shine.",
+        "heading": "Your ambitiondeserves its own shine.",
         "description": "Lightweight gold and laboratory-grown diamonds for women building life on their own terms.",
         "button_label": "Discover the office edit",
         "button_link": "#shop"
