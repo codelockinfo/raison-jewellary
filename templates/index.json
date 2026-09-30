@@ -386,6 +386,7 @@
     "campaign_poster": {
       "type": "campaign-poster",
       "settings": {
+        "image": "shopify://shop_images/riseon-campaign-jewellery-v3.png",
         "eyebrow": "RISE IN STYLE",
         "heading": "Your ambitiondeserves its own shine.",
         "description": "Lightweight gold and laboratory-grown diamonds for women building life on their own terms.",
@@ -426,7 +427,7 @@
       "settings": {
         "section_id": "partner",
         "eyebrow": "RISEON BRAND PARTNER",
-        "heading": "Share the style.<br>Grow with Riseon.",
+        "heading": "Share the style.Grow with Riseon.",
         "description": "Recommend jewellery you genuinely love and earn on eligible delivered orders.",
         "button_label": "Explore the programme",
         "button_link": "/pages/brand-partner-programme",
@@ -439,6 +440,7 @@
         "guide_1": {
           "type": "article_card",
           "settings": {
+            "image": "shopify://shop_images/lgd-card-resized-aug2026.webp",
             "tag": "DIAMOND EDUCATION · 3 MIN READ",
             "title": "Are Laboratory-Grown Diamonds Real?",
             "summary": "A clear answer to what they are, how they are made and what to check before buying.",
@@ -449,6 +451,7 @@
         "guide_2": {
           "type": "article_card",
           "settings": {
+            "image": "shopify://shop_images/gold-card-resized-aug2026.webp",
             "tag": "GOLD EDUCATION · 4 MIN READ",
             "title": "How Gold Purity Affects Jewellery Price",
             "summary": "Understand karat, gold weight and every component that shapes the final jewellery price.",
@@ -459,6 +462,7 @@
         "guide_3": {
           "type": "article_card",
           "settings": {
+            "image": "shopify://shop_images/care-card-resized-aug2026.webp",
             "tag": "JEWELLERY CARE · 4 MIN READ",
             "title": "Daily-Wear Jewellery Care",
             "summary": "Simple, safe habits that help protect your fine jewellery, its setting and its finish.",
