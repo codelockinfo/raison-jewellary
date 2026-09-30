@@ -253,6 +253,7 @@
         "range_1": {
           "type": "range_card",
           "settings": {
+            "image": "shopify://shop_images/shop-nose-pin-v2.png",
             "heading": "Up to ₹9,999",
             "description": "Selected entry-price pieces for your first fine-jewellery buy.",
             "link_text": "Explore the collection →",
@@ -262,6 +263,7 @@
         "range_2": {
           "type": "range_card",
           "settings": {
+            "image": "shopify://shop_images/shop-earring-v2_1.png",
             "heading": "Up to ₹24,999",
             "description": "Lightweight gold and laboratory-grown diamond styles for everyday wear.",
             "link_text": "Explore the collection →",
@@ -271,6 +273,7 @@
         "range_3": {
           "type": "range_card",
           "settings": {
+            "image": "shopify://shop_images/shop-mangalsutra-v2.png",
             "heading": "Up to ₹99,999",
             "description": "Elevated designs for celebrations, milestones and meaningful gifting.",
             "link_text": "Explore the collection →",
