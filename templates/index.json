@@ -238,6 +238,7 @@
       "type": "editorial-story",
       "settings": {
         "section_id": "story",
+        "image": "shopify://shop_images/riseon-editorial-v2-optimized.png",
         "eyebrow": "ABOUT RISEON",
         "founder_name": "Apurva Yadav",
         "founder_role": "Founder, Riseon Jewels",
