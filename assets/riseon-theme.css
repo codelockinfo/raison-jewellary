@@ -146,9 +146,7 @@ h1, h2, h3, h4, h5, h6,
   font-family: var(--font-heading--family, var(--font-cormorant, Georgia, serif)) !important;
   font-weight: 500;
 }
-.campaign-poster h2{
-  color: white !important;
-}
+
 .eyebrow {
   color: var(--wine);
   letter-spacing: .24em;
