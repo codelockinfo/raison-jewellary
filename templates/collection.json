@@ -50,7 +50,7 @@
         "custom_collection_title": "",
         "show_collection_description": false,
         "show_style_rail": false,
-        "show_style_rail_eyebrow": true,
+        "show_style_rail_eyebrow": false,
         "style_rail_eyebrow": "FIND YOUR FIT",
         "show_style_rail_title": true,
         "style_rail_title": "Shop by Style",
