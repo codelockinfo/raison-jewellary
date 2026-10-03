@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "collection_metafield_banner_yciF6r": {
@@ -15,65 +24,48 @@
     },
     "main": {
       "type": "collection",
+      "blocks": {
+        "tag_filter_mCh7WY": {
+          "type": "tag_filter",
+          "settings": {
+            "title": "Tags",
+            "tags_list": "Saree, Women, Cloth Accessories"
+          }
+        },
+        "variant_filter_biirw6": {
+          "type": "variant_filter",
+          "settings": {
+            "title": "Color",
+            "variant_label": "Color"
+          }
+        }
+      },
+      "block_order": [
+        "tag_filter_mCh7WY",
+        "variant_filter_biirw6"
+      ],
       "settings": {
         "show_breadcrumbs": true,
         "show_collection_title": true,
+        "custom_collection_title": "",
+        "show_collection_description": false,
         "show_style_rail": false,
         "show_style_rail_eyebrow": true,
         "style_rail_eyebrow": "FIND YOUR FIT",
         "show_style_rail_title": true,
         "style_rail_title": "Shop by Style",
-        "products_per_page": 24,
+        "products_per_page": 16,
         "columns_desktop": "3",
         "columns_mobile": "2",
         "show_filters": true,
-        "filters_title": "FILTERS",
+        "filters_title": "Filters",
         "filter_type": "storefront",
         "show_sort_by": true
-      }
-    },
-    "disclosure": {
-      "type": "collection-disclosure",
-      "blocks": {
-        "disclosure_1": {
-          "type": "disclosure_item",
-          "settings": {
-            "number": "01",
-            "title": "Gold purity & weight",
-            "description": "Karat, net gold weight, hallmark and HUID status shown product-wise."
-          }
-        },
-        "disclosure_2": {
-          "type": "disclosure_item",
-          "settings": {
-            "number": "02",
-            "title": "Diamond information",
-            "description": "Laboratory-grown origin, shape, carat, colour-clarity and report status."
-          }
-        },
-        "disclosure_3": {
-          "type": "disclosure_item",
-          "settings": {
-            "number": "03",
-            "title": "Transparent price",
-            "description": "Gold, diamond, making charge and GST breakup before checkout."
-          }
-        }
-      },
-      "block_order": [
-        "disclosure_1",
-        "disclosure_2",
-        "disclosure_3"
-      ],
-      "settings": {
-        "eyebrow": "BUY WITH CLARITY",
-        "heading": "What every Riseon listing will disclose"
       }
     }
   },
   "order": [
     "collection_metafield_banner_yciF6r",
-    "main",
-    "disclosure"
+    "main"
   ]
 }
