@@ -83,7 +83,7 @@
     "enable_currency_selector": true,
     "custom_color_mapping": "Floral : #EBA20F\nMehndi Green : #5A4A1F\nCerulean : #4F80B4\nPeach : #9CCEB5\nLavender : #814175\nEmerald Green : #05AA3D\nRose : #C2185B\nRich Black : #FF4D4D\nGreen Dark : #2C6D42\nDark Brown : #311506\nLight Purple : #A54DCF\nLight Blue : #AFB3C4\nBronze : #734731\nGold : #D49A06\nPurple : #A54DCF\nBlack : #000000\nRose Gold : #B76E79\nWhite : #FEFEFE\nBlue : #005BD3\nPink : #FFC0CB\nGreen : #05AA3D\nRed : #F61F1F\nYellow : #FFE500\nBrown : #9A5630\nGray : #D3D3D3\nBeige : #F5F5DC\nLight Pink : #FDECEF\nSilver: #D3D3D3",
     "card_show_wishlist": true,
-    "card_show_badge": true,
+    "card_show_badge": false,
     "card_default_badge": "NEW",
     "card_show_subtitle": true,
     "card_default_subtitle": "14K Rose Gold · Laboratory-Grown Diamond",
