@@ -184,9 +184,10 @@
         aria-label="Save {{ card_title | escape }}"
         data-product-handle="{{ prod.handle | default: card_title | handleize }}"
         data-product-id="{{ prod.id }}"
-      >♡</button>
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
     {%- endif -%}
-    <a class="quick" href="{{ card_url }}">View product</a>
   </div>
 
   <div class="collection-card-copy product-info">
@@ -198,14 +199,19 @@
       <a href="{{ card_url }}">{{ card_title }}</a>
     </h3>
 
-    <div class="product-price-action-row">
-      <div class="card-price-row">
-        <strong>{{ card_price }}</strong>
-        {%- if card_compare_price != blank and card_compare_price != card_price -%}
-          <del>{{ card_compare_price }}</del>
-        {%- endif -%}
-      </div>
-      <button type="button" class="collection-view" onclick="window.location.href='{{ card_url }}'">Select options</button>
+    <div class="card-price-row">
+      <strong>{{ card_price }}</strong>
+      {%- if card_compare_price != blank and card_compare_price != card_price -%}
+        <del>{{ card_compare_price }}</del>
+      {%- endif -%}
     </div>
+
+    {%- if show_tags and card_tags != blank -%}
+      <small class="card-tags">{{ card_tags }}</small>
+    {%- endif -%}
+
+    {%- if show_view_button -%}
+      <a href="{{ card_url }}" class="collection-view">{{ btn_text }}</a>
+    {%- endif -%}
   </div>
 </article>

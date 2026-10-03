@@ -878,7 +878,11 @@ header .header__cart-count {
 }
 
 header .header__wishlist-count:empty {
-  display: none;
+  visibility: hidden;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .header__menu {

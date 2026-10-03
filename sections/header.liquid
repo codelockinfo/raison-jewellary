@@ -289,6 +289,15 @@
       /* ── Smart Sticky Header on scroll (matching reference site) ───── */
       let lastScrollY = window.scrollY;
       const siteTopShell = document.getElementById('SiteTopShell-{{ section.id }}') || document.querySelector('.site-top-shell');
+      const headerSection = siteTopShell ? (siteTopShell.closest('.header-section') || siteTopShell.parentElement) : null;
+
+      function updateHeaderPlaceholder() {
+        if (siteTopShell && headerSection && !siteTopShell.classList.contains('is-pinned')) {
+          headerSection.style.minHeight = siteTopShell.offsetHeight + 'px';
+        }
+      }
+      updateHeaderPlaceholder();
+      window.addEventListener('resize', updateHeaderPlaceholder);
 
       function onHeaderScroll() {
         if (!siteTopShell) return;
@@ -308,18 +317,32 @@
         /* At the top of page (scrollY <= 20px) -> return to normal static flow */
         if (currentY <= 20) {
           siteTopShell.classList.remove('is-pinned', 'is-hidden');
+          if (headerSection) headerSection.style.minHeight = '';
           lastScrollY = currentY;
           return;
         }
 
-        const diff = currentY - lastScrollY;
-        if (Math.abs(diff) < 4) return;
+        const headerH = siteTopShell.offsetHeight || 120;
+        const threshold = headerH + 30;
 
-        if (diff > 0 && currentY > 100) {
-          /* Scrolling DOWN -> hide header smoothly */
-          siteTopShell.classList.add('is-pinned', 'is-hidden');
-        } else if (diff < 0) {
-          /* Scrolling UP -> reveal pinned sticky header smoothly */
+        if (currentY > threshold) {
+          if (headerSection && !headerSection.style.minHeight) {
+            headerSection.style.minHeight = headerH + 'px';
+          }
+
+          const diff = currentY - lastScrollY;
+
+          if (diff > 8) {
+            /* Scrolling down -> hide header */
+            siteTopShell.classList.add('is-pinned');
+            siteTopShell.classList.add('is-hidden');
+          } else if (diff < -8) {
+            /* Scrolling up (bottom to top) -> show header & keep sticky */
+            siteTopShell.classList.add('is-pinned');
+            siteTopShell.classList.remove('is-hidden');
+          }
+        } else {
+          /* Just past 20px up to threshold -> keep pinned & visible */
           siteTopShell.classList.add('is-pinned');
           siteTopShell.classList.remove('is-hidden');
         }
