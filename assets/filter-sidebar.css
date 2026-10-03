@@ -254,6 +254,15 @@
     transform: translateX(0);
 }
 
+/* Drop header below filter drawer when filter is open */
+body:has(.filter-drawer.active) .site-top-shell,
+body:has(.filter-drawer.active) .header-section,
+body:has(.filter-drawer-overlay.active) .site-top-shell,
+body:has(.filter-drawer-overlay.active) .header-section {
+    z-index: 1 !important;
+    will-change: auto !important;
+}
+
 .filter-drawer-header {
     display: flex;
     justify-content: space-between;
