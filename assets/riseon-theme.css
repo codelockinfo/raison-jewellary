@@ -391,7 +391,7 @@ h1, h2, h3, h4, h5, h6,
   justify-content: flex-end;
   gap: 26px !important;
   width: auto !important;
-  min-width: 0px;
+  min-width: 0;
   display: flex !important;
   align-items: center;
 }
@@ -805,20 +805,29 @@ h1, h2, h3, h4, h5, h6,
     height: 20px;
   }
   .header-actions {
-    gap: 14px;
+    gap: 8px;
     width: auto;
+    min-width: 0;
+    flex-shrink: 0;
   }
-  .header-actions a,
-  .header-actions button {
-    display: none;
+  .header-actions a:not(.cart-btn),
+  .header-actions button:not(.cart-btn) {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    overflow: hidden !important;
   }
-  .header-actions button:last-child,
   .header-actions .cart-btn {
-    display: flex;
-    color: #fff;
+    display: flex !important;
+    visibility: visible !important;
+    color: #fff !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: auto !important;
   }
   .header-actions small {
-    display: none;
+    display: none !important;
   }
 
   /* ─ Slide-in nav drawer ─ */
