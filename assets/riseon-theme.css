@@ -4088,6 +4088,10 @@ footer.riseon-footer {
     min-height: 34px;
   }
 
+  .products-section .product-info h3, .products-section .product-info .card-title{
+    font-size:  14px !important;
+  }
+
   /* Grid Pill Filters */
   .grid-pill-filters {
     justify-content: flex-start;
