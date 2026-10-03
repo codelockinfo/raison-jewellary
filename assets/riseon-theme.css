@@ -1516,6 +1516,16 @@ h1, h2, h3, h4, h5, h6,
     min-height: 40px;
     display: inline-flex;
   }
+  .section-head-centered > a {
+    position: static;
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    width: 100%;
+  }
+  .section-head-centered {
+    position: static;
+  }
 }
 
 @media (max-width: 700px) {
@@ -1530,6 +1540,13 @@ h1, h2, h3, h4, h5, h6,
   .section h2 {
     font-size: clamp(31px, 9vw, 38px);
     line-height: 1.05;
+  }
+  .section-head-centered > a {
+    position: static;
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    width: 100%;
   }
 }
 
