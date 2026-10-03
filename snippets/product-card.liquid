@@ -75,6 +75,14 @@
     # Subtitle determination
     if custom_subtitle != blank
       assign card_subtitle = custom_subtitle
+    elsif prod.handle == 'aurelia-arc-ring'
+      assign card_subtitle = 'Gold · Laboratory-Grown Diamond'
+    elsif prod.handle == 'mira-dewdrop-studs'
+      assign card_subtitle = 'Gold · Laboratory-Grown Diamonds'
+    elsif prod.handle == 'elara-line-bracelet'
+      assign card_subtitle = 'Gold · Laboratory-Grown Diamonds'
+    elsif prod.handle == 'luna-light-pendant'
+      assign card_subtitle = 'Gold · Laboratory-Grown Diamond'
     elsif prod.metafields.custom.subtitle != blank
       assign card_subtitle = prod.metafields.custom.subtitle
     elsif prod.metafields.descriptors.subtitle != blank
@@ -88,6 +96,14 @@
     # Badge determination
     if custom_badge != blank
       assign card_badge = custom_badge
+    elsif prod.handle == 'aurelia-arc-ring'
+      assign card_badge = 'Everyday Edit'
+    elsif prod.handle == 'mira-dewdrop-studs'
+      assign card_badge = 'Bestseller Edit'
+    elsif prod.handle == 'elara-line-bracelet'
+      assign card_badge = 'Office Edit'
+    elsif prod.handle == 'luna-light-pendant'
+      assign card_badge = 'Minimal Edit'
     elsif prod.compare_at_price > prod.price
       assign card_badge = 'SALE'
     elsif prod.tags contains 'new' or prod.tags contains 'New' or prod.tags contains 'NEW'
@@ -150,31 +166,28 @@
 -%}
 
 <article class="collection-card product-card" data-product-id="{{ prod.id }}">
-  <a href="{{ card_url }}" class="collection-card-image product-image" aria-label="{{ card_title | escape }}">
+  <div class="collection-card-image product-image">
     <img 
       src="{{ card_image_src }}" 
       alt="{{ card_image_alt | escape }}" 
       loading="lazy"
       width="600"
       height="600"
-      style="object-position: center;"
     >
     {%- if show_badge and card_badge != blank -%}
       <span class="badge">{{ card_badge }}</span>
     {%- endif -%}
-  </a>
-
-  {%- if show_wishlist -%}
-    <button 
-      type="button" 
-      class="collection-wish wishlist-btn js-wishlist-toggle" 
-      aria-label="Save {{ card_title | escape }}"
-      data-product-handle="{{ prod.handle | default: card_title | handleize }}"
-      data-product-id="{{ prod.id }}"
-    >
-      <span class="wishlist-icon">♥</span>
-    </button>
-  {%- endif -%}
+    {%- if show_wishlist -%}
+      <button 
+        type="button" 
+        class="collection-wish wishlist-btn js-wishlist-toggle" 
+        aria-label="Save {{ card_title | escape }}"
+        data-product-handle="{{ prod.handle | default: card_title | handleize }}"
+        data-product-id="{{ prod.id }}"
+      >♡</button>
+    {%- endif -%}
+    <a class="quick" href="{{ card_url }}">View product</a>
+  </div>
 
   <div class="collection-card-copy product-info">
     {%- if show_subtitle and card_subtitle != blank -%}
@@ -185,21 +198,14 @@
       <a href="{{ card_url }}">{{ card_title }}</a>
     </h3>
 
-    <div class="card-price-row">
-      <strong>{{ card_price }}</strong>
-      {%- if card_compare_price != blank and card_compare_price != card_price -%}
-        <del>{{ card_compare_price }}</del>
-      {%- endif -%}
+    <div class="product-price-action-row">
+      <div class="card-price-row">
+        <strong>{{ card_price }}</strong>
+        {%- if card_compare_price != blank and card_compare_price != card_price -%}
+          <del>{{ card_compare_price }}</del>
+        {%- endif -%}
+      </div>
+      <button type="button" class="collection-view" onclick="window.location.href='{{ card_url }}'">Select options</button>
     </div>
-
-    {%- if show_tags and card_tags != blank -%}
-      <small class="card-tags">{{ card_tags }}</small>
-    {%- endif -%}
-
-    {%- if show_view_button -%}
-      <a href="{{ card_url }}" class="collection-view">
-        {{ btn_text }}
-      </a>
-    {%- endif -%}
   </div>
 </article>

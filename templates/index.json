@@ -388,7 +388,7 @@
       "settings": {
         "image": "shopify://shop_images/riseon-campaign-jewellery-v3.png",
         "eyebrow": "RISE IN STYLE",
-        "heading": "Your ambitiondeserves its own shine.",
+        "heading": "Your ambition<br/>deserves its own shine.",
         "description": "Lightweight gold and laboratory-grown diamonds for women building life on their own terms.",
         "button_label": "Discover the office edit",
         "button_link": "#shop"
@@ -427,7 +427,7 @@
       "settings": {
         "section_id": "partner",
         "eyebrow": "RISEON BRAND PARTNER",
-        "heading": "Share the style.Grow with Riseon.",
+        "heading": "Share the style.<br/>Grow with Riseon.",
         "description": "Recommend jewellery you genuinely love and earn on eligible delivered orders.",
         "button_label": "Explore the programme",
         "button_link": "/pages/brand-partner-programme",

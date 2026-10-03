@@ -1735,8 +1735,8 @@
 }
 
 .product-description-title {
-  font-family: var(--font-heading, 'Cormorant Garamond', Georgia, serif);
-  font-size: 20px;
+  font-family: var(--font-heading, var(--font-mulish, 'Mulish', sans-serif));
+  font-size: 18px;
   font-weight: 600;
   color: #3a1726;
   margin: 0 0 10px 0;

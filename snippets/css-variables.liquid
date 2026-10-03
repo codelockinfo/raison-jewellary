@@ -160,17 +160,17 @@
       {%- assign heading_font_parts = heading_first_line | split: '@' -%}
       {%- assign heading_font_name = heading_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
       {%- if heading_font_parts[2] != blank %}{% assign heading_font_name = heading_font_parts[2] | strip %}{% endif -%}
-      --font-heading--family: '{{ heading_font_name }}', {{ settings.type_header_font.fallback_families | default: 'serif' }};
+      --font-heading--family: '{{ heading_font_name }}', {{ settings.type_header_font.fallback_families | default: 'sans-serif' }};
       --font-heading--style: normal;
-      --font-heading--weight: {{ settings.custom_heading_weight | default: 500 }};
+      --font-heading--weight: {{ settings.custom_heading_weight | default: 600 }};
     {%- elsif settings.type_header_font != blank -%}
       --font-heading--family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
       --font-heading--style: {{ settings.type_header_font.style }};
       --font-heading--weight: {{ settings.type_header_font.weight }};
     {%- else -%}
-      --font-heading--family: 'Cormorant Garamond', Georgia, serif;
+      --font-heading--family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-heading--style: normal;
-      --font-heading--weight: 500;
+      --font-heading--weight: 600;
     {%- endif -%}
     --font-heading--scale: {{ settings.type_heading_scale | divided_by: 100.0 }};
     
@@ -215,13 +215,13 @@
       {%- assign subheading_font_parts = subheading_first_line | split: '@' -%}
       {%- assign subheading_font_name = subheading_font_parts[0] | split: '/' | last | split: '.' | first | split: '?' | first -%}
       {%- if subheading_font_parts[2] != blank %}{% assign subheading_font_name = subheading_font_parts[2] | strip %}{% endif -%}
-      --font-subheading--family: '{{ subheading_font_name }}', 'Cormorant Garamond', serif;
+      --font-subheading--family: '{{ subheading_font_name }}', 'Mulish', sans-serif;
       --font-subheading--style: normal;
-      --font-subheading--weight: {{ settings.custom_subheading_weight | default: 500 }};
+      --font-subheading--weight: {{ settings.custom_subheading_weight | default: 600 }};
     {%- else -%}
-      --font-subheading--family: 'Cormorant Garamond', Georgia, serif;
+      --font-subheading--family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-subheading--style: normal;
-      --font-subheading--weight: 500;
+      --font-subheading--weight: 600;
     {%- endif -%}
     --subheading-size: {{ settings.subheading_font_size }}px;
 

@@ -7,16 +7,18 @@
 
   {%- form 'customer', class: 'riseon-newsletter-form' -%}
     <input type="hidden" name="contact[tags]" value="newsletter">
-    <input 
-      type="email" 
-      name="contact[email]" 
-      value="{{ form.email }}"
-      aria-label="Email address" 
-      placeholder="{{ section.settings.placeholder | default: 'Your email address' }}" 
-      required
-      autocomplete="email"
-    >
-    <button type="submit">{{ section.settings.button_text | default: 'Join the list →' }}</button>
+    <div class="newsletter-field-row">
+      <input 
+        type="email" 
+        name="contact[email]" 
+        value="{{ form.email }}"
+        aria-label="Email address" 
+        placeholder="{{ section.settings.placeholder | default: 'Your email address' }}" 
+        required
+        autocomplete="email"
+      >
+      <button type="submit">{{ section.settings.button_text | default: 'Join the list →' }}</button>
+    </div>
     <small>{{ section.settings.disclaimer | default: 'By subscribing, you agree to our <a href="/policies/privacy-policy">Privacy Policy</a>.' }}</small>
 
     {%- if form.posted_successfully? -%}

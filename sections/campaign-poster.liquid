@@ -1,4 +1,4 @@
-<section class="campaign-poster" id="CampaignPoster-{{ section.id }}" {%- if section.settings.image != blank -%}style="background-image: linear-gradient(90deg, #2a0018df 0%, #2a0018a8 34%, transparent 68%), url('{{ section.settings.image | image_url: width: 2000 }}');"{%- endif -%}>
+<section class="campaign-poster" id="CampaignPoster-{{ section.id }}" style="{%- if section.settings.image != blank -%}--poster-bg: url('{{ section.settings.image | image_url: width: 2000 }}');{%- endif -%}">
   <div>
     <span class="eyebrow">{{ section.settings.eyebrow | default: 'RISE IN STYLE' }}</span>
     <h2>{{ section.settings.heading | default: 'Your ambition<br/>deserves its own shine.' }}</h2>

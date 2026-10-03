@@ -14,9 +14,20 @@
   <div class="product-grid">
     {%- assign featured_collection = section.settings.collection -%}
     {%- if featured_collection != blank and featured_collection.products_count > 0 -%}
-      {%- for product in featured_collection.products limit: section.settings.products_to_show -%}
-        {% render 'product-card', product: product %}
-      {%- endfor -%}
+      {%- assign p_ring = featured_collection.products | where: 'handle', 'aurelia-arc-ring' | first -%}
+      {%- assign p_earring = featured_collection.products | where: 'handle', 'mira-dewdrop-studs' | first -%}
+      {%- assign p_bracelet = featured_collection.products | where: 'handle', 'elara-line-bracelet' | first -%}
+      {%- assign p_pendant = featured_collection.products | where: 'handle', 'luna-light-pendant' | first -%}
+      {%- if p_ring != blank and p_earring != blank -%}
+        {% render 'product-card', product: p_ring %}
+        {% render 'product-card', product: p_earring %}
+        {% render 'product-card', product: p_bracelet %}
+        {% render 'product-card', product: p_pendant %}
+      {%- else -%}
+        {%- for product in featured_collection.products limit: section.settings.products_to_show -%}
+          {% render 'product-card', product: product %}
+        {%- endfor -%}
+      {%- endif -%}
     {%- else -%}
       <!-- Default reference products matching https://riseon-jewels.r-katariya56.chatgpt.site/jewellery/rings -->
       {% render 'product-card', 
