@@ -391,7 +391,7 @@ h1, h2, h3, h4, h5, h6,
   justify-content: flex-end;
   gap: 26px !important;
   width: auto !important;
-  min-width: 340px;
+  min-width: 0px;
   display: flex !important;
   align-items: center;
 }
