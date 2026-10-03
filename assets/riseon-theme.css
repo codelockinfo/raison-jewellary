@@ -4364,3 +4364,21 @@ button, input, select, textarea { font-size: 13px; }
   .product-info p { font-size: 11px; }
   .footer-col a { font-size: 12px; }
 }
+
+/* ── Mobile product card fixes ──────────────────────────── */
+@media (max-width: 900px) {
+  /* Title 1px smaller on mobile */
+  .collection-card-copy .card-title,
+  .collection-card-copy h2,
+  .collection-card-copy h3,
+  .product-card .card-title {
+    font-size: 16px !important;
+  }
+  /* Remove extra space below VIEW DESIGN button */
+  .product-card .product-info {
+    padding: 14px 14px 12px !important;
+  }
+  .collection-view {
+    margin-top: 10px !important;
+  }
+}
